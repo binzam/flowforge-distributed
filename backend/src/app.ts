@@ -1,5 +1,6 @@
 import express from "express";
 import { errorHandler } from "./errors/errorHandler.js";
+import userRoutes from "./modules/users/routes.js";
 
 const app = express();
 
@@ -11,6 +12,7 @@ app.get("/health", (_req, res) => {
   });
 });
 
+app.use("/api/users", userRoutes);
 app.use(errorHandler);
 
 export default app;

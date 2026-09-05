@@ -1,10 +1,13 @@
 import express from "express";
+import cookieParser from "cookie-parser";
 import { errorHandler } from "./errors/errorHandler.js";
 import userRoutes from "./modules/users/routes.js";
+import authRoutes from "./modules/auth/routes.js";
 
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.get("/health", (_req, res) => {
   res.json({
@@ -13,6 +16,8 @@ app.get("/health", (_req, res) => {
 });
 
 app.use("/api/users", userRoutes);
+app.use("/api/auth", authRoutes);
+
 app.use(errorHandler);
 
 export default app;

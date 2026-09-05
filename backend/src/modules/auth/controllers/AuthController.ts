@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import type { AuthService } from "../services/AuthService.js";
 import { toPublicUser } from "../../users/mapper/userMapper.js";
+import { AppError } from "../../../errors/AppError.js";
 
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -23,6 +24,17 @@ export class AuthController {
     res.status(200).json({
       data: {
         user: toPublicUser(user),
+      },
+    });
+  };
+  me = async (req: Request, res: Response): Promise<void> => {
+    if (!req.user) {
+      throw new AppError("Authenticated user missing", 500);
+    }
+
+    res.status(200).json({
+      data: {
+        user: toPublicUser(req.user),
       },
     });
   };

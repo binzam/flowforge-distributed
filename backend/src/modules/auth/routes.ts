@@ -7,6 +7,7 @@ import { AuthController } from "./controllers/AuthController.js";
 import { loginSchema } from "./schemas/auth.schemas.js";
 import { AuthService } from "./services/AuthService.js";
 import { SessionRepository } from "./repositories/SessionRepository.js";
+import { createAuthenticate } from "./middleware/authenticate.js";
 
 const router = Router();
 
@@ -21,7 +22,9 @@ const authService = new AuthService(
 );
 
 const authController = new AuthController(authService);
+const authenticate = createAuthenticate(sessionRepository, userRepository);
 
 router.post("/login", validate(loginSchema), authController.login);
+router.get("/me", authenticate, authController.me);
 
 export default router;

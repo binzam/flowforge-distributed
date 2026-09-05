@@ -18,4 +18,14 @@ export class UserController {
       data: toPublicUser(user),
     });
   };
+  getById = async (
+    req: Request<{ id: string }>,
+    res: Response,
+  ): Promise<void> => {
+    const user = await this.userService.getUserById(req.params.id);
+
+    res.status(200).json({
+      data: toPublicUser(user),
+    });
+  };
 }

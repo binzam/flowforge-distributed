@@ -4,7 +4,7 @@ import { UserController } from "./controllers/UserController.js";
 import { UserRepository } from "./repositories/UserRepository.js";
 import { UserService } from "./services/UserService.js";
 import { Argon2PasswordHasher } from "../../infrastructure/security/Argon2PasswordHasher.js";
-import { createUserSchema } from "./schemas/user.schemas.js";
+import { createUserSchema, userIdSchema } from "./schemas/user.schemas.js";
 import { validate } from "../../middleware/validate.js";
 
 const router = Router();
@@ -16,5 +16,6 @@ const userService = new UserService(userRepository, passwordHasher);
 const userController = new UserController(userService);
 
 router.post("/", validate(createUserSchema), userController.create);
+router.get("/:id", validate(userIdSchema, "params"), userController.getById);
 
 export default router;

@@ -22,7 +22,17 @@ export class UserService {
     return this.userRepository.create({
       name: input.name,
       email: input.email,
-      password: passwordHash,
+      passwordHash,
     });
+  }
+
+  async getUserById(id: string): Promise<User> {
+    const user = await this.userRepository.findById(id);
+
+    if (!user) {
+      throw new AppError("User not found", 404);
+    }
+
+    return user;
   }
 }

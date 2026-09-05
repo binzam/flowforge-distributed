@@ -1,16 +1,24 @@
 import type { RequestHandler } from "express";
-import type { ZodType } from "zod";
+import { z, type ZodType } from "zod";
 import { AppError } from "../errors/AppError.js";
 
-export const validate = (schema: ZodType): RequestHandler => {
+export const validate = (
+  schema: ZodType,
+  source: "body" | "params" = "body",
+): RequestHandler => {
   return (req, _res, next) => {
-    const result = schema.safeParse(req.body);
+    const result = schema.safeParse(req[source]);
 
     if (!result.success) {
-      throw new AppError("Validation failed", 400);
+      throw new AppError(
+        "Validation failed",
+        400,
+        true,
+        z.treeifyError(result.error),
+      );
     }
 
-    req.body = result.data;
+    req[source] = result.data;
 
     next();
   };

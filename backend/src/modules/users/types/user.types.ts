@@ -14,3 +14,9 @@ export interface PublicUser {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface CreateUserRecord {
+  name: string;
+  email: string;
+  passwordHash: string;
+}

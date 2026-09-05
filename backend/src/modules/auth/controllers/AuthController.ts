@@ -38,4 +38,19 @@ export class AuthController {
       },
     });
   };
+  logout = async (req: Request, res: Response): Promise<void> => {
+    const sessionId = req.cookies.session_id;
+
+    if (sessionId) {
+      await this.authService.logout(sessionId);
+    }
+
+    res.clearCookie("session_id", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    });
+
+    res.status(204).send();
+  };
 }

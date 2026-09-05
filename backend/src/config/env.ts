@@ -17,4 +17,7 @@ export const config = {
   database: {
     url: getEnv("DATABASE_URL"),
   },
+  frontend: {
+    url: getEnv("FRONTEND_URL"),
+  },
 };

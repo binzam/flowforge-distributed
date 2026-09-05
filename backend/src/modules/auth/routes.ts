@@ -26,5 +26,6 @@ const authenticate = createAuthenticate(sessionRepository, userRepository);
 
 router.post("/login", validate(loginSchema), authController.login);
 router.get("/me", authenticate, authController.me);
+router.post("/logout", authController.logout);
 
 export default router;

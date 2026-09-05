@@ -40,4 +40,7 @@ export class AuthService {
       sessionId: session.id,
     };
   }
+  async logout(sessionId: string): Promise<void> {
+    await this.sessionRepository.deleteById(sessionId);
+  }
 }

@@ -1,7 +1,11 @@
 import type { Pool } from "pg";
-import type { CreateUserRecord, User } from "../types/user.types.js";
+import type {
+  CreateUserRecord,
+  FindUsersResult,
+  User,
+} from "../types/user.types.js";
 import { AppError } from "../../../errors/AppError.js";
-import type { CreateUserInput } from "../schemas/user.schemas.js";
+import type { GetUsersQuery } from "../schemas/user.schemas.js";
 import { handlePostgresError } from "../../../errors/postgresErrors.js";
 
 export class UserRepository {
@@ -75,5 +79,65 @@ export class UserRepository {
     );
 
     return result.rows[0] ?? null;
+  }
+
+  async findAll(options: GetUsersQuery = {}): Promise<FindUsersResult> {
+    const { role, limit, offset } = options;
+
+    const values: unknown[] = [];
+    const conditions: string[] = [];
+
+    if (role !== undefined) {
+      values.push(role);
+      conditions.push(`role = $${values.length}`);
+    }
+
+    const whereClause =
+      conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
+    const countResult = await this.db.query<{ total: string }>(
+      `
+      SELECT COUNT(*) AS total
+      FROM users
+      ${whereClause};
+      `,
+      values,
+    );
+
+    const total = Number(countResult.rows[0]?.total ?? 0);
+
+    let paginationClause = "";
+
+    if (limit !== undefined) {
+      values.push(limit);
+      paginationClause += ` LIMIT $${values.length}`;
+    }
+
+    if (offset !== undefined) {
+      values.push(offset);
+      paginationClause += ` OFFSET $${values.length}`;
+    }
+
+    const result = await this.db.query<User>(
+      `
+      SELECT
+        id,
+        name,
+        email,
+        role,
+        created_at AS "createdAt",
+        updated_at AS "updatedAt"
+      FROM users
+      ${whereClause}
+      ORDER BY created_at DESC
+      ${paginationClause};
+      `,
+      values,
+    );
+
+    return {
+      users: result.rows,
+      total,
+    };
   }
 }

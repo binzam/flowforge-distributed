@@ -1,3 +1,6 @@
+import type { Request } from "express";
+import type { GetUsersQuery } from "../schemas/user.schemas.js";
+
 export interface User {
   id: string;
   name: string;
@@ -23,3 +26,9 @@ export interface CreateUserRecord {
   passwordHash: string;
 }
 export type UserRole = "customer" | "admin" | "warehouse";
+
+// Get all users query
+export interface FindUsersResult {
+  users: User[];
+  total: number;
+}

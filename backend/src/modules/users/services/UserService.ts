@@ -1,7 +1,10 @@
 import { AppError } from "../../../errors/AppError.js";
 import type { PasswordHasher } from "../../../infrastructure/security/PasswordHasher.js";
 import type { UserRepository } from "../repositories/UserRepository.js";
-import type { CreateUserInput } from "../schemas/user.schemas.js";
+import type {
+  CreateUserInput,
+  GetUsersQuery,
+} from "../schemas/user.schemas.js";
 import type { User } from "../types/user.types.js";
 
 export class UserService {
@@ -34,5 +37,9 @@ export class UserService {
     }
 
     return user;
+  }
+
+  async getUsers(options: GetUsersQuery) {
+    return this.userRepository.findAll(options);
   }
 }

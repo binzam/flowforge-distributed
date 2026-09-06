@@ -4,9 +4,9 @@ import { AppError } from "../errors/AppError.js";
 
 export const validate = (
   schema: ZodType,
-  source: "body" | "params" = "body",
+  source: "body" | "params" | "query" = "body",
 ): RequestHandler => {
-  return (req, _res, next) => {
+  return (req, res, next) => {
     const result = schema.safeParse(req[source]);
 
     if (!result.success) {
@@ -18,7 +18,11 @@ export const validate = (
       );
     }
 
-    req[source] = result.data;
+    if (source === "query") {
+      res.locals.validated = result.data;
+    } else {
+      req[source] = result.data;
+    }
 
     next();
   };

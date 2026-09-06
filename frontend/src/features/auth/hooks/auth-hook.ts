@@ -21,10 +21,13 @@ export const useGetCurrentUser = () => {
 
 // Login
 export const useLoginUser = () => {
+  const navigate = useNavigate();
+
   return useMutation({
     mutationFn: loginUser,
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["user"] });
+      navigate("/");
     },
   });
 };

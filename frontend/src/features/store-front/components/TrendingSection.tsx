@@ -1,11 +1,7 @@
-const mockProducts = [
-  { id: 1, name: "Matte Ceramic Vase", price: "$120", category: "Decor" },
-  { id: 2, name: "Brushed Steel Lamp", price: "$285", category: "Lighting" },
-  { id: 3, name: "Linen Lounge Chair", price: "$890", category: "Furniture" },
-  { id: 4, name: "Oak Desk Organizer", price: "$65", category: "Workspace" },
-];
+import { useGetProducts } from "../hooks/product-hooks";
 
 export const TrendingSection = () => {
+  const { data } = useGetProducts();
   return (
     <section className="py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -27,7 +23,7 @@ export const TrendingSection = () => {
         </div>
 
         <div className="grid grid-cols-1 gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
-          {mockProducts.map((product) => (
+          {data?.data.map((product) => (
             <div key={product.id} className="group cursor-pointer">
               <div className="relative aspect-[3/4] w-full overflow-hidden bg-neutral-900 mb-4">
                 <div className="absolute inset-0 bg-neutral-800 transition-transform duration-500 group-hover:scale-105" />
@@ -41,7 +37,7 @@ export const TrendingSection = () => {
               <div className="flex justify-between items-start text-sm">
                 <div>
                   <h3 className="font-medium text-white">{product.name}</h3>
-                  <p className="mt-1 text-neutral-500">{product.category}</p>
+                  <p className="mt-1 text-neutral-500">{product.description}</p>
                 </div>
                 <p className="font-medium text-white">{product.price}</p>
               </div>

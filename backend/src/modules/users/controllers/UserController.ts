@@ -1,7 +1,6 @@
 import type { Request, Response } from "express";
 import type { UserService } from "../services/UserService.js";
 import { toPublicUser } from "../mapper/userMapper.js";
-import { AppError } from "../../../errors/AppError.js";
 import type { GetUsersQuery } from "../schemas/user.schemas.js";
 
 export class UserController {

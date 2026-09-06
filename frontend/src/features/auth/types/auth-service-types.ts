@@ -4,9 +4,15 @@ export interface User {
   email: string;
   createdAt: string;
   updatedAt: string;
+  role: "customer" | "admin" | "warehouse";
 }
 
 export interface GetUserResponse {
+  data: {
+    user: User;
+  };
+}
+export interface LoginUserResponse {
   data: {
     user: User;
   };

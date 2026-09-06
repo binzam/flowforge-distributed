@@ -10,7 +10,8 @@ const PublicRoute = () => {
   }
 
   if (user != null) {
-    return <Navigate to="/" replace />;
+    const destination = user.data.user.role === "admin" ? "/admin" : "/";
+    return <Navigate to={destination} replace />;
   }
 
   return <Outlet />;

@@ -5,6 +5,7 @@ export interface User {
   passwordHash: string;
   createdAt: Date;
   updatedAt: Date;
+  role: UserRole;
 }
 
 export interface PublicUser {
@@ -13,6 +14,7 @@ export interface PublicUser {
   email: string;
   createdAt: Date;
   updatedAt: Date;
+  role: UserRole;
 }
 
 export interface CreateUserRecord {
@@ -20,3 +22,4 @@ export interface CreateUserRecord {
   email: string;
   passwordHash: string;
 }
+export type UserRole = "customer" | "admin" | "warehouse";

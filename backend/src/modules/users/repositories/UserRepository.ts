@@ -45,6 +45,7 @@ export class UserRepository {
         name,
         email,
         password_hash AS "passwordHash",
+        role,
         created_at AS "createdAt",
         updated_at AS "updatedAt"
       FROM users
@@ -64,6 +65,7 @@ export class UserRepository {
         name,
         email,
         password_hash AS "passwordHash",
+        role,
         created_at AS "createdAt",
         updated_at AS "updatedAt"
       FROM users

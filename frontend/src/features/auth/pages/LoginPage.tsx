@@ -93,7 +93,7 @@ const LoginPage = () => {
               </label>
               <Link
                 to="/forgot-password"
-                className="text-[10px] font-bold uppercase tracking-[0.1em] text-neutral-500 hover:text-white transition-colors"
+                className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 hover:text-white transition-colors"
               >
                 Recover
               </Link>

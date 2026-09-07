@@ -33,7 +33,6 @@ router.post(
   orderController.create,
 );
 
-// Must be registered before "/:id" or Express will match "mine" as an id.
 router.get(
   "/mine",
   authenticate,

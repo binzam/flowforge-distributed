@@ -1,9 +1,12 @@
 import { Search, ShoppingCart, User, Menu } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useGetCurrentUser, useLogoutUser } from "../../auth/hooks/auth-hook";
+import { useCartStore } from "../cart/store/cart-store";
+import { getCartItemCount } from "../cart/store/cart-utils";
 
 export const Header = () => {
   const { data: user } = useGetCurrentUser();
+  const cartItemCount = getCartItemCount(useCartStore((state) => state.items));
 
   const { mutate: logoutUser, isPending: isLoggingOut } = useLogoutUser();
 
@@ -23,7 +26,7 @@ export const Header = () => {
         </div>
 
         <nav className="hidden space-x-8 md:block text-sm font-medium tracking-wide text-neutral-400">
-          <Link to="/shop" className="hover:text-white transition-colors">
+          <Link to="/products" className="hover:text-white transition-colors">
             SHOP
           </Link>
           <Link
@@ -53,12 +56,25 @@ export const Header = () => {
               {isLoggingOut ? "Good Bye" : "Logout"}
             </button>
           )}
-          <button className="hover:text-white transition-colors relative">
+          {user?.data.user.role === "customer" && (
+            <Link
+              to="/orders"
+              className="hover:text-white transition-colors text-xs tracking-widest"
+            >
+              ORDERS
+            </Link>
+          )}
+          <Link
+            to="/cart"
+            className="hover:text-white transition-colors relative"
+          >
             <ShoppingCart className="h-5 w-5" />
-            <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-white text-[10px] font-bold text-black">
-              2
-            </span>
-          </button>
+            {cartItemCount > 0 && (
+              <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-white text-[10px] font-bold text-black">
+                {cartItemCount}
+              </span>
+            )}
+          </Link>
         </div>
       </div>
     </header>

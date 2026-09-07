@@ -19,7 +19,19 @@ export const createOrderItemSchema = z.object({
 });
 
 export const createOrderSchema = z.object({
-  items: z.array(createOrderItemSchema).min(1),
+  items: z
+    .array(createOrderItemSchema)
+    .min(1)
+    .refine(
+      (items) => {
+        const productIds = items.map((item) => item.productId);
+
+        return new Set(productIds).size === productIds.length;
+      },
+      {
+        message: "Each product can only appear once in an order",
+      },
+    ),
 });
 export type CreateOrderInput = z.infer<typeof createOrderSchema>;
 

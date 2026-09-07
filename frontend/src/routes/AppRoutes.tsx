@@ -11,6 +11,8 @@ import {
   CheckoutPage,
   StoreFrontLayout,
 } from "@/features/store-front";
+import MyOrdersPage from "@/features/orders/pages/MyOrdersPage";
+import OrderDetailsPage from "@/features/orders/pages/OrderDetailsPage";
 import RoleProtectedRoute from "./RoleProtectedRoute";
 // You can destructure directly from the admin barrel file inside the dynamic import
 const AdminLayout = lazy(() =>
@@ -22,6 +24,9 @@ const AdminDashboard = lazy(() =>
 const AdminOrdersPage = lazy(() =>
   import("@/features/admin").then((mod) => ({ default: mod.AdminOrdersPage })),
 );
+const AdminOrderDetailsPage = lazy(
+  () => import("@/features/admin/orders/pages/AdminOrderDetailsPage"),
+);
 
 const AppRoutes = () => {
   return (
@@ -31,6 +36,10 @@ const AppRoutes = () => {
           <Route path="/" element={<HomePage />} />
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/cart" element={<CartPage />} />
+          <Route element={<RoleProtectedRoute allowedRoles={["customer"]} />}>
+            <Route path="/orders" element={<MyOrdersPage />} />
+            <Route path="/orders/:id" element={<OrderDetailsPage />} />
+          </Route>
 
           <Route element={<RoleProtectedRoute allowedRoles={["customer"]} />}>
             <Route path="/checkout" element={<CheckoutPage />} />
@@ -41,6 +50,7 @@ const AppRoutes = () => {
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
             <Route path="orders" element={<AdminOrdersPage />} />
+            <Route path="orders/:id" element={<AdminOrderDetailsPage />} />
           </Route>
         </Route>
 

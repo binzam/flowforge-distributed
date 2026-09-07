@@ -1,10 +1,9 @@
-import HomePageLayout from "../../../layouts/HomePageLayout";
 import { HeroSection } from "../components/HeroSection";
 import { TrendingSection } from "../components/TrendingSection";
 
 const HomePage = () => {
   return (
-    <HomePageLayout>
+    <>
       <HeroSection />
 
       <div className="w-full border-b border-neutral-800 bg-neutral-900 py-4 overflow-hidden">
@@ -38,7 +37,7 @@ const HomePage = () => {
           </div>
         </div>
       </section>
-    </HomePageLayout>
+    </>
   );
 };
 

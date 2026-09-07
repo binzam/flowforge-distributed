@@ -1,4 +1,4 @@
-import { apiClient } from "../../../lib/api-client";
+import { apiClient } from "@/lib/api-client";
 import type { LoginFormValues, SignUpFormValues } from "../schemas/auth-schema";
 import type { GetUserResponse } from "../types/auth-service-types";
 

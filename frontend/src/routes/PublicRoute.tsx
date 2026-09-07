@@ -1,6 +1,6 @@
 import { Navigate, Outlet } from "react-router-dom";
-import LoadingScreen from "../components/LoadingScreen";
-import { useGetCurrentUser } from "../features/auth/hooks/auth-hook";
+import LoadingScreen from "@/components/LoadingScreen";
+import { useGetCurrentUser } from "@/features/auth/hooks/auth-hook";
 
 const PublicRoute = () => {
   const { data: user, isLoading } = useGetCurrentUser();
@@ -10,7 +10,12 @@ const PublicRoute = () => {
   }
 
   if (user != null) {
-    const destination = user.data.user.role === "admin" ? "/admin" : "/";
+    const destination =
+      user.data.user.role === "admin"
+        ? "/admin"
+        : user.data.user.role === "warehouse"
+          ? "/warehouse"
+          : "/";
     return <Navigate to={destination} replace />;
   }
 

@@ -21,10 +21,15 @@ if (!chapaSecretKey) {
   throw new Error("CHAPA_SECRET_KEY environment variable is required");
 }
 
+const chapaWebhookSecret = process.env.CHAPA_WEBHOOK_SECRET;
+if (!chapaWebhookSecret) {
+  throw new Error("CHAPA_WEBHOOK_SECRET environment variable is required");
+}
+
 const frontendBaseUrl = process.env.FRONTEND_URL ?? "http://localhost:3000";
 const apiBaseUrl = process.env.API_BASE_URL ?? "http://localhost:5000";
 
-const paymentProvider = new ChapaProvider(chapaSecretKey);
+const paymentProvider = new ChapaProvider(chapaSecretKey, chapaWebhookSecret);
 
 const paymentRepository = new PaymentRepository(pool);
 const orderRepository = new OrderRepository(pool);

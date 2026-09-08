@@ -34,7 +34,7 @@ export class PaymentController {
           lastName,
         },
       );
-    console.log({ payment, checkoutUrl });
+    console.log("Payment Controller:Initialize", { payment, checkoutUrl });
     res.status(201).json({
       data: {
         paymentId: payment.id,
@@ -86,7 +86,7 @@ export class PaymentController {
   };
 
   callback = async (
-    req: Request,
+    _req: Request,
     res: Response<unknown, { validated: ChapaCallbackQuery }>,
   ): Promise<void> => {
     await this.paymentService.confirmPayment(res.locals.validated.tx_ref);

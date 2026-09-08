@@ -10,7 +10,10 @@ import type {
 const CHAPA_BASE_URL = "https://api.chapa.co/v1";
 
 export class ChapaProvider implements PaymentProvider {
-  constructor(private readonly secretKey: string) {}
+  constructor(
+    private readonly secretKey: string,
+    private readonly webhookSecret: string,
+  ) {}
 
   async initialize(
     input: InitializePaymentInput,
@@ -34,7 +37,7 @@ export class ChapaProvider implements PaymentProvider {
     });
 
     const body = await response.json();
-    console.log("body", body);
+    console.log("Chapa Provider: Initialize Payment: Response:", body);
     if (!response.ok || body.status !== "success") {
       throw new AppError(
         body?.message ?? "Failed to initialize payment with Chapa",
@@ -56,7 +59,7 @@ export class ChapaProvider implements PaymentProvider {
     );
 
     const body = await response.json();
-
+    console.log("Chapa Provider: Verify: Response", body);
     if (!response.ok || body.status !== "success") {
       throw new AppError(
         body?.message ?? "Failed to verify payment with Chapa",
@@ -73,7 +76,7 @@ export class ChapaProvider implements PaymentProvider {
   }
 
   verifyWebhookSignature(rawBody: Buffer, signatureHeader: string): boolean {
-    const expected = createHmac("sha256", this.secretKey)
+    const expected = createHmac("sha256", this.webhookSecret)
       .update(rawBody)
       .digest("hex");
 

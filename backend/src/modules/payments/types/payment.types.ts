@@ -15,3 +15,14 @@ export interface Payment {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface InitializePaymentResult {
+  payment: Payment;
+  checkoutUrl: string;
+}
+
+export interface PayerDetails {
+  email: string;
+  firstName: string | undefined;
+  lastName: string | undefined;
+}

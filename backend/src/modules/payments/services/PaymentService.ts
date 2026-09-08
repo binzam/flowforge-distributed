@@ -4,18 +4,11 @@ import type { OrderRepository } from "../../orders/repositories/OrderRepository.
 import type { OrderService } from "../../orders/services/OrderService.js";
 import type { UserRole } from "../../users/types/user.types.js";
 import type { PaymentRepository } from "../repositories/PaymentRepository.js";
-import type { Payment } from "../types/payment.types.js";
-
-interface InitializePaymentResult {
-  payment: Payment;
-  checkoutUrl: string;
-}
-
-interface PayerDetails {
-  email: string;
-  firstName: string;
-  lastName: string;
-}
+import type {
+  InitializePaymentResult,
+  PayerDetails,
+  Payment,
+} from "../types/payment.types.js";
 
 const CURRENCY = "ETB";
 
@@ -72,8 +65,8 @@ export class PaymentService {
       currency: CURRENCY,
       txRef,
       email: payer.email,
-      firstName: payer.firstName,
-      lastName: payer.lastName,
+      firstName: payer.firstName ?? "",
+      lastName: payer.lastName ?? "",
       callbackUrl: `${this.apiBaseUrl}/payments/callback`,
       returnUrl: `${this.frontendBaseUrl}/orders/${orderId}`,
     });

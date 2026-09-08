@@ -9,7 +9,8 @@ export const Header = () => {
   const cartItemCount = getCartItemCount(useCartStore((state) => state.items));
 
   const { mutate: logoutUser, isPending: isLoggingOut } = useLogoutUser();
-
+  const role = user?.data.user.role;
+  const canAddToCart = role === undefined || role === "customer";
   return (
     <header className="sticky top-0 z-50 w-full border-b border-neutral-800 bg-neutral-950/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -64,17 +65,19 @@ export const Header = () => {
               ORDERS
             </Link>
           )}
-          <Link
-            to="/cart"
-            className="hover:text-white transition-colors relative"
-          >
-            <ShoppingCart className="h-5 w-5" />
-            {cartItemCount > 0 && (
-              <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-white text-[10px] font-bold text-black">
-                {cartItemCount}
-              </span>
-            )}
-          </Link>
+          {canAddToCart && (
+            <Link
+              to="/cart"
+              className="hover:text-white transition-colors relative"
+            >
+              <ShoppingCart className="h-5 w-5" />
+              {cartItemCount > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-white text-[10px] font-bold text-black">
+                  {cartItemCount}
+                </span>
+              )}
+            </Link>
+          )}
         </div>
       </div>
     </header>

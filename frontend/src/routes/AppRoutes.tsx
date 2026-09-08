@@ -35,8 +35,8 @@ const AppRoutes = () => {
         <Route element={<StoreFrontLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/products" element={<ProductsPage />} />
-          <Route path="/cart" element={<CartPage />} />
           <Route element={<RoleProtectedRoute allowedRoles={["customer"]} />}>
+            <Route path="/cart" element={<CartPage />} />
             <Route path="/orders" element={<MyOrdersPage />} />
             <Route path="/orders/:id" element={<OrderDetailsPage />} />
           </Route>

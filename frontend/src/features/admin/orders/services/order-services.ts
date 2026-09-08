@@ -1,22 +1,9 @@
 import { apiClient } from "@/lib/api-client";
 import type {
-  CreateOrderInput,
   OrderResponse,
   OrdersQuery,
   OrdersResponse,
 } from "../types/order-types";
-
-export const createOrder = async (input: CreateOrderInput) => {
-  const response = await apiClient.post<OrderResponse>("/orders", input);
-  return response.data;
-};
-
-export const getMyOrders = async (query: OrdersQuery = {}) => {
-  const response = await apiClient.get<OrdersResponse>("/orders/mine", {
-    params: query,
-  });
-  return response.data;
-};
 
 export const getOrders = async (query: OrdersQuery = {}) => {
   const response = await apiClient.get<OrdersResponse>("/orders", {

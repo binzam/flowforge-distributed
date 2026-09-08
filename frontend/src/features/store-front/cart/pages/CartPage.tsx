@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useGetCurrentUser } from "@/features/auth/hooks/auth-hook";
-import { useCreateOrder } from "@/features/orders/hooks/order-hooks";
+import { useCreateOrder } from "@/features/store-front/orders/hooks/order-hooks";
 import { useCartStore } from "../store/cart-store";
 import { getCartTotal } from "../store/cart-utils";
 

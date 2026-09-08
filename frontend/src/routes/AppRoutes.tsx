@@ -11,10 +11,10 @@ import {
   CheckoutPage,
   StoreFrontLayout,
 } from "@/features/store-front";
-import MyOrdersPage from "@/features/orders/pages/MyOrdersPage";
-import OrderDetailsPage from "@/features/orders/pages/OrderDetailsPage";
+import MyOrdersPage from "@/features/store-front/orders/pages/MyOrdersPage";
+import OrderDetailsPage from "@/features/store-front/orders/pages/OrderDetailsPage";
 import RoleProtectedRoute from "./RoleProtectedRoute";
-// You can destructure directly from the admin barrel file inside the dynamic import
+
 const AdminLayout = lazy(() =>
   import("@/features/admin").then((mod) => ({ default: mod.AdminLayout })),
 );

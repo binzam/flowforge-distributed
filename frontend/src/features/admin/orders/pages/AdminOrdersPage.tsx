@@ -1,9 +1,9 @@
 import { Link, useSearchParams } from "react-router-dom";
-import { useGetOrders } from "../../../orders/hooks/order-hooks";
 import {
   ORDER_STATUSES,
   type OrderStatus,
-} from "../../../orders/types/order-types";
+} from "../../../store-front/orders/types/order-types";
+import { useGetOrders } from "../hooks/order-hooks";
 
 const PAGE_SIZE = 20;
 

@@ -1,8 +1,14 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 import { queryClient } from "@/lib/query-client";
-import { getPaymentForOrder, initializePayment } from "../services/payment-services";
-import type { InitializePaymentInput, PaymentStatus } from "../types/payment-types";
+import {
+  getPaymentForOrder,
+  initializePayment,
+} from "../services/payment-services";
+import type {
+  InitializePaymentInput,
+  PaymentStatus,
+} from "../types/payment-types";
 
 const SETTLED_STATUSES: PaymentStatus[] = ["successful", "failed", "cancelled"];
 
@@ -10,7 +16,10 @@ const isNotFoundError = (error: unknown) =>
   isAxiosError(error) && error.response?.status === 404;
 
 export const getPaymentErrorMessage = (error: unknown): string => {
-  if (isAxiosError(error) && typeof error.response?.data?.message === "string") {
+  if (
+    isAxiosError(error) &&
+    typeof error.response?.data?.message === "string"
+  ) {
     return error.response.data.message;
   }
   return "Something went wrong starting the payment. Please try again.";

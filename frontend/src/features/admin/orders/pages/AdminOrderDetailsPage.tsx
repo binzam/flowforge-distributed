@@ -1,10 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import {
-  useGetOrder,
-  useUpdateOrderStatus,
-} from "../../../orders/hooks/order-hooks";
-import type { OrderStatus } from "../../../orders/types/order-types";
+import type { OrderStatus } from "../../../store-front/orders/types/order-types";
+import { useGetOrder, useUpdateOrderStatus } from "../hooks/order-hooks";
 
 const nextStatuses: Record<OrderStatus, OrderStatus[]> = {
   pending: ["payment_pending", "cancelled"],

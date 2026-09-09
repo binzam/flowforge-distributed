@@ -7,6 +7,7 @@ import userRoutes from "./modules/users/routes.js";
 import authRoutes from "./modules/auth/routes.js";
 import productRoutes from "./modules/products/routes.js";
 import orderRoutes from "./modules/orders/routes.js";
+import inventoryRoutes from "./modules/inventory/routes.js";
 import paymentsRoutes, {
   paymentsWebhookMiddleware,
 } from "./modules/payments/routes.js";
@@ -34,6 +35,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/payments", paymentsRoutes);
+app.use("/api/inventory", inventoryRoutes);
 
 app.use(errorHandler);
 

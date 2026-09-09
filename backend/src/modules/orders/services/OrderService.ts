@@ -5,17 +5,21 @@ import type {
   CreateOrderInput,
   GetOrdersQuery,
 } from "../schemas/order.schemas.js";
-import type { OrderStatus, OrderWithItems } from "../types/order.types.js";
+import type {
+  Order,
+  OrderStatus,
+  OrderWithItems,
+} from "../types/order.types.js";
 
 const ALLOWED_STATUS_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
   pending: ["payment_pending", "cancelled"],
   payment_pending: ["paid", "failed", "cancelled"],
-  paid: ["processing", "cancelled"],
+  paid: ["processing", "failed", "cancelled"],
   processing: ["shipped", "cancelled"],
   shipped: ["delivered"],
   delivered: [],
   cancelled: [],
-  failed: [],
+  failed: ["payment_pending"],
 };
 
 export class OrderService {
@@ -69,7 +73,7 @@ export class OrderService {
     return this.orderRepository.findAll(options);
   }
 
-  async updateStatus(id: string, nextStatus: OrderStatus) {
+  async updateStatus(id: string, nextStatus: OrderStatus): Promise<Order> {
     const order = await this.orderRepository.findById(id);
 
     if (!order) {
@@ -92,5 +96,13 @@ export class OrderService {
     }
 
     return updated;
+  }
+
+  async markAsPaid(id: string): Promise<Order> {
+    return this.updateStatus(id, "paid");
+  }
+
+  async markProcessing(id: string): Promise<Order> {
+    return this.updateStatus(id, "processing");
   }
 }

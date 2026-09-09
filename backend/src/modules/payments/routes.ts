@@ -15,6 +15,8 @@ import { OrderService } from "../orders/services/OrderService.js";
 import { UserRepository } from "../users/repositories/UserRepository.js";
 import { SessionRepository } from "../auth/repositories/SessionRepository.js";
 import { createAuthenticate } from "../auth/middleware/authenticate.js";
+import { InventoryRepository } from "../inventory/repositories/InventoryRepository.js";
+import { InventoryService } from "../inventory/services/InventoryService.js";
 
 const chapaSecretKey = process.env.CHAPA_SECRET_KEY;
 if (!chapaSecretKey) {
@@ -34,12 +36,15 @@ const paymentProvider = new ChapaProvider(chapaSecretKey, chapaWebhookSecret);
 const paymentRepository = new PaymentRepository(pool);
 const orderRepository = new OrderRepository(pool);
 const orderService = new OrderService(orderRepository);
+const inventoryRepository = new InventoryRepository(pool);
+const inventoryService = new InventoryService(inventoryRepository);
 
 const paymentService = new PaymentService(
   paymentRepository,
   orderRepository,
   orderService,
   paymentProvider,
+  inventoryService,
   frontendBaseUrl,
   apiBaseUrl,
 );

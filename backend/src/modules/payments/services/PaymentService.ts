@@ -2,6 +2,7 @@ import { AppError } from "../../../errors/AppError.js";
 import type { PaymentProvider } from "../../../infrastructure/payments/PaymentProvider.js";
 import type { OrderRepository } from "../../orders/repositories/OrderRepository.js";
 import type { OrderService } from "../../orders/services/OrderService.js";
+import type { InventoryService } from "../../inventory/services/InventoryService.js";
 import type { UserRole } from "../../users/types/user.types.js";
 import type { PaymentRepository } from "../repositories/PaymentRepository.js";
 import type {
@@ -18,6 +19,7 @@ export class PaymentService {
     private readonly orderRepository: OrderRepository,
     private readonly orderService: OrderService,
     private readonly paymentProvider: PaymentProvider,
+    private readonly inventoryService: InventoryService,
     private readonly frontendBaseUrl: string,
     private readonly apiBaseUrl: string,
   ) {}
@@ -130,10 +132,32 @@ export class PaymentService {
 
     if (verified.status === "success") {
       await this.paymentRepository.updateStatus(payment.id, "successful");
-      await this.orderService.updateStatus(payment.orderId, "paid");
+      await this.orderService.markAsPaid(payment.orderId);
+      await this.fulfillOrder(payment.orderId);
     } else {
       await this.paymentRepository.updateStatus(payment.id, "failed");
       await this.orderService.updateStatus(payment.orderId, "failed");
+    }
+  }
+
+  private async fulfillOrder(orderId: string): Promise<void> {
+    const order = await this.orderRepository.findById(orderId);
+
+    if (!order) {
+      console.error(`fulfillOrder: order ${orderId} not found after paid`);
+      return;
+    }
+
+    try {
+      await this.inventoryService.reserveStock(order);
+      await this.orderService.markProcessing(orderId);
+    } catch (error) {
+      console.error(
+        `fulfillOrder: stock reservation failed for order ${orderId}, refund required`,
+        error,
+      );
+      await this.orderService.updateStatus(orderId, "failed");
+      // TODO: this is where refund will be implmented
     }
   }
 }

@@ -156,7 +156,7 @@ export class PaymentService {
         `fulfillOrder: stock reservation failed for order ${orderId}, refund required`,
         error,
       );
-      await this.orderService.updateStatus(orderId, "failed");
+      await this.orderService.markFailed(orderId);
       // TODO: this is where refund will be implmented
     }
   }

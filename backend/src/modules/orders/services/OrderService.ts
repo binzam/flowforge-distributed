@@ -105,4 +105,8 @@ export class OrderService {
   async markProcessing(id: string): Promise<Order> {
     return this.updateStatus(id, "processing");
   }
+
+  async markFailed(orderId: string): Promise<Order> {
+    return this.updateStatus(orderId, "failed");
+  }
 }

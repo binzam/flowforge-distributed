@@ -8,6 +8,7 @@ import {
   useInitializePayment,
 } from "../hooks/payment-hooks";
 import type { OrderStatus } from "../types/order-types";
+import { dateFormatter } from "@/utils/date-formatter";
 
 const PAYABLE_STATUSES: OrderStatus[] = ["pending", "payment_pending"];
 
@@ -78,7 +79,7 @@ const OrderDetailsPage = () => {
             #{order.id.slice(0, 8)}
           </h1>
           <p className="mt-2 text-sm text-neutral-500">
-            {new Date(order.createdAt).toLocaleString()}
+            {dateFormatter(order.createdAt)}
           </p>
         </div>
         <span className="border border-neutral-700 px-3 py-1 text-xs uppercase tracking-widest">
@@ -118,9 +119,7 @@ const OrderDetailsPage = () => {
             className="flex flex-wrap justify-between gap-4 py-5"
           >
             <div>
-              <p className="font-medium">
-                {item.product.name}
-              </p>
+              <p className="font-medium">{item.product.name}</p>
               <p className="mt-1 text-sm text-neutral-500">
                 Quantity {item.quantity} at ${Number(item.unitPrice).toFixed(2)}
               </p>

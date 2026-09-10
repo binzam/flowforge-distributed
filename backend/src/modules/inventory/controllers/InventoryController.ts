@@ -2,12 +2,29 @@ import type { Request, Response } from "express";
 import type { InventoryService } from "../services/InventoryService.js";
 import type {
   CreateInventoryInput,
+  GetInventoriesQuery,
   InventoryProductIdParam,
   UpdateInventoryInput,
 } from "../schemas/inventory.schemas.js";
 
 export class InventoryController {
   constructor(private readonly inventoryService: InventoryService) {}
+
+  getInventories = async (
+    _req: Request,
+    res: Response<unknown, { validated: GetInventoriesQuery }>,
+  ): Promise<void> => {
+    const query = res.locals.validated;
+    const { inventories, total } =
+      await this.inventoryService.getInventories(query);
+
+    res.status(200).json({
+      data: inventories,
+      total,
+      limit: query.limit ?? null,
+      offset: query.offset ?? null,
+    });
+  };
 
   getInventory = async (
     req: Request<{ productId: string }>,

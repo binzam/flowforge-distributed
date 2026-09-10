@@ -14,6 +14,7 @@ import {
 import MyOrdersPage from "@/features/store-front/orders/pages/MyOrdersPage";
 import OrderDetailsPage from "@/features/store-front/orders/pages/OrderDetailsPage";
 import RoleProtectedRoute from "./RoleProtectedRoute";
+import InventoryPage from "@/features/admin/inventory/pages/InventoryPage";
 
 const AdminLayout = lazy(() =>
   import("@/features/admin").then((mod) => ({ default: mod.AdminLayout })),
@@ -26,6 +27,9 @@ const AdminOrdersPage = lazy(() =>
 );
 const AdminOrderDetailsPage = lazy(
   () => import("@/features/admin/orders/pages/AdminOrderDetailsPage"),
+);
+const InventoryDetailPage = lazy(
+  () => import("@/features/admin/inventory/pages/InventoryDetailPage"),
 );
 
 const AppRoutes = () => {
@@ -51,6 +55,11 @@ const AppRoutes = () => {
             <Route index element={<AdminDashboard />} />
             <Route path="orders" element={<AdminOrdersPage />} />
             <Route path="orders/:id" element={<AdminOrderDetailsPage />} />
+            <Route path="inventory" element={<InventoryPage />} />
+            <Route
+              path="inventory/:productId"
+              element={<InventoryDetailPage />}
+            />
           </Route>
         </Route>
 

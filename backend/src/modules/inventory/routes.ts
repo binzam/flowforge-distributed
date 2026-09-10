@@ -7,6 +7,7 @@ import { createAuthenticate } from "../auth/middleware/authenticate.js";
 import { authorize } from "../../middleware/authorize.js";
 import {
   createInventorySchema,
+  getInventoriesQuerySchema,
   inventoryProductIdParamSchema,
   updateInventorySchema,
 } from "./schemas/inventory.schemas.js";
@@ -23,6 +24,14 @@ const inventoryController = new InventoryController(inventoryService);
 const userRepository = new UserRepository(pool);
 const sessionRepository = new SessionRepository(pool);
 const authenticate = createAuthenticate(sessionRepository, userRepository);
+
+router.get(
+  "/",
+  authenticate,
+  authorize("admin", "warehouse"),
+  validate(getInventoriesQuerySchema, "query"),
+  inventoryController.getInventories,
+);
 
 router.post(
   "/:productId",

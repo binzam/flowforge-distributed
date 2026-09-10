@@ -20,3 +20,19 @@ export interface InventoryReservationItem {
   productId: string;
   quantity: number;
 }
+export interface InventoryListItem {
+  id: string;
+  productId: string;
+  productName: string;
+  sku: string;
+  quantity: number;
+  reservedQuantity: number;
+  availableQuantity: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface FindInventoriesResult {
+  inventories: InventoryListItem[];
+  total: number;
+}

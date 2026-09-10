@@ -3,27 +3,96 @@ import { AppError } from "../../../errors/AppError.js";
 import { handlePostgresError } from "../../../errors/postgresErrors.js";
 import type {
   CreateInventoryRecord,
+  FindInventoriesResult,
   Inventory,
+  InventoryListItem,
   InventoryReservationItem,
   UpdateInventoryRecord,
 } from "../types/inventory.types.js";
+import type { GetInventoriesQuery } from "../schemas/inventory.schemas.js";
 
 export class InventoryRepository {
   constructor(private readonly db: Pool) {}
 
-  async findByProductId(productId: string): Promise<Inventory | null> {
-    const result = await this.db.query<Inventory>(
+  async findAll(
+    options: GetInventoriesQuery = {},
+  ): Promise<FindInventoriesResult> {
+    const { limit, offset } = options;
+
+    const values: unknown[] = [];
+    const conditions: string[] = [];
+
+    const whereClause =
+      conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
+    const countResult = await this.db.query<{ total: string }>(
+      `
+      SELECT COUNT(*) AS total
+      FROM inventory i
+      JOIN products p ON p.id = i.product_id
+      ${whereClause};
+      `,
+      values,
+    );
+
+    const total = Number(countResult.rows[0]?.total ?? 0);
+
+    let paginationClause = "";
+
+    if (limit !== undefined) {
+      values.push(limit);
+      paginationClause += ` LIMIT $${values.length}`;
+    }
+
+    if (offset !== undefined) {
+      values.push(offset);
+      paginationClause += ` OFFSET $${values.length}`;
+    }
+
+    const result = await this.db.query<InventoryListItem>(
       `
       SELECT
-        id,
-        product_id AS "productId",
-        quantity,
-        reserved_quantity AS "reservedQuantity",
-        created_at AS "createdAt",
-        updated_at AS "updatedAt"
-      FROM inventory
-      WHERE product_id = $1;
+        i.id,
+        i.product_id AS "productId",
+        p.name AS "productName",
+        p.sku,
+        i.quantity,
+        i.reserved_quantity AS "reservedQuantity",
+        i.quantity - i.reserved_quantity AS "availableQuantity",
+        i.created_at AS "createdAt",
+        i.updated_at AS "updatedAt"
+      FROM inventory i
+      JOIN products p ON p.id = i.product_id
+      ${whereClause}
+      ORDER BY p.name ASC
+      ${paginationClause};
       `,
+      values,
+    );
+
+    return {
+      inventories: result.rows,
+      total,
+    };
+  }
+
+  async findByProductId(productId: string): Promise<InventoryListItem | null> {
+    const result = await this.db.query<InventoryListItem>(
+      `
+    SELECT
+      i.id,
+      i.product_id AS "productId",
+      p.name AS "productName",
+      p.sku,
+      i.quantity,
+      i.reserved_quantity AS "reservedQuantity",
+      i.quantity - i.reserved_quantity AS "availableQuantity",
+      i.created_at AS "createdAt",
+      i.updated_at AS "updatedAt"
+    FROM inventory i
+    JOIN products p ON p.id = i.product_id
+    WHERE i.product_id = $1;
+    `,
       [productId],
     );
 

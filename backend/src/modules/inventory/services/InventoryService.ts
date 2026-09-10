@@ -1,14 +1,17 @@
 import { AppError } from "../../../errors/AppError.js";
 import type { OrderWithItems } from "../../orders/types/order.types.js";
 import type { InventoryRepository } from "../repositories/InventoryRepository.js";
-import type {
-  Inventory,
-} from "../types/inventory.types.js";
+import type { GetInventoriesQuery } from "../schemas/inventory.schemas.js";
+import type { Inventory, InventoryListItem } from "../types/inventory.types.js";
 
 export class InventoryService {
   constructor(private readonly inventoryRepository: InventoryRepository) {}
 
-  async getInventory(productId: string): Promise<Inventory> {
+  async getInventories(options: GetInventoriesQuery) {
+    return this.inventoryRepository.findAll(options);
+  }
+
+  async getInventory(productId: string): Promise<InventoryListItem> {
     const inventory = await this.inventoryRepository.findByProductId(productId);
 
     if (!inventory) {

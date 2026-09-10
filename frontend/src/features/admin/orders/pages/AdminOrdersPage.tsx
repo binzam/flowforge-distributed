@@ -4,8 +4,9 @@ import {
   type OrderStatus,
 } from "../../../store-front/orders/types/order-types";
 import { useGetOrders } from "../hooks/order-hooks";
+import { dateFormatter } from "@/utils/date-formatter";
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 10;
 
 const AdminOrdersPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -108,7 +109,7 @@ const AdminOrdersPage = () => {
                   ${Number(order.totalAmount).toFixed(2)}
                 </td>
                 <td className="px-4 py-4 text-slate-600">
-                  {new Date(order.createdAt).toLocaleDateString()}
+                  {dateFormatter(order.createdAt)}
                 </td>
               </tr>
             ))}

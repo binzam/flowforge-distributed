@@ -2,6 +2,7 @@ import { Link, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import type { OrderStatus } from "../../../store-front/orders/types/order-types";
 import { useGetOrder, useUpdateOrderStatus } from "../hooks/order-hooks";
+import { dateFormatter } from "@/utils/date-formatter";
 
 const nextStatuses: Record<OrderStatus, OrderStatus[]> = {
   pending: ["payment_pending", "cancelled"],
@@ -49,7 +50,7 @@ const AdminOrderDetailsPage = () => {
             Customer: {order.customer.name}
           </p>
           <p className="text-sm text-slate-500">
-            {new Date(order.createdAt).toLocaleString()}
+            {dateFormatter(order.createdAt)}
           </p>
         </div>
         <div className="text-right">

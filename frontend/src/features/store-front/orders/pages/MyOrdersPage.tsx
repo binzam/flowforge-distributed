@@ -1,8 +1,8 @@
 import { Link, useSearchParams } from "react-router-dom";
 import { useGetMyOrders } from "../hooks/order-hooks";
 import type { OrderStatus } from "../types/order-types";
+import { dateFormatter } from "@/utils/date-formatter";
 
-const formatDate = (value: string) => new Date(value).toLocaleDateString();
 
 const MyOrdersPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -41,7 +41,7 @@ const MyOrdersPage = () => {
               <div>
                 <p className="font-medium">Order #{order.id.slice(0, 8)}</p>
                 <p className="mt-1 text-sm text-neutral-500">
-                  {formatDate(order.createdAt)}
+                  {dateFormatter(order.createdAt)}
                 </p>
               </div>
               <span className="border border-neutral-700 px-3 py-1 text-xs uppercase tracking-widest">

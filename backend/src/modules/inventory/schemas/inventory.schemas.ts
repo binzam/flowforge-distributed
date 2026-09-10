@@ -16,3 +16,9 @@ export const updateInventorySchema = z.object({
   quantity: z.number().int().nonnegative(),
 });
 export type UpdateInventoryInput = z.infer<typeof updateInventorySchema>;
+
+export const getInventoriesQuerySchema = z.object({
+  limit: z.coerce.number().int().positive().max(100).optional(),
+  offset: z.coerce.number().int().nonnegative().optional(),
+});
+export type GetInventoriesQuery = z.infer<typeof getInventoriesQuerySchema>;

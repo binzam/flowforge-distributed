@@ -46,7 +46,7 @@ const AdminOrderDetailsPage = () => {
             #{order.id.slice(0, 8)}
           </h1>
           <p className="mt-2 text-sm text-slate-500">
-            Customer ID: {order.userId}
+            Customer: {order.customer.name}
           </p>
           <p className="text-sm text-slate-500">
             {new Date(order.createdAt).toLocaleString()}
@@ -91,10 +91,10 @@ const AdminOrderDetailsPage = () => {
           <tbody>
             {order.items.map((item) => (
               <tr
-                key={item.id}
+                key={item.product.id}
                 className="border-b border-slate-100 last:border-0"
               >
-                <td className="px-4 py-4">{item.productId}</td>
+                <td className="px-4 py-4">{item.product.name}</td>
                 <td className="px-4 py-4">{item.quantity}</td>
                 <td className="px-4 py-4">
                   ${Number(item.unitPrice).toFixed(2)}

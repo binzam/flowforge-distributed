@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import type { OrderService } from "../services/OrderService.js";
 import {
   toPublicOrder,
+  toPublicOrderSummary,
   toPublicOrderWithItems,
 } from "../mapper/orderMapper.js";
 import { AppError } from "../../../errors/AppError.js";
@@ -38,14 +39,14 @@ export class OrderController {
       throw new AppError("Authentication required", 401);
     }
 
-    const order = await this.orderService.getOrderById(
+    const order = await this.orderService.getOrderByIdWithDetails(
       req.params.id,
       req.user.id,
       req.user.role,
     );
 
     res.status(200).json({
-      data: toPublicOrderWithItems(order),
+      data: toPublicOrderSummary(order),
     });
   };
 
@@ -59,7 +60,7 @@ export class OrderController {
     const { orders, total } = await this.orderService.getOrders(query);
 
     res.status(200).json({
-      data: orders.map(toPublicOrder),
+      data: orders.map(toPublicOrderSummary),
       total,
       limit: query.limit ?? null,
       offset: query.offset ?? null,
@@ -83,7 +84,7 @@ export class OrderController {
     const { orders, total } = await this.orderService.getOrders(query);
 
     res.status(200).json({
-      data: orders.map(toPublicOrder),
+      data: orders.map(toPublicOrderSummary),
       total,
       limit: query.limit ?? null,
       offset: query.offset ?? null,

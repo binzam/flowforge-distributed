@@ -168,7 +168,7 @@ export class InventoryRepository {
       }
 
       await client.query("COMMIT");
-
+      console.log("inventory service:reserve stock: inventories", inventories);
       return inventories;
     } catch (error) {
       await client.query("ROLLBACK");

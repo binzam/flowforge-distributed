@@ -114,12 +114,12 @@ const OrderDetailsPage = () => {
       <div className="mt-10 divide-y divide-neutral-800 border-y border-neutral-800">
         {order.items.map((item) => (
           <div
-            key={item.id}
+            key={item.product.id}
             className="flex flex-wrap justify-between gap-4 py-5"
           >
             <div>
               <p className="font-medium">
-                Product #{item.productId.slice(0, 8)}
+                {item.product.name}
               </p>
               <p className="mt-1 text-sm text-neutral-500">
                 Quantity {item.quantity} at ${Number(item.unitPrice).toFixed(2)}

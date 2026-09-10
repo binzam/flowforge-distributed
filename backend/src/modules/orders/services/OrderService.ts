@@ -8,6 +8,7 @@ import type {
 import type {
   Order,
   OrderStatus,
+  OrderSummary,
   OrderWithItems,
 } from "../types/order.types.js";
 
@@ -48,6 +49,27 @@ export class OrderService {
     return this.orderRepository.createWithItems(userId, items);
   }
 
+  async getOrderByIdWithDetails(
+    id: string,
+    requestingUserId: string,
+    requestingUserRole: UserRole,
+  ): Promise<OrderSummary> {
+    const order = await this.orderRepository.findByIdWithDetails(id);
+
+    if (!order) {
+      throw new AppError("Order not found", 404);
+    }
+
+    const canViewAny =
+      requestingUserRole === "admin" || requestingUserRole === "warehouse";
+
+    if (!canViewAny && order.customer.id !== requestingUserId) {
+      throw new AppError("Order not found", 404);
+    }
+
+    return order;
+  }
+
   async getOrderById(
     id: string,
     requestingUserId: string,
@@ -75,6 +97,7 @@ export class OrderService {
 
   async updateStatus(id: string, nextStatus: OrderStatus): Promise<Order> {
     const order = await this.orderRepository.findById(id);
+    console.log("order service: updatestatus: order", order);
 
     if (!order) {
       throw new AppError("Order not found", 404);
@@ -99,14 +122,29 @@ export class OrderService {
   }
 
   async markAsPaid(id: string): Promise<Order> {
+    console.log(
+      "order service: markaspaid: markaspaid called for orderid:",
+      id,
+    );
+
     return this.updateStatus(id, "paid");
   }
 
   async markProcessing(id: string): Promise<Order> {
+    console.log(
+      "order service: markProcessing: markProcessing called for orderid:",
+      id,
+    );
+
     return this.updateStatus(id, "processing");
   }
 
   async markFailed(orderId: string): Promise<Order> {
+    console.log(
+      "order service: markFailed: markFailed called for orderid:",
+      orderId,
+    );
+
     return this.updateStatus(orderId, "failed");
   }
 }

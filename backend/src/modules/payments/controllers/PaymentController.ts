@@ -64,7 +64,7 @@ export class PaymentController {
     const rawBody = req.body as Buffer;
     const signature =
       req.header("x-chapa-signature") ?? req.header("chapa-signature");
-
+    console.log("Payment Controller: webhook : Signature", signature);
     if (
       !signature ||
       !this.paymentProvider.verifyWebhookSignature(rawBody, signature)
@@ -74,6 +74,7 @@ export class PaymentController {
     }
 
     const event = JSON.parse(rawBody.toString("utf8")) as { tx_ref?: string };
+    console.log("Payment Controller: webhook : Event", event);
 
     if (!event.tx_ref) {
       res.status(400).json({ message: "Missing tx_ref in webhook payload" });

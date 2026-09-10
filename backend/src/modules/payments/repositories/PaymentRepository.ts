@@ -111,6 +111,7 @@ export class PaymentRepository {
       `,
       [id, status],
     );
+    console.log("payment repository: updatestatus: result", result.rows[0]);
 
     return result.rows[0] ?? null;
   }

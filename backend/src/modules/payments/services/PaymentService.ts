@@ -109,7 +109,7 @@ export class PaymentService {
 
   async confirmPayment(txRef: string): Promise<void> {
     const payment = await this.paymentRepository.findByProviderPaymentId(txRef);
-
+    console.log("payment service: confirmpayment: payment", payment);
     if (!payment) {
       throw new AppError(`Unknown payment reference: ${txRef}`, 404);
     }
@@ -119,6 +119,7 @@ export class PaymentService {
     }
 
     const verified = await this.paymentProvider.verify(txRef);
+    console.log("payment service: confirmpayment: verified", verified);
 
     if (
       verified.txRef !== txRef ||
@@ -142,7 +143,7 @@ export class PaymentService {
 
   private async fulfillOrder(orderId: string): Promise<void> {
     const order = await this.orderRepository.findById(orderId);
-
+    console.log("payment service: fulfillOrder: order:", order);
     if (!order) {
       console.error(`fulfillOrder: order ${orderId} not found after paid`);
       return;

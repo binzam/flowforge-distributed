@@ -35,8 +35,51 @@ export interface CreateOrderItemRecord {
   quantity: number;
   unitPrice: string;
 }
+export interface OrderCustomer {
+  id: string;
+  name: string;
+}
 
+export interface OrderSummaryProduct {
+  id: string;
+  name: string;
+  sku: string;
+}
+export interface OrderSummaryItem {
+  product: OrderSummaryProduct;
+  quantity: number;
+  unitPrice: string;
+}
+
+export interface OrderSummary {
+  id: string;
+  customer: OrderCustomer;
+  status: OrderStatus;
+  totalAmount: string;
+  createdAt: Date;
+  updatedAt: Date;
+  items: OrderSummaryItem[];
+}
 export interface FindOrdersResult {
-  orders: Order[];
+  orders: OrderSummary[];
   total: number;
+}
+
+export interface OrderWithCustomerRow {
+  id: string;
+  status: OrderStatus;
+  totalAmount: string;
+  createdAt: Date;
+  updatedAt: Date;
+  customerId: string;
+  customerName: string;
+}
+
+export interface OrderItemWithProductRow {
+  orderId: string;
+  quantity: number;
+  unitPrice: string;
+  productId: string;
+  productName: string;
+  productSku: string;
 }

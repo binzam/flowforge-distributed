@@ -98,7 +98,9 @@ const AdminOrdersPage = () => {
                     #{order.id.slice(0, 8)}
                   </Link>
                 </td>
-                <td className="px-4 py-4 text-slate-600">{order.userId}</td>
+                <td className="px-4 py-4 text-slate-600">
+                  {order.customer.name}
+                </td>
                 <td className="px-4 py-4 uppercase text-slate-600">
                   {order.status.replace("_", " ")}
                 </td>

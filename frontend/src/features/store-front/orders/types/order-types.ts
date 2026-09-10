@@ -11,25 +11,30 @@ export const ORDER_STATUSES = [
 
 export type OrderStatus = (typeof ORDER_STATUSES)[number];
 
+export interface OrderCustomer {
+  id: string;
+  name: string;
+}
+
+export interface OrderProduct {
+  id: string;
+  name: string;
+  sku: string;
+}
+
+export interface OrderItem {
+  product: OrderProduct;
+  quantity: number;
+  unitPrice: string;
+}
+
 export interface Order {
   id: string;
-  userId: string;
+  customer: OrderCustomer;
   status: OrderStatus;
   totalAmount: string;
   createdAt: string;
   updatedAt: string;
-}
-
-export interface OrderItem {
-  id: string;
-  orderId: string;
-  productId: string;
-  quantity: number;
-  unitPrice: string;
-  createdAt: string;
-}
-
-export interface OrderWithItems extends Order {
   items: OrderItem[];
 }
 
@@ -41,7 +46,7 @@ export interface OrdersResponse {
 }
 
 export interface OrderResponse {
-  data: OrderWithItems;
+  data: Order;
 }
 
 export interface CreateOrderInput {

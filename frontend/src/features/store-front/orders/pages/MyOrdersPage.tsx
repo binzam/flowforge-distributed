@@ -1,82 +1,133 @@
-import { Link, useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useGetMyOrders } from "../hooks/order-hooks";
-import type { OrderStatus } from "../types/order-types";
+import {
+  ORDER_STATUSES,
+  type OrderStatus,
+  type Order,
+} from "../types/order-types";
 import { dateFormatter } from "@/utils/date-formatter";
+import { useListQueryParams } from "@/hooks/use-list-query-params";
+import {
+  DataTable,
+  type DataTableColumnDef,
+} from "@/components/data-table/data-table";
+import { DataTablePagination } from "@/components/data-table/data-table-pagination";
 
+const PAGE_SIZE = 10;
+
+const columns: DataTableColumnDef<Order>[] = [
+  {
+    accessorKey: "id",
+    header: "Order",
+    cell: (info) => (
+      <Link
+        to={`/orders/${info.getValue<string>()}`}
+        className="font-medium underline"
+      >
+        #{info.getValue<string>().slice(0, 8)}
+      </Link>
+    ),
+  },
+  {
+    id: "customer",
+    header: "Customer",
+    accessorFn: (row) => row.customer.name,
+    cell: (info) => (
+      <span className="text-slate-600">{info.getValue<string>()}</span>
+    ),
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
+    cell: (info) => (
+      <span className="uppercase text-slate-600">
+        {info.getValue<OrderStatus>().replace("_", " ")}
+      </span>
+    ),
+  },
+  {
+    accessorKey: "totalAmount",
+    header: "Total",
+    cell: (info) => `ETB ${Number(info.getValue<string>()).toFixed(2)}`,
+  },
+  {
+    accessorKey: "createdAt",
+    header: "Created",
+    cell: (info) => (
+      <span className="text-slate-600">
+        {dateFormatter(info.getValue<string>())}
+      </span>
+    ),
+  },
+];
 
 const MyOrdersPage = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const page = Number(searchParams.get("page") ?? "0");
-  const { data, isLoading, isError } = useGetMyOrders({
-    limit: 20,
-    offset: page * 20,
-  });
-  const totalPages = Math.ceil((data?.total ?? 0) / 20);
+  const { filters, page, setFilter, setPage } = useListQueryParams([
+    "status",
+  ] as const);
+  const status = filters.status as OrderStatus | undefined;
 
-  if (isLoading)
-    return (
-      <div className="py-24 text-center text-neutral-400">
-        Loading your orders...
-      </div>
-    );
-  if (isError)
-    return (
-      <div className="py-24 text-center text-red-400">
-        Unable to load your orders.
-      </div>
-    );
+  const { data, isLoading, isError } = useGetMyOrders({
+    status,
+    limit: PAGE_SIZE,
+    offset: page * PAGE_SIZE,
+  });
 
   return (
     <section className="py-12">
-      <p className="text-xs tracking-[0.3em] text-neutral-500">ACCOUNT</p>
-      <h1 className="mt-3 text-4xl font-semibold tracking-tight">My orders</h1>
-      {data?.data.length ? (
-        <div className="mt-10 divide-y divide-neutral-800 border-y border-neutral-800">
-          {data.data.map((order) => (
-            <Link
-              key={order.id}
-              to={`/orders/${order.id}`}
-              className="flex flex-wrap items-center justify-between gap-4 py-6 hover:bg-neutral-900/50"
-            >
-              <div>
-                <p className="font-medium">Order #{order.id.slice(0, 8)}</p>
-                <p className="mt-1 text-sm text-neutral-500">
-                  {dateFormatter(order.createdAt)}
-                </p>
-              </div>
-              <span className="border border-neutral-700 px-3 py-1 text-xs uppercase tracking-widest">
-                {order.status.replace("_", " ") as OrderStatus}
-              </span>
-              <strong>${Number(order.totalAmount).toFixed(2)}</strong>
-            </Link>
-          ))}
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p className="text-xs tracking-[0.3em] text-neutral-500">ACCOUNT</p>
+          <h1 className="mt-3 text-4xl font-semibold tracking-tight">
+            My orders
+          </h1>
         </div>
-      ) : (
-        <p className="mt-12 text-neutral-400">
-          You have not placed an order yet.
-        </p>
-      )}
-      {(data?.total ?? 0) > 20 && (
-        <div className="mt-6 flex justify-end gap-3 text-sm">
-          <button
-            disabled={page === 0}
-            onClick={() => setSearchParams({ page: String(page - 1) })}
-            className="underline disabled:opacity-40"
+        <div>
+          <select
+            value={status ?? ""}
+            onChange={(event) => setFilter("status", event.target.value)}
+            className="border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm text-white"
           >
-            Previous
-          </button>
-          <span>
-            {page + 1} / {totalPages}
-          </span>
-          <button
-            disabled={page + 1 >= totalPages}
-            onClick={() => setSearchParams({ page: String(page + 1) })}
-            className="underline disabled:opacity-40"
-          >
-            Next
-          </button>
+            <option value="">All statuses</option>
+            {ORDER_STATUSES.map((item) => (
+              <option key={item} value={item}>
+                {item.replace("_", " ")}
+              </option>
+            ))}
+          </select>
         </div>
-      )}
+      </div>
+
+      <DataTable
+        className="mt-10"
+        tableId="my-orders"
+        columns={columns}
+        data={data?.data ?? []}
+        getRowId={(order) => order.id}
+        isLoading={isLoading}
+        isError={isError}
+        loadingState={
+          <div className="py-24 text-center text-neutral-400">
+            Loading your orders...
+          </div>
+        }
+        errorState={
+          <div className="py-24 text-center text-red-400">
+            Unable to load your orders.
+          </div>
+        }
+        emptyState="You have not placed an order yet."
+        variant="dark"
+      />
+
+      <DataTablePagination
+        page={page}
+        pageSize={PAGE_SIZE}
+        total={data?.total ?? 0}
+        onPageChange={setPage}
+        itemLabel="orders"
+        variant="dark"
+      />
     </section>
   );
 };

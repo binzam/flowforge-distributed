@@ -1,29 +1,78 @@
-import { Link, useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useGetInventories } from "../hooks/inventory-hooks";
+import type { Inventory } from "../types/inventory-types";
 import { dateFormatter } from "@/utils/date-formatter";
+import { useListQueryParams } from "@/hooks/use-list-query-params";
+import {
+  DataTable,
+  type DataTableColumnDef,
+} from "@/components/data-table/data-table";
+import { DataTablePagination } from "@/components/data-table/data-table-pagination";
 
 const PAGE_SIZE = 20;
 
+const columns: DataTableColumnDef<Inventory>[] = [
+  {
+    accessorKey: "productName",
+    header: "Product",
+    cell: (info) => (
+      <Link
+        to={`/admin/inventory/${info.row.original.productId}`}
+        className="font-medium underline"
+      >
+        {info.getValue<string>()}
+      </Link>
+    ),
+  },
+  {
+    accessorKey: "sku",
+    header: "SKU",
+    cell: (info) => (
+      <span className="text-slate-600">{info.getValue<string>()}</span>
+    ),
+  },
+  {
+    accessorKey: "quantity",
+    header: "Quantity",
+    cell: (info) => (
+      <span className="text-slate-600">{info.getValue<number>()}</span>
+    ),
+  },
+  {
+    accessorKey: "reservedQuantity",
+    header: "Reserved",
+    cell: (info) => (
+      <span className="text-slate-600">{info.getValue<number>()}</span>
+    ),
+  },
+  {
+    accessorKey: "availableQuantity",
+    header: "Available",
+    cell: (info) => (
+      <span className="text-slate-600">{info.getValue<number>()}</span>
+    ),
+  },
+  {
+    accessorKey: "updatedAt",
+    header: "Updated",
+    cell: (info) => (
+      <span className="text-slate-600">
+        {dateFormatter(info.getValue<string>())}
+      </span>
+    ),
+  },
+];
+
 const InventoryPage = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const productId = searchParams.get("productId") ?? "";
-  const page = Number(searchParams.get("page") ?? "0");
+  const { filters, page, setFilter, setPage } = useListQueryParams([
+    "productId",
+  ] as const);
+
   const { data, isLoading, isError } = useGetInventories({
+    productId: filters.productId,
     limit: PAGE_SIZE,
     offset: page * PAGE_SIZE,
   });
-  const totalPages = Math.ceil((data?.total ?? 0) / PAGE_SIZE);
-
-  const setPage = (nextPage: number) =>
-    setSearchParams({
-      ...(productId ? { productId } : {}),
-      page: String(nextPage),
-    });
-
-  if (isLoading)
-    return <div className="py-12 text-slate-500">Loading inventory...</div>;
-  if (isError)
-    return <div className="py-12 text-red-600">Unable to load inventory.</div>;
 
   return (
     <section>
@@ -32,71 +81,40 @@ const InventoryPage = () => {
           <p className="text-sm text-slate-500">Manage</p>
           <h1 className="mt-1 text-3xl font-semibold">Inventory</h1>
         </div>
-      </div>
-      <div className="mt-8 overflow-x-auto rounded-md border border-slate-200 bg-white">
-        <table className="w-full text-left text-sm">
-          <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase text-slate-500">
-            <tr>
-              <th className="px-4 py-3">Product</th>
-              <th className="px-4 py-3">SKU</th>
-              <th className="px-4 py-3">Quantity</th>
-              <th className="px-4 py-3">Reserved</th>
-              <th className="px-4 py-3">Available</th>
-              <th className="px-4 py-3">Updated</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data?.data.map((item) => (
-              <tr
-                key={item.id}
-                className="border-b border-slate-100 last:border-0"
-              >
-                <td className="px-4 py-4">
-                  <Link
-                    to={`/admin/inventory/${item.productId}`}
-                    className="font-medium underline"
-                  >
-                    {item.productName}
-                  </Link>
-                </td>
-                <td className="px-4 py-4 text-slate-600">{item.sku}</td>
-                <td className="px-4 py-4 text-slate-600">{item.quantity}</td>
-                <td className="px-4 py-4 text-slate-600">
-                  {item.reservedQuantity}
-                </td>
-                <td className="px-4 py-4 text-slate-600">
-                  {item.availableQuantity}
-                </td>
-                <td className="px-4 py-4 text-slate-600">
-                  {dateFormatter(item.updatedAt)}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <div className="mt-5 flex items-center justify-between text-sm text-slate-600">
-        <span>{data?.total ?? 0} items</span>
-        <div className="flex gap-2">
-          <button
-            disabled={page === 0}
-            onClick={() => setPage(page - 1)}
-            className="rounded border border-slate-300 px-3 py-1 disabled:opacity-40"
-          >
-            Previous
-          </button>
-          <span className="px-2 py-1">
-            {totalPages === 0 ? 0 : page + 1} / {totalPages}
-          </span>
-          <button
-            disabled={page + 1 >= totalPages}
-            onClick={() => setPage(page + 1)}
-            className="rounded border border-slate-300 px-3 py-1 disabled:opacity-40"
-          >
-            Next
-          </button>
+        <div className="flex flex-wrap gap-2">
+          <input
+            value={filters.productId ?? ""}
+            onChange={(event) => setFilter("productId", event.target.value)}
+            placeholder="Filter product ID"
+            className="border border-slate-300 px-3 py-2 text-sm"
+          />
         </div>
       </div>
+
+      <DataTable
+        className="mt-8"
+        tableId="admin-inventory"
+        columns={columns}
+        data={data?.data ?? []}
+        getRowId={(item) => item.id}
+        isLoading={isLoading}
+        isError={isError}
+        loadingState={
+          <div className="py-12 text-slate-500">Loading inventory...</div>
+        }
+        errorState={
+          <div className="py-12 text-red-600">Unable to load inventory.</div>
+        }
+        emptyState="No inventory items found."
+      />
+
+      <DataTablePagination
+        page={page}
+        pageSize={PAGE_SIZE}
+        total={data?.total ?? 0}
+        onPageChange={setPage}
+        itemLabel="items"
+      />
     </section>
   );
 };

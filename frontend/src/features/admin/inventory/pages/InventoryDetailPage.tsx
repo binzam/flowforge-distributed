@@ -1,6 +1,33 @@
+import type { ReactNode } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useGetInventory } from "../hooks/inventory-hooks";
 import { dateFormatter } from "@/utils/date-formatter";
+import {
+  DataTable,
+  type DataTableColumnDef,
+} from "@/components/data-table/data-table";
+
+interface InventoryMetricRow {
+  metric: string;
+  value: ReactNode;
+}
+
+const metricColumns: DataTableColumnDef<InventoryMetricRow>[] = [
+  {
+    accessorKey: "metric",
+    header: "Metric",
+    cell: (info) => (
+      <span className="font-medium">{info.getValue<string>()}</span>
+    ),
+  },
+  {
+    accessorKey: "value",
+    header: "Value",
+    cell: (info) => (
+      <span className="text-slate-600">{info.getValue<ReactNode>()}</span>
+    ),
+  },
+];
 
 const InventoryDetailPage = () => {
   const { productId = "" } = useParams();
@@ -11,8 +38,23 @@ const InventoryDetailPage = () => {
     return <div className="py-12 text-slate-500">Loading inventory...</div>;
   if (isError || !inventory)
     return (
-      <div className="py-12 text-red-600">Unable to load this inventory.</div>
+      <div>
+        <Link
+          to="/admin/inventory"
+          className="text-sm text-slate-500 underline"
+        >
+          Back to inventory
+        </Link>
+        <div className="py-12 text-red-600">Unable to load this inventory.</div>
+      </div>
     );
+
+  const metricRows: InventoryMetricRow[] = [
+    { metric: "Total Quantity", value: inventory.quantity },
+    { metric: "Reserved Quantity", value: inventory.reservedQuantity },
+    { metric: "Available Quantity", value: inventory.availableQuantity },
+    { metric: "Created", value: dateFormatter(inventory.createdAt) },
+  ];
 
   return (
     <section>
@@ -31,40 +73,14 @@ const InventoryDetailPage = () => {
           </p>
         </div>
       </div>
-      <div className="mt-8 overflow-x-auto rounded-md border border-slate-200 bg-white">
-        <table className="w-full text-left text-sm">
-          <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase text-slate-500">
-            <tr>
-              <th className="px-4 py-3">Metric</th>
-              <th className="px-4 py-3">Value</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr className="border-b border-slate-100">
-              <td className="px-4 py-4 font-medium">Total Quantity</td>
-              <td className="px-4 py-4 text-slate-600">{inventory.quantity}</td>
-            </tr>
-            <tr className="border-b border-slate-100">
-              <td className="px-4 py-4 font-medium">Reserved Quantity</td>
-              <td className="px-4 py-4 text-slate-600">
-                {inventory.reservedQuantity}
-              </td>
-            </tr>
-            <tr className="border-b border-slate-100">
-              <td className="px-4 py-4 font-medium">Available Quantity</td>
-              <td className="px-4 py-4 text-slate-600">
-                {inventory.availableQuantity}
-              </td>
-            </tr>
-            <tr>
-              <td className="px-4 py-4 font-medium">Created</td>
-              <td className="px-4 py-4 text-slate-600">
-                {dateFormatter(inventory.createdAt)}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+
+      <DataTable
+        className="mt-8"
+        tableId="inventory-metrics"
+        columns={metricColumns}
+        data={metricRows}
+        getRowId={(row) => row.metric}
+      />
     </section>
   );
 };

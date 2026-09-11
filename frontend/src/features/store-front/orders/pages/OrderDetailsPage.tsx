@@ -7,10 +7,39 @@ import {
   useGetPaymentForOrder,
   useInitializePayment,
 } from "../hooks/payment-hooks";
-import type { OrderStatus } from "../types/order-types";
+import type { OrderStatus, OrderItem } from "../types/order-types";
 import { dateFormatter } from "@/utils/date-formatter";
+import {
+  DataTable,
+  type DataTableColumnDef,
+} from "@/components/data-table/data-table";
 
 const PAYABLE_STATUSES: OrderStatus[] = ["pending", "payment_pending"];
+
+const orderItemColumns: DataTableColumnDef<OrderItem>[] = [
+  {
+    id: "product",
+    header: "Product",
+    accessorFn: (row) => row.product.name,
+    cell: (info) => info.getValue<string>(),
+  },
+  {
+    accessorKey: "quantity",
+    header: "Quantity",
+    cell: (info) => info.getValue<number>(),
+  },
+  {
+    accessorKey: "unitPrice",
+    header: "Unit price",
+    cell: (info) => `$${Number(info.getValue<string>()).toFixed(2)}`,
+  },
+  {
+    id: "lineTotal",
+    header: "Line total",
+    accessorFn: (row) => Number(row.unitPrice) * row.quantity,
+    cell: (info) => `$${info.getValue<number>().toFixed(2)}`,
+  },
+];
 
 const OrderDetailsPage = () => {
   const { id = "" } = useParams();
@@ -112,24 +141,16 @@ const OrderDetailsPage = () => {
         </div>
       )}
 
-      <div className="mt-10 divide-y divide-neutral-800 border-y border-neutral-800">
-        {order.items.map((item) => (
-          <div
-            key={item.product.id}
-            className="flex flex-wrap justify-between gap-4 py-5"
-          >
-            <div>
-              <p className="font-medium">{item.product.name}</p>
-              <p className="mt-1 text-sm text-neutral-500">
-                Quantity {item.quantity} at ${Number(item.unitPrice).toFixed(2)}
-              </p>
-            </div>
-            <strong>
-              ${(Number(item.unitPrice) * item.quantity).toFixed(2)}
-            </strong>
-          </div>
-        ))}
-      </div>
+      <DataTable
+        className="mt-10"
+        tableId="order-items"
+        columns={orderItemColumns}
+        data={order.items}
+        getRowId={(item) => item.product.id}
+        emptyState="No items on this order."
+        variant="dark"
+      />
+
       <p className="mt-8 text-right text-xl">
         Total <strong>${Number(order.totalAmount).toFixed(2)}</strong>
       </p>

@@ -22,6 +22,7 @@ export interface InventoryResponse {
 }
 
 export interface InventoriesQuery {
+  productId?: string;
   limit?: number;
   offset?: number;
 }

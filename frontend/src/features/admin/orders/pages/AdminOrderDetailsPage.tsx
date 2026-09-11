@@ -1,8 +1,15 @@
 import { Link, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import type { OrderStatus } from "../../../store-front/orders/types/order-types";
+import type { Order } from "../types/order-types";
 import { useGetOrder, useUpdateOrderStatus } from "../hooks/order-hooks";
 import { dateFormatter } from "@/utils/date-formatter";
+import {
+  DataTable,
+  type DataTableColumnDef,
+} from "@/components/data-table/data-table";
+
+type OrderItem = Order["items"][number];
 
 const nextStatuses: Record<OrderStatus, OrderStatus[]> = {
   pending: ["payment_pending", "cancelled"],
@@ -15,6 +22,31 @@ const nextStatuses: Record<OrderStatus, OrderStatus[]> = {
   failed: [],
 };
 
+const orderItemColumns: DataTableColumnDef<OrderItem>[] = [
+  {
+    id: "product",
+    header: "Product",
+    accessorFn: (row) => row.product.name,
+    cell: (info) => info.getValue<string>(),
+  },
+  {
+    accessorKey: "quantity",
+    header: "Quantity",
+    cell: (info) => info.getValue<number>(),
+  },
+  {
+    accessorKey: "unitPrice",
+    header: "Unit price",
+    cell: (info) => `$${Number(info.getValue<string>()).toFixed(2)}`,
+  },
+  {
+    id: "lineTotal",
+    header: "Line total",
+    accessorFn: (row) => Number(row.unitPrice) * row.quantity,
+    cell: (info) => `$${info.getValue<number>().toFixed(2)}`,
+  },
+];
+
 const AdminOrderDetailsPage = () => {
   const { id = "" } = useParams();
   const { data, isLoading, isError } = useGetOrder(id);
@@ -24,7 +56,14 @@ const AdminOrderDetailsPage = () => {
   if (isLoading)
     return <div className="py-12 text-slate-500">Loading order...</div>;
   if (isError || !order)
-    return <div className="py-12 text-red-600">Unable to load this order.</div>;
+    return (
+      <div>
+        <Link to="/admin/orders" className="text-sm text-slate-500 underline">
+          Back to orders
+        </Link>
+        <div className="py-12 text-red-600">Unable to load this order.</div>
+      </div>
+    );
 
   const changeStatus = (status: OrderStatus) =>
     updateStatus.mutate(
@@ -79,35 +118,16 @@ const AdminOrderDetailsPage = () => {
           </select>
         </div>
       </div>
-      <div className="mt-8 overflow-x-auto rounded-md border border-slate-200 bg-white">
-        <table className="w-full text-left text-sm">
-          <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase text-slate-500">
-            <tr>
-              <th className="px-4 py-3">Product</th>
-              <th className="px-4 py-3">Quantity</th>
-              <th className="px-4 py-3">Unit price</th>
-              <th className="px-4 py-3">Line total</th>
-            </tr>
-          </thead>
-          <tbody>
-            {order.items.map((item) => (
-              <tr
-                key={item.product.id}
-                className="border-b border-slate-100 last:border-0"
-              >
-                <td className="px-4 py-4">{item.product.name}</td>
-                <td className="px-4 py-4">{item.quantity}</td>
-                <td className="px-4 py-4">
-                  ${Number(item.unitPrice).toFixed(2)}
-                </td>
-                <td className="px-4 py-4">
-                  ${(Number(item.unitPrice) * item.quantity).toFixed(2)}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+
+      <DataTable
+        className="mt-8"
+        tableId="order-items"
+        columns={orderItemColumns}
+        data={order.items}
+        getRowId={(item) => item.product.id}
+        emptyState="No items on this order."
+      />
+
       <p className="mt-6 text-right text-lg font-semibold">
         Total: ${Number(order.totalAmount).toFixed(2)}
       </p>

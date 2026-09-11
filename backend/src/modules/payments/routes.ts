@@ -17,6 +17,8 @@ import { SessionRepository } from "../auth/repositories/SessionRepository.js";
 import { createAuthenticate } from "../auth/middleware/authenticate.js";
 import { InventoryRepository } from "../inventory/repositories/InventoryRepository.js";
 import { InventoryService } from "../inventory/services/InventoryService.js";
+import { FulfillmentService } from "../fulfillments/services/FulfillmentService.js";
+import { FulfillmentRepository } from "../fulfillments/repositories/FulfillmentRepository.js";
 
 const chapaSecretKey = process.env.CHAPA_SECRET_KEY;
 if (!chapaSecretKey) {
@@ -38,6 +40,8 @@ const orderRepository = new OrderRepository(pool);
 const orderService = new OrderService(orderRepository);
 const inventoryRepository = new InventoryRepository(pool);
 const inventoryService = new InventoryService(inventoryRepository);
+const fulfillmentRepository = new FulfillmentRepository(pool);
+const fulfillmentService = new FulfillmentService(fulfillmentRepository);
 
 const paymentService = new PaymentService(
   paymentRepository,
@@ -45,6 +49,7 @@ const paymentService = new PaymentService(
   orderService,
   paymentProvider,
   inventoryService,
+  fulfillmentService,
   frontendBaseUrl,
   apiBaseUrl,
 );

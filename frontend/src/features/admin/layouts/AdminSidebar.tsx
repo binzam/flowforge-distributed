@@ -13,6 +13,10 @@ const menuItems = [
     label: "Inventory",
     path: "inventory",
   },
+  {
+    label: "Fulfillments",
+    path: "fulfillments",
+  },
 ];
 const AdminSidebar = () => {
   return (

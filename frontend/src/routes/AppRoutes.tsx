@@ -48,6 +48,12 @@ const InventoryPage = lazy(
 const InventoryDetailPage = lazy(
   () => import("@/features/admin/inventory/pages/InventoryDetailPage"),
 );
+const FulfillmentsPage = lazy(
+  () => import("@/features/admin/fulfillments/pages/FulfillmentsPage"),
+);
+const FulfillmentDetailPage = lazy(
+  () => import("@/features/admin/fulfillments/pages/FulfillmentDetailPage"),
+);
 
 const AppRoutes = () => {
   return (
@@ -74,6 +80,11 @@ const AppRoutes = () => {
             <Route
               path="inventory/:productId"
               element={<InventoryDetailPage />}
+            />
+            <Route path="fulfillments" element={<FulfillmentsPage />} />
+            <Route
+              path="fulfillments/:id"
+              element={<FulfillmentDetailPage />}
             />
           </Route>
         </Route>

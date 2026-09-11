@@ -10,6 +10,7 @@ import type {
   PayerDetails,
   Payment,
 } from "../types/payment.types.js";
+import type { FulfillmentService } from "../../fulfillments/services/FulfillmentService.js";
 
 const CURRENCY = "ETB";
 
@@ -20,6 +21,7 @@ export class PaymentService {
     private readonly orderService: OrderService,
     private readonly paymentProvider: PaymentProvider,
     private readonly inventoryService: InventoryService,
+    private readonly fulfillmentService: FulfillmentService,
     private readonly frontendBaseUrl: string,
     private readonly apiBaseUrl: string,
   ) {}
@@ -152,6 +154,7 @@ export class PaymentService {
     try {
       await this.inventoryService.reserveStock(order);
       await this.orderService.markProcessing(orderId);
+      await this.fulfillmentService.createFulfillment(order.id);
     } catch (error) {
       console.error(
         `fulfillOrder: stock reservation failed for order ${orderId}, refund required`,

@@ -19,6 +19,7 @@ const columns: DataTableColumnDef<Inventory>[] = [
       <Link
         to={`/admin/inventory/${info.row.original.productId}`}
         className="font-medium underline"
+        style={{ color: "var(--brand-green)" }}
       >
         {info.getValue<string>()}
       </Link>
@@ -28,35 +29,43 @@ const columns: DataTableColumnDef<Inventory>[] = [
     accessorKey: "sku",
     header: "SKU",
     cell: (info) => (
-      <span className="text-slate-600">{info.getValue<string>()}</span>
+      <span style={{ color: "var(--brand-green)" }}>
+        {info.getValue<string>()}
+      </span>
     ),
   },
   {
     accessorKey: "quantity",
     header: "Quantity",
     cell: (info) => (
-      <span className="text-slate-600">{info.getValue<number>()}</span>
+      <span style={{ color: "var(--brand-green)" }}>
+        {info.getValue<number>()}
+      </span>
     ),
   },
   {
     accessorKey: "reservedQuantity",
     header: "Reserved",
     cell: (info) => (
-      <span className="text-slate-600">{info.getValue<number>()}</span>
+      <span style={{ color: "var(--brand-green)" }}>
+        {info.getValue<number>()}
+      </span>
     ),
   },
   {
     accessorKey: "availableQuantity",
     header: "Available",
     cell: (info) => (
-      <span className="text-slate-600">{info.getValue<number>()}</span>
+      <span style={{ color: "var(--brand-green)" }}>
+        {info.getValue<number>()}
+      </span>
     ),
   },
   {
     accessorKey: "updatedAt",
     header: "Updated",
     cell: (info) => (
-      <span className="text-slate-600">
+      <span style={{ color: "var(--brand-green)" }}>
         {dateFormatter(info.getValue<string>())}
       </span>
     ),
@@ -78,15 +87,23 @@ const InventoryPage = () => {
     <section>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-sm text-slate-500">Manage</p>
-          <h1 className="mt-1 text-3xl font-semibold">Inventory</h1>
+          <p className="text-sm" style={{ color: "var(--brand-green)" }}>
+            Manage
+          </p>
+          <h1
+            className="mt-1 text-3xl font-semibold"
+            style={{ color: "var(--brand-dark-green)" }}
+          >
+            Inventory
+          </h1>
         </div>
         <div className="flex flex-wrap gap-2">
           <input
             value={filters.productId ?? ""}
             onChange={(event) => setFilter("productId", event.target.value)}
             placeholder="Filter product ID"
-            className="border border-slate-300 px-3 py-2 text-sm"
+            className="px-3 py-2 text-sm border rounded"
+            style={{ borderColor: "var(--brand-light-green)" }}
           />
         </div>
       </div>
@@ -100,7 +117,9 @@ const InventoryPage = () => {
         isLoading={isLoading}
         isError={isError}
         loadingState={
-          <div className="py-12 text-slate-500">Loading inventory...</div>
+          <div className="py-12" style={{ color: "var(--brand-green)" }}>
+            Loading inventory...
+          </div>
         }
         errorState={
           <div className="py-12 text-red-600">Unable to load inventory.</div>

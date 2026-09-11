@@ -27,23 +27,39 @@ const orderItemColumns: DataTableColumnDef<OrderItem>[] = [
     id: "product",
     header: "Product",
     accessorFn: (row) => row.product.name,
-    cell: (info) => info.getValue<string>(),
+    cell: (info) => (
+      <span style={{ color: "var(--brand-dark-green)" }}>
+        {info.getValue<string>()}
+      </span>
+    ),
   },
   {
     accessorKey: "quantity",
     header: "Quantity",
-    cell: (info) => info.getValue<number>(),
+    cell: (info) => (
+      <span style={{ color: "var(--brand-green)" }}>
+        {info.getValue<number>()}
+      </span>
+    ),
   },
   {
     accessorKey: "unitPrice",
     header: "Unit price",
-    cell: (info) => `$${Number(info.getValue<string>()).toFixed(2)}`,
+    cell: (info) => (
+      <span style={{ color: "var(--brand-green)" }}>
+        ETB {Number(info.getValue<string>()).toFixed(2)}
+      </span>
+    ),
   },
   {
     id: "lineTotal",
     header: "Line total",
     accessorFn: (row) => Number(row.unitPrice) * row.quantity,
-    cell: (info) => `$${info.getValue<number>().toFixed(2)}`,
+    cell: (info) => (
+      <span style={{ color: "var(--brand-green)" }}>
+        ETB {info.getValue<number>().toFixed(2)}
+      </span>
+    ),
   },
 ];
 
@@ -54,11 +70,19 @@ const AdminOrderDetailsPage = () => {
   const order = data?.data;
 
   if (isLoading)
-    return <div className="py-12 text-slate-500">Loading order...</div>;
+    return (
+      <div className="py-12" style={{ color: "var(--brand-green)" }}>
+        Loading order...
+      </div>
+    );
   if (isError || !order)
     return (
       <div>
-        <Link to="/admin/orders" className="text-sm text-slate-500 underline">
+        <Link
+          to="/admin/orders"
+          className="text-sm underline"
+          style={{ color: "var(--brand-green)" }}
+        >
           Back to orders
         </Link>
         <div className="py-12 text-red-600">Unable to load this order.</div>
@@ -76,25 +100,39 @@ const AdminOrderDetailsPage = () => {
 
   return (
     <section>
-      <Link to="/admin/orders" className="text-sm text-slate-500 underline">
+      <Link
+        to="/admin/orders"
+        className="text-sm underline"
+        style={{ color: "var(--brand-green)" }}
+      >
         Back to orders
       </Link>
       <div className="mt-6 flex flex-wrap justify-between gap-4">
         <div>
-          <p className="text-sm text-slate-500">Order</p>
-          <h1 className="mt-1 text-3xl font-semibold">
+          <p className="text-sm" style={{ color: "var(--brand-green)" }}>
+            Order
+          </p>
+          <h1
+            className="mt-1 text-3xl font-semibold"
+            style={{ color: "var(--brand-dark-green)" }}
+          >
             #{order.id.slice(0, 8)}
           </h1>
-          <p className="mt-2 text-sm text-slate-500">
+          <p className="mt-2 text-sm" style={{ color: "var(--brand-green)" }}>
             Customer: {order.customer.name}
           </p>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm" style={{ color: "var(--brand-green)" }}>
             {dateFormatter(order.createdAt)}
           </p>
         </div>
         <div className="text-right">
-          <p className="text-sm text-slate-500">Current status</p>
-          <p className="mt-2 font-semibold uppercase">
+          <p className="text-sm" style={{ color: "var(--brand-green)" }}>
+            Current status
+          </p>
+          <p
+            className="mt-2 font-semibold uppercase"
+            style={{ color: "var(--brand-dark-green)" }}
+          >
             {order.status.replace("_", " ")}
           </p>
           <select
@@ -105,7 +143,8 @@ const AdminOrderDetailsPage = () => {
             onChange={(event) =>
               changeStatus(event.target.value as OrderStatus)
             }
-            className="mt-3 border border-slate-300 bg-white px-3 py-2 text-sm"
+            className="mt-3 border px-3 py-2 text-sm rounded"
+            style={{ borderColor: "var(--brand-light-green)" }}
           >
             <option value="">
               {updateStatus.isPending ? "Updating..." : "Change status"}
@@ -128,8 +167,11 @@ const AdminOrderDetailsPage = () => {
         emptyState="No items on this order."
       />
 
-      <p className="mt-6 text-right text-lg font-semibold">
-        Total: ${Number(order.totalAmount).toFixed(2)}
+      <p
+        className="mt-6 text-right text-lg font-semibold"
+        style={{ color: "var(--brand-dark-green)" }}
+      >
+        Total: ETB {Number(order.totalAmount).toFixed(2)}
       </p>
     </section>
   );

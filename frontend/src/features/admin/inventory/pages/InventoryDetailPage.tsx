@@ -17,14 +17,21 @@ const metricColumns: DataTableColumnDef<InventoryMetricRow>[] = [
     accessorKey: "metric",
     header: "Metric",
     cell: (info) => (
-      <span className="font-medium">{info.getValue<string>()}</span>
+      <span
+        className="font-medium"
+        style={{ color: "var(--brand-dark-green)" }}
+      >
+        {info.getValue<string>()}
+      </span>
     ),
   },
   {
     accessorKey: "value",
     header: "Value",
     cell: (info) => (
-      <span className="text-slate-600">{info.getValue<ReactNode>()}</span>
+      <span style={{ color: "var(--brand-green)" }}>
+        {info.getValue<ReactNode>()}
+      </span>
     ),
   },
 ];
@@ -35,13 +42,18 @@ const InventoryDetailPage = () => {
   const inventory = data?.data;
 
   if (isLoading)
-    return <div className="py-12 text-slate-500">Loading inventory...</div>;
+    return (
+      <div className="py-12" style={{ color: "var(--brand-green)" }}>
+        Loading inventory...
+      </div>
+    );
   if (isError || !inventory)
     return (
       <div>
         <Link
           to="/admin/inventory"
-          className="text-sm text-slate-500 underline"
+          className="text-sm underline"
+          style={{ color: "var(--brand-green)" }}
         >
           Back to inventory
         </Link>
@@ -58,17 +70,28 @@ const InventoryDetailPage = () => {
 
   return (
     <section>
-      <Link to="/admin/inventory" className="text-sm text-slate-500 underline">
+      <Link
+        to="/admin/inventory"
+        className="text-sm underline"
+        style={{ color: "var(--brand-green)" }}
+      >
         Back to inventory
       </Link>
       <div className="mt-6 flex flex-wrap justify-between gap-4">
         <div>
-          <p className="text-sm text-slate-500">Product</p>
-          <h1 className="mt-1 text-3xl font-semibold">
+          <p className="text-sm" style={{ color: "var(--brand-green)" }}>
+            Product
+          </p>
+          <h1
+            className="mt-1 text-3xl font-semibold"
+            style={{ color: "var(--brand-dark-green)" }}
+          >
             {inventory.productName}
           </h1>
-          <p className="mt-2 text-sm text-slate-500">SKU: {inventory.sku}</p>
-          <p className="text-sm text-slate-500">
+          <p className="mt-2 text-sm" style={{ color: "var(--brand-green)" }}>
+            SKU: {inventory.sku}
+          </p>
+          <p className="text-sm" style={{ color: "var(--brand-green)" }}>
             Last updated: {dateFormatter(inventory.updatedAt)}
           </p>
         </div>

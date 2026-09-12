@@ -15,12 +15,12 @@ import { DataTablePagination } from "@/components/data-table/data-table-paginati
 const PAGE_SIZE = 20;
 
 const FULFILLMENT_STATUS_COLORS: Record<FulfillmentStatus, string> = {
-  pending: "bg-yellow-50 text-yellow-900 border border-yellow-200",
-  processing: "bg-blue-50 text-blue-900 border border-blue-200",
-  packed: "bg-purple-50 text-purple-900 border border-purple-200",
-  shipped: "bg-indigo-50 text-indigo-900 border border-indigo-200",
-  delivered: "bg-green-50 text-green-900 border border-green-200",
-  cancelled: "bg-red-50 text-red-900 border border-red-200",
+  pending: "bg-yellow-100 text-yellow-800",
+  processing: "bg-blue-100 text-blue-800",
+  packed: "bg-purple-100 text-purple-800",
+  shipped: "bg-indigo-100 text-indigo-800",
+  delivered: "bg-green-100 text-green-800",
+  cancelled: "bg-red-100 text-red-800",
 };
 
 const columns: DataTableColumnDef<FulfillmentListItem>[] = [
@@ -31,7 +31,6 @@ const columns: DataTableColumnDef<FulfillmentListItem>[] = [
       <Link
         to={`/admin/fulfillments/${info.row.original.id}`}
         className="font-medium underline"
-        style={{ color: "var(--brand-green)" }}
       >
         {info.getValue<string>().slice(0, 8)}...
       </Link>
@@ -41,39 +40,28 @@ const columns: DataTableColumnDef<FulfillmentListItem>[] = [
     accessorKey: "customerName",
     header: "Customer",
     cell: (info) => (
-      <span style={{ color: "var(--brand-green)" }}>
-        {info.getValue<string>()}
-      </span>
+      <span className="text-slate-600">{info.getValue<string>()}</span>
     ),
   },
   {
     accessorKey: "customerEmail",
     header: "Email",
     cell: (info) => (
-      <span style={{ color: "var(--brand-green)" }}>
-        {info.getValue<string>()}
-      </span>
+      <span className="text-slate-600 text-sm">{info.getValue<string>()}</span>
     ),
   },
   {
     accessorKey: "itemCount",
     header: "Items",
     cell: (info) => (
-      <span style={{ color: "var(--brand-green)" }}>
-        {info.getValue<number>()}
-      </span>
+      <span className="text-slate-600">{info.getValue<number>()}</span>
     ),
   },
   {
     accessorKey: "totalAmount",
     header: "Total",
     cell: (info) => (
-      <span
-        className="font-medium"
-        style={{ color: "var(--brand-dark-green)" }}
-      >
-        {info.getValue<string>()}
-      </span>
+      <span className="font-medium">{info.getValue<string>()}</span>
     ),
   },
   {
@@ -95,7 +83,7 @@ const columns: DataTableColumnDef<FulfillmentListItem>[] = [
     accessorKey: "updatedAt",
     header: "Updated",
     cell: (info) => (
-      <span style={{ color: "var(--brand-green)" }}>
+      <span className="text-slate-600">
         {dateFormatter(info.getValue<string>())}
       </span>
     ),
@@ -117,15 +105,8 @@ const FulfillmentsPage = () => {
     <section>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-sm" style={{ color: "var(--brand-green)" }}>
-            Manage
-          </p>
-          <h1
-            className="mt-1 text-3xl font-semibold"
-            style={{ color: "var(--brand-dark-green)" }}
-          >
-            Fulfillments
-          </h1>
+          <p className="text-sm text-slate-500">Manage</p>
+          <h1 className="mt-1 text-3xl font-semibold">Fulfillments</h1>
         </div>
         <div className="flex flex-wrap gap-2">
           <select
@@ -134,8 +115,7 @@ const FulfillmentsPage = () => {
               setFilter("status", event.target.value || undefined);
               setPage(0);
             }}
-            className="px-3 py-2 text-sm border rounded"
-            style={{ borderColor: "var(--brand-light-green)" }}
+            className="border border-slate-300 px-3 py-2 text-sm"
           >
             <option value="">All Statuses</option>
             <option value="pending">Pending</option>
@@ -157,9 +137,7 @@ const FulfillmentsPage = () => {
         isLoading={isLoading}
         isError={isError}
         loadingState={
-          <div className="py-12" style={{ color: "var(--brand-green)" }}>
-            Loading fulfillments...
-          </div>
+          <div className="py-12 text-slate-500">Loading fulfillments...</div>
         }
         errorState={
           <div className="py-12 text-red-600">Unable to load fulfillments.</div>

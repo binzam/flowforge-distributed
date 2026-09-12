@@ -23,7 +23,6 @@ const columns: DataTableColumnDef<Order>[] = [
       <Link
         to={`/admin/orders/${info.getValue<string>()}`}
         className="font-medium underline"
-        style={{ color: "var(--brand-green)" }}
       >
         #{info.getValue<string>().slice(0, 8)}
       </Link>
@@ -34,16 +33,14 @@ const columns: DataTableColumnDef<Order>[] = [
     header: "Customer",
     accessorFn: (row) => row.customer.name,
     cell: (info) => (
-      <span style={{ color: "var(--brand-green)" }}>
-        {info.getValue<string>()}
-      </span>
+      <span className="text-slate-600">{info.getValue<string>()}</span>
     ),
   },
   {
     accessorKey: "status",
     header: "Status",
     cell: (info) => (
-      <span className="uppercase" style={{ color: "var(--brand-green)" }}>
+      <span className="uppercase text-slate-600">
         {info.getValue<OrderStatus>().replace("_", " ")}
       </span>
     ),
@@ -51,17 +48,13 @@ const columns: DataTableColumnDef<Order>[] = [
   {
     accessorKey: "totalAmount",
     header: "Total",
-    cell: (info) => (
-      <span style={{ color: "var(--brand-dark-green)" }}>
-        ETB {Number(info.getValue<string>()).toFixed(2)}
-      </span>
-    ),
+    cell: (info) => `ETB ${Number(info.getValue<string>()).toFixed(2)}`,
   },
   {
     accessorKey: "createdAt",
     header: "Created",
     cell: (info) => (
-      <span style={{ color: "var(--brand-green)" }}>
+      <span className="text-slate-600">
         {dateFormatter(info.getValue<string>())}
       </span>
     ),
@@ -86,29 +79,20 @@ const AdminOrdersPage = () => {
     <section>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-sm" style={{ color: "var(--brand-green)" }}>
-            Operations
-          </p>
-          <h1
-            className="mt-1 text-3xl font-semibold"
-            style={{ color: "var(--brand-dark-green)" }}
-          >
-            Orders
-          </h1>
+          <p className="text-sm text-slate-500">Operations</p>
+          <h1 className="mt-1 text-3xl font-semibold">Orders</h1>
         </div>
         <div className="flex flex-wrap gap-2">
           <input
             value={filters.userId ?? ""}
             onChange={(event) => setFilter("userId", event.target.value)}
             placeholder="Filter customer ID"
-            className="px-3 py-2 text-sm border rounded"
-            style={{ borderColor: "var(--brand-light-green)" }}
+            className="border border-slate-300 px-3 py-2 text-sm"
           />
           <select
             value={status ?? ""}
             onChange={(event) => setFilter("status", event.target.value)}
-            className="border px-3 py-2 text-sm rounded"
-            style={{ borderColor: "var(--brand-light-green)" }}
+            className="border border-slate-300 bg-white px-3 py-2 text-sm"
           >
             <option value="">All statuses</option>
             {ORDER_STATUSES.map((item) => (
@@ -129,9 +113,7 @@ const AdminOrdersPage = () => {
         isLoading={isLoading}
         isError={isError}
         loadingState={
-          <div className="py-12" style={{ color: "var(--brand-green)" }}>
-            Loading orders...
-          </div>
+          <div className="py-12 text-slate-500">Loading orders...</div>
         }
         errorState={
           <div className="py-12 text-red-600">Unable to load orders.</div>

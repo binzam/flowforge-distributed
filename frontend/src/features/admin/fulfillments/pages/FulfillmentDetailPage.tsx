@@ -18,12 +18,12 @@ interface FulfillmentMetricRow {
 }
 
 const FULFILLMENT_STATUS_COLORS: Record<FulfillmentStatus, string> = {
-  pending: "bg-yellow-50 text-yellow-900 border border-yellow-200",
-  processing: "bg-blue-50 text-blue-900 border border-blue-200",
-  packed: "bg-purple-50 text-purple-900 border border-purple-200",
-  shipped: "bg-indigo-50 text-indigo-900 border border-indigo-200",
-  delivered: "bg-green-50 text-green-900 border border-green-200",
-  cancelled: "bg-red-50 text-red-900 border border-red-200",
+  pending: "bg-yellow-100 text-yellow-800",
+  processing: "bg-blue-100 text-blue-800",
+  packed: "bg-purple-100 text-purple-800",
+  shipped: "bg-indigo-100 text-indigo-800",
+  delivered: "bg-green-100 text-green-800",
+  cancelled: "bg-red-100 text-red-800",
 };
 
 const ALLOWED_STATUS_TRANSITIONS: Record<
@@ -43,21 +43,14 @@ const metricColumns: DataTableColumnDef<FulfillmentMetricRow>[] = [
     accessorKey: "metric",
     header: "Metric",
     cell: (info) => (
-      <span
-        className="font-medium"
-        style={{ color: "var(--brand-dark-green)" }}
-      >
-        {info.getValue<string>()}
-      </span>
+      <span className="font-medium">{info.getValue<string>()}</span>
     ),
   },
   {
     accessorKey: "value",
     header: "Value",
     cell: (info) => (
-      <span style={{ color: "var(--brand-green)" }}>
-        {info.getValue<ReactNode>()}
-      </span>
+      <span className="text-slate-600">{info.getValue<ReactNode>()}</span>
     ),
   },
 ];
@@ -67,37 +60,28 @@ const itemsColumns: DataTableColumnDef<OrderItem>[] = [
     accessorKey: "productName",
     header: "Product",
     cell: (info) => (
-      <span
-        className="font-medium"
-        style={{ color: "var(--brand-dark-green)" }}
-      >
-        {info.getValue<string>()}
-      </span>
+      <span className="font-medium">{info.getValue<string>()}</span>
     ),
   },
   {
     accessorKey: "sku",
     header: "SKU",
     cell: (info) => (
-      <span style={{ color: "var(--brand-green)" }}>
-        {info.getValue<string>()}
-      </span>
+      <span className="text-slate-600 text-sm">{info.getValue<string>()}</span>
     ),
   },
   {
     accessorKey: "quantity",
     header: "Quantity",
     cell: (info) => (
-      <span style={{ color: "var(--brand-green)" }}>
-        {info.getValue<number>()}
-      </span>
+      <span className="text-slate-600">{info.getValue<number>()}</span>
     ),
   },
   {
     accessorKey: "unitPrice",
     header: "Unit Price",
     cell: (info) => (
-      <span style={{ color: "var(--brand-green)" }}>
+      <span className="text-slate-600">
         {typeof info.getValue<number | string>() === "string"
           ? info.getValue<string>()
           : info.getValue<number>().toFixed(2)}
@@ -117,18 +101,13 @@ const FulfillmentDetailPage = () => {
   const fulfillment = data?.data;
 
   if (isLoading)
-    return (
-      <div className="py-12" style={{ color: "var(--brand-green)" }}>
-        Loading fulfillment...
-      </div>
-    );
+    return <div className="py-12 text-slate-500">Loading fulfillment...</div>;
   if (isError || !fulfillment)
     return (
       <div>
         <Link
           to="/admin/fulfillments"
-          className="text-sm underline"
-          style={{ color: "var(--brand-green)" }}
+          className="text-sm text-slate-500 underline"
         >
           Back to fulfillments
         </Link>
@@ -168,26 +147,20 @@ const FulfillmentDetailPage = () => {
     <section>
       <Link
         to="/admin/fulfillments"
-        className="text-sm underline"
-        style={{ color: "var(--brand-green)" }}
+        className="text-sm text-slate-500 underline"
       >
         Back to fulfillments
       </Link>
       <div className="mt-6 flex flex-wrap justify-between gap-4">
         <div>
-          <p className="text-sm" style={{ color: "var(--brand-green)" }}>
-            Fulfillment Details
-          </p>
-          <h1
-            className="mt-1 text-3xl font-semibold"
-            style={{ color: "var(--brand-dark-green)" }}
-          >
+          <p className="text-sm text-slate-500">Fulfillment Details</p>
+          <h1 className="mt-1 text-3xl font-semibold">
             {fulfillment.id.slice(0, 8)}...
           </h1>
-          <p className="mt-2 text-sm" style={{ color: "var(--brand-green)" }}>
+          <p className="mt-2 text-sm text-slate-500">
             Customer: {fulfillment.customerName}
           </p>
-          <p className="text-sm" style={{ color: "var(--brand-green)" }}>
+          <p className="text-sm text-slate-500">
             Email: {fulfillment.customerEmail}
           </p>
           <div className="mt-3">
@@ -202,13 +175,8 @@ const FulfillmentDetailPage = () => {
           </div>
         </div>
         <div className="text-right">
-          <p className="text-sm" style={{ color: "var(--brand-green)" }}>
-            Order Total
-          </p>
-          <p
-            className="mt-1 text-2xl font-semibold"
-            style={{ color: "var(--brand-dark-green)" }}
-          >
+          <p className="text-sm text-slate-500">Order Total</p>
+          <p className="mt-1 text-2xl font-semibold">
             {fulfillment.totalAmount}
           </p>
         </div>
@@ -216,13 +184,8 @@ const FulfillmentDetailPage = () => {
 
       <div className="mt-8">
         <div>
-          <p className="text-sm" style={{ color: "var(--brand-green)" }}>
-            Order Items
-          </p>
-          <h3
-            className="mt-1 text-lg font-semibold"
-            style={{ color: "var(--brand-dark-green)" }}
-          >
+          <p className="text-sm text-slate-500">Order Items</p>
+          <h3 className="mt-1 text-lg font-semibold">
             Items in Fulfillment ({fulfillment.items.length})
           </h3>
         </div>
@@ -236,15 +199,8 @@ const FulfillmentDetailPage = () => {
       </div>
 
       <div className="mt-8">
-        <p className="text-sm" style={{ color: "var(--brand-green)" }}>
-          Details
-        </p>
-        <h3
-          className="mt-1 text-lg font-semibold"
-          style={{ color: "var(--brand-dark-green)" }}
-        >
-          Fulfillment Information
-        </h3>
+        <p className="text-sm text-slate-500">Details</p>
+        <h3 className="mt-1 text-lg font-semibold">Fulfillment Information</h3>
         <DataTable
           className="mt-4"
           tableId="fulfillment-metrics"
@@ -255,18 +211,10 @@ const FulfillmentDetailPage = () => {
       </div>
 
       {allowedTransitions.length > 0 && (
-        <div
-          className="mt-8 border-t pt-8"
-          style={{ borderColor: "var(--brand-light-green)" }}
-        >
+        <div className="mt-8 border-t border-slate-200 pt-8">
           <div>
-            <p className="text-sm" style={{ color: "var(--brand-green)" }}>
-              Update Status
-            </p>
-            <h3
-              className="mt-1 text-lg font-semibold"
-              style={{ color: "var(--brand-dark-green)" }}
-            >
+            <p className="text-sm text-slate-500">Update Status</p>
+            <h3 className="mt-1 text-lg font-semibold">
               Change Fulfillment Status
             </h3>
           </div>
@@ -277,8 +225,7 @@ const FulfillmentDetailPage = () => {
               onChange={(e) =>
                 setSelectedStatus(e.target.value as FulfillmentStatus)
               }
-              className="px-3 py-2 text-sm border rounded"
-              style={{ borderColor: "var(--brand-light-green)" }}
+              className="border border-slate-300 px-3 py-2 text-sm"
               disabled={isPending}
             >
               <option value="">Select new status...</option>
@@ -291,8 +238,7 @@ const FulfillmentDetailPage = () => {
             <button
               onClick={handleStatusUpdate}
               disabled={!selectedStatus || isPending}
-              className="text-white px-4 py-2 text-sm font-medium rounded hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{ backgroundColor: "var(--brand-light-green)" }}
+              className="bg-blue-600 text-white px-4 py-2 text-sm font-medium rounded hover:bg-blue-700 disabled:bg-slate-400 disabled:cursor-not-allowed"
             >
               {isPending ? "Updating..." : "Update Status"}
             </button>

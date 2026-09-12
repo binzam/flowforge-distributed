@@ -4,10 +4,7 @@ import AdminSidebar from "./AdminSidebar";
 
 const AdminLayout = () => {
   return (
-    <div
-      className="flex h-screen w-full text-slate-900 overflow-hidden"
-      style={{ backgroundColor: "var(--brand-cream)" }}
-    >
+    <div className="flex h-screen w-full bg-slate-50 text-slate-900 overflow-hidden">
       <AdminSidebar />
 
       <div className="flex flex-col flex-1 min-w-0">

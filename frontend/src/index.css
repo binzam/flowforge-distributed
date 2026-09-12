@@ -1,10 +1,1 @@
 @import "tailwindcss";
-
-@layer base {
-  :root {
-    --brand-cream: #e5d9b6;
-    --brand-light-green: #a4be7b;
-    --brand-green: #5f8d4e;
-    --brand-dark-green: #285430;
-  }
-}

@@ -17,6 +17,10 @@ const menuItems = [
     label: "Fulfillments",
     path: "fulfillments",
   },
+  {
+    label: "Users",
+    path: "users",
+  },
 ];
 const AdminSidebar = () => {
   return (

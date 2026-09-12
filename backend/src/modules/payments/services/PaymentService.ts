@@ -2,7 +2,6 @@ import { AppError } from "../../../errors/AppError.js";
 import type { PaymentProvider } from "../../../infrastructure/payments/PaymentProvider.js";
 import type { OrderRepository } from "../../orders/repositories/OrderRepository.js";
 import type { OrderService } from "../../orders/services/OrderService.js";
-import type { InventoryService } from "../../inventory/services/InventoryService.js";
 import type { UserRole } from "../../users/types/user.types.js";
 import type { PaymentRepository } from "../repositories/PaymentRepository.js";
 import type {
@@ -10,7 +9,8 @@ import type {
   PayerDetails,
   Payment,
 } from "../types/payment.types.js";
-import type { FulfillmentService } from "../../fulfillments/services/FulfillmentService.js";
+import type { EventBus } from "../../../infrastructure/events/EventBus.js";
+import { PaymentCompletedEvent } from "../events/PaymentCompletedEvent.js";
 
 const CURRENCY = "ETB";
 
@@ -20,8 +20,7 @@ export class PaymentService {
     private readonly orderRepository: OrderRepository,
     private readonly orderService: OrderService,
     private readonly paymentProvider: PaymentProvider,
-    private readonly inventoryService: InventoryService,
-    private readonly fulfillmentService: FulfillmentService,
+    private readonly eventBus: EventBus,
     private readonly frontendBaseUrl: string,
     private readonly apiBaseUrl: string,
   ) {}
@@ -135,33 +134,19 @@ export class PaymentService {
 
     if (verified.status === "success") {
       await this.paymentRepository.updateStatus(payment.id, "successful");
+
       await this.orderService.markAsPaid(payment.orderId);
-      await this.fulfillOrder(payment.orderId);
+      this.eventBus.publish(
+        new PaymentCompletedEvent({
+          paymentId: payment.id,
+          orderId: payment.orderId,
+          amount: payment.amount,
+          txRef,
+        }),
+      );
     } else {
       await this.paymentRepository.updateStatus(payment.id, "failed");
       await this.orderService.updateStatus(payment.orderId, "failed");
-    }
-  }
-
-  private async fulfillOrder(orderId: string): Promise<void> {
-    const order = await this.orderRepository.findById(orderId);
-    console.log("payment service: fulfillOrder: order:", order);
-    if (!order) {
-      console.error(`fulfillOrder: order ${orderId} not found after paid`);
-      return;
-    }
-
-    try {
-      await this.inventoryService.reserveStock(order);
-      await this.orderService.markProcessing(orderId);
-      await this.fulfillmentService.createFulfillment(order.id);
-    } catch (error) {
-      console.error(
-        `fulfillOrder: stock reservation failed for order ${orderId}, refund required`,
-        error,
-      );
-      await this.orderService.markFailed(orderId);
-      // TODO: this is where refund will be implmented
     }
   }
 }

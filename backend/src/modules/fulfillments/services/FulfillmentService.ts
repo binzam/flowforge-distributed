@@ -1,4 +1,7 @@
 import { AppError } from "../../../errors/AppError.js";
+import type { EventBus } from "../../../infrastructure/events/EventBus.js";
+import { FulfillmentDeliveredEvent } from "../events/FulfillmentDeliveredEvent.js";
+import { FulfillmentShippedEvent } from "../events/FulfillmentShippedEvent.js";
 import type { FulfillmentRepository } from "../repositories/FulfillmentRepository.js";
 import type { GetFulfillmentsQuery } from "../schemas/fulfillment.schemas.js";
 import type {
@@ -20,7 +23,10 @@ const ALLOWED_STATUS_TRANSITIONS: Record<
 };
 
 export class FulfillmentService {
-  constructor(private readonly fulfillmentRepository: FulfillmentRepository) {}
+  constructor(
+    private readonly fulfillmentRepository: FulfillmentRepository,
+    private readonly eventBus: EventBus,
+  ) {}
 
   async getFulfillments(options: GetFulfillmentsQuery = {}) {
     return this.fulfillmentRepository.findAll(options);
@@ -77,6 +83,23 @@ export class FulfillmentService {
 
     if (!updated) {
       throw new AppError("Fulfillment not found", 404);
+    }
+
+    if (newStatus === "shipped") {
+      this.eventBus.publish(
+        new FulfillmentShippedEvent({
+          fulfillmentId: updated.id,
+          orderId: updated.orderId,
+        }),
+      );
+    }
+    if (newStatus === "delivered") {
+      this.eventBus.publish(
+        new FulfillmentDeliveredEvent({
+          fulfillmentId: updated.id,
+          orderId: updated.orderId,
+        }),
+      );
     }
 
     return updated;

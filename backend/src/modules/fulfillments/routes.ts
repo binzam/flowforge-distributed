@@ -14,6 +14,7 @@ import { SessionRepository } from "../auth/repositories/SessionRepository.js";
 import { pool } from "../../database/pool.js";
 import { FulfillmentService } from "./services/FulfillmentService.js";
 import { FulfillmentRepository } from "./repositories/FulfillmentRepository.js";
+import { eventBus } from "../../infrastructure/events/eventBusInstance.js";
 
 const router = Router();
 
@@ -21,7 +22,7 @@ const userRepository = new UserRepository(pool);
 const sessionRepository = new SessionRepository(pool);
 const fulfillmentRepository = new FulfillmentRepository(pool);
 
-const fulfillmentService = new FulfillmentService(fulfillmentRepository);
+const fulfillmentService = new FulfillmentService(fulfillmentRepository, eventBus);
 
 const fulfillmentController = new FulfillmentController(fulfillmentService);
 

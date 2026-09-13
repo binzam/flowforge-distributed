@@ -24,8 +24,8 @@ export const useUpdateOrderStatus = () =>
   useMutation({
     mutationFn: ({ id, status }: { id: string; status: OrderStatus }) =>
       updateOrderStatus(id, status),
-    onSuccess: (response) => {
-      queryClient.setQueryData(["orders", response.data.id], response);
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["orders", variables.id] });
       queryClient.invalidateQueries({ queryKey: ["orders", "all"] });
     },
   });

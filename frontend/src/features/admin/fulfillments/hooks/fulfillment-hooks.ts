@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import {
   getFulfillments,
   getFulfillmentById,
@@ -9,6 +9,7 @@ import type {
   GetFulfillmentsQuery,
   UpdateFulfillmentStatusInput,
 } from "../types/fulfillment-types";
+import { queryClient } from "@/lib/query-client";
 
 export const useGetFulfillments = (query: GetFulfillmentsQuery = {}) =>
   useQuery({
@@ -31,8 +32,6 @@ export const useGetFulfillmentByOrderId = (orderId: string) =>
   });
 
 export const useUpdateFulfillmentStatus = () => {
-  const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: ({
       id,
@@ -41,9 +40,12 @@ export const useUpdateFulfillmentStatus = () => {
       id: string;
       input: UpdateFulfillmentStatusInput;
     }) => updateFulfillmentStatus(id, input),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["fulfillments"] });
-      queryClient.setQueryData(["fulfillments", data.data.id], data);
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["fulfillments", variables.id],
+      });
+
+      queryClient.invalidateQueries({ queryKey: ["fulfillments", "all"] });
     },
   });
 };

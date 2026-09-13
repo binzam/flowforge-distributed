@@ -27,7 +27,7 @@ const AdminSidebar = () => {
     <aside className="w-64 hidden md:flex flex-col bg-white border-r border-slate-200 shrink-0">
       {/* Logo/Brand Area - Fixed height to align with Header */}
       <div className="h-16 flex items-center px-6 border-b border-slate-200">
-        <span className="font-bold text-lg tracking-tight">FlowFor Admin</span>
+        <span className="font-bold text-lg tracking-tight">FlowForge Admin</span>
       </div>
 
       {/* Navigation Area - Scrolls independently if menu gets too long */}

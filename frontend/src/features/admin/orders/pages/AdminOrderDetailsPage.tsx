@@ -65,14 +65,20 @@ const AdminOrderDetailsPage = () => {
       </div>
     );
 
-  const changeStatus = (status: OrderStatus) =>
+  const currentStatus = order.status.toLowerCase() as OrderStatus;
+  const availableStatuses = nextStatuses[currentStatus] || [];
+
+  const changeStatus = (status: string) => {
+    if (!status) return;
+
     updateStatus.mutate(
-      { id: order.id, status },
+      { id: order.id, status: status as OrderStatus },
       {
         onSuccess: () => toast.success("Order status updated"),
         onError: (error) => toast.error(error.message),
       },
     );
+  };
 
   return (
     <section>
@@ -86,7 +92,7 @@ const AdminOrderDetailsPage = () => {
             #{order.id.slice(0, 8)}
           </h1>
           <p className="mt-2 text-sm text-slate-500">
-            Customer: {order.customer.name}
+            Customer: {order.customer?.name ?? "Unknown"}
           </p>
           <p className="text-sm text-slate-500">
             {dateFormatter(order.createdAt)}
@@ -97,20 +103,17 @@ const AdminOrderDetailsPage = () => {
           <p className="mt-2 font-semibold uppercase">
             {order.status.replace("_", " ")}
           </p>
+
           <select
-            disabled={
-              updateStatus.isPending || nextStatuses[order.status].length === 0
-            }
+            disabled={updateStatus.isPending || availableStatuses.length === 0}
             value=""
-            onChange={(event) =>
-              changeStatus(event.target.value as OrderStatus)
-            }
+            onChange={(event) => changeStatus(event.target.value)}
             className="mt-3 border border-slate-300 bg-white px-3 py-2 text-sm"
           >
             <option value="">
               {updateStatus.isPending ? "Updating..." : "Change status"}
             </option>
-            {nextStatuses[order.status].map((status) => (
+            {availableStatuses.map((status) => (
               <option key={status} value={status}>
                 {status.replace("_", " ")}
               </option>

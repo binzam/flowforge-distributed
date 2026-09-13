@@ -12,9 +12,12 @@ import { registerFulfillmentShippedHandler } from "../modules/fulfillments/event
 import { registerFulfillmentDeliveredHandler } from "../modules/fulfillments/events/fulfillmentDeliveredHandler.js";
 import { registerOrderCancelledHandler } from "../modules/orders/events/orderCancelledHandler.js";
 import { registerInventoryReleasedHandler } from "../modules/inventory/events/inventoryReleasedHandler.js";
+import { OrderEventRepository } from "../modules/orders/events/OrderEventRepository.js";
+import { registerOrderEventHandler } from "../modules/orders/events/orderEventHandler.js";
 
 export const registerEventHandlers = (): void => {
   const orderRepository = new OrderRepository(pool);
+  const orderEventRepository = new OrderEventRepository(pool);
   const orderService = new OrderService(orderRepository, eventBus);
 
   const inventoryRepository = new InventoryRepository(pool);
@@ -42,4 +45,6 @@ export const registerEventHandlers = (): void => {
   registerFulfillmentDeliveredHandler(eventBus, orderService);
 
   registerOrderCancelledHandler(eventBus, orderRepository, inventoryService);
+
+  registerOrderEventHandler(eventBus, orderEventRepository);
 };

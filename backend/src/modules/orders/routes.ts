@@ -16,12 +16,20 @@ import { SessionRepository } from "../auth/repositories/SessionRepository.js";
 import { createAuthenticate } from "../auth/middleware/authenticate.js";
 import { authorize } from "../../middleware/authorize.js";
 import { eventBus } from "../../infrastructure/events/eventBusInstance.js";
+import { OrderEventRepository } from "./events/OrderEventRepository.js";
+import { OrderEventService } from "./services/OrderEventService.js";
 
 const router = Router();
 
 const orderRepository = new OrderRepository(pool);
+const orderEventRepository = new OrderEventRepository(pool);
+
 const orderService = new OrderService(orderRepository, eventBus);
-const orderController = new OrderController(orderService);
+const orderEventService = new OrderEventService(
+  orderRepository,
+  orderEventRepository,
+);
+const orderController = new OrderController(orderService, orderEventService);
 
 const userRepository = new UserRepository(pool);
 const sessionRepository = new SessionRepository(pool);
@@ -47,6 +55,13 @@ router.get(
   authorize("admin", "warehouse"),
   validate(getOrdersQuerySchema, "query"),
   orderController.getAll,
+);
+
+router.get(
+  "/:id/events",
+  authenticate,
+  validate(orderIdSchema, "params"),
+  orderController.getEvents,
 );
 
 router.get(

@@ -12,9 +12,13 @@ import type {
   GetOrdersQuery,
   UpdateOrderStatusInput,
 } from "../schemas/order.schemas.js";
+import type { OrderEventService } from "../services/OrderEventService.js";
 
 export class OrderController {
-  constructor(private readonly orderService: OrderService) {}
+  constructor(
+    private readonly orderService: OrderService,
+    private readonly orderEventService: OrderEventService,
+  ) {}
 
   create = async (
     req: Request<Record<string, never>, unknown, CreateOrderInput>,
@@ -122,5 +126,23 @@ export class OrderController {
     console.log("order controller: cancel order : order", order);
 
     res.status(200).json(order);
+  };
+  getEvents = async (
+    req: Request<{ id: string }>,
+    res: Response,
+  ): Promise<void> => {
+    if (!req.user) {
+      throw new AppError("Authentication required", 401);
+    }
+
+    const events = await this.orderEventService.getOrderEvents(
+      req.params.id,
+      req.user.id,
+      req.user.role,
+    );
+
+    res.status(200).json({
+      data: events,
+    });
   };
 }

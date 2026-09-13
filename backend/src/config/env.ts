@@ -11,9 +11,9 @@ const getEnv = (key: string): string => {
 };
 
 export const config = {
-  nodeEnv: process.env.NODE_ENV ?? "development",
-  port: Number(process.env.PORT ?? 3000),
-
+  nodeEnv: getEnv("NODE_ENV"),
+  port: getEnv("PORT"),
+  rabbitmqUrl: getEnv("RABBITMQ_URL"),
   database: {
     url: getEnv("DATABASE_URL"),
   },

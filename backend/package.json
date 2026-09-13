@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "rabbitmq:worker": "tsx src/infrastructure/messaging/testWorker.ts",
+    "rabbitmq:publish": "tsx src/infrastructure/messaging/testPublisher.ts"
   },
   "keywords": [],
   "author": "",
@@ -21,19 +23,23 @@
   "packageManager": "pnpm@11.25.0",
   "type": "module",
   "dependencies": {
+    "amqplib": "^2.0.1",
     "argon2": "^0.45.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "nodemailer": "^10.0.9",
     "pg": "^8.23.0",
     "zod": "^4.5.4"
   },
   "devDependencies": {
+    "@types/amqplib": "^0.10.8",
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/node": "^26.4.1",
+    "@types/nodemailer": "^8.0.1",
     "@types/pg": "^8.23.1",
     "tsx": "^4.23.13",
     "typescript": "^7.0.2"

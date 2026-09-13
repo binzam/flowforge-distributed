@@ -1,5 +1,7 @@
 import { AppError } from "../../../errors/AppError.js";
+import type { EventBus } from "../../../infrastructure/events/EventBus.js";
 import type { UserRole } from "../../users/types/user.types.js";
+import { OrderCancelledEvent } from "../events/OrderCancelledEvent.js";
 import type { OrderRepository } from "../repositories/OrderRepository.js";
 import type {
   CreateOrderInput,
@@ -24,7 +26,10 @@ const ALLOWED_STATUS_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
 };
 
 export class OrderService {
-  constructor(private readonly orderRepository: OrderRepository) {}
+  constructor(
+    private readonly orderRepository: OrderRepository,
+    private readonly eventBus: EventBus,
+  ) {}
 
   async createOrder(
     userId: string,
@@ -117,8 +122,34 @@ export class OrderService {
     if (!updated) {
       throw new AppError("Order not found", 404);
     }
-
+    if (nextStatus === "cancelled") {
+      this.eventBus.publish(
+        new OrderCancelledEvent({
+          orderId: updated.id,
+        }),
+      );
+    }
     return updated;
+  }
+  async cancelOrder(
+    id: string,
+    requestingUserId: string,
+    requestingUserRole: UserRole,
+  ): Promise<Order> {
+    const order = await this.orderRepository.findById(id);
+
+    if (!order) {
+      throw new AppError("Order not found", 404);
+    }
+
+    const canCancelAny =
+      requestingUserRole === "admin" || requestingUserRole === "warehouse";
+
+    if (!canCancelAny && order.userId !== requestingUserId) {
+      throw new AppError("Order not found", 404);
+    }
+
+    return this.updateStatus(id, "cancelled");
   }
 
   async markAsPaid(id: string): Promise<Order> {

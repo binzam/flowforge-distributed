@@ -15,11 +15,12 @@ import { UserRepository } from "../users/repositories/UserRepository.js";
 import { SessionRepository } from "../auth/repositories/SessionRepository.js";
 import { createAuthenticate } from "../auth/middleware/authenticate.js";
 import { authorize } from "../../middleware/authorize.js";
+import { eventBus } from "../../infrastructure/events/eventBusInstance.js";
 
 const router = Router();
 
 const orderRepository = new OrderRepository(pool);
-const orderService = new OrderService(orderRepository);
+const orderService = new OrderService(orderRepository, eventBus);
 const orderController = new OrderController(orderService);
 
 const userRepository = new UserRepository(pool);
@@ -63,5 +64,7 @@ router.patch(
   validate(updateOrderStatusSchema),
   orderController.updateStatus,
 );
+
+router.post("/:id/cancel", authenticate, orderController.cancelOrder);
 
 export default router;

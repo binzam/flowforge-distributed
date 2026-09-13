@@ -2,6 +2,7 @@ import type { FulfillmentDeliveredEvent } from "../../modules/fulfillments/event
 import type { FulfillmentShippedEvent } from "../../modules/fulfillments/events/FulfillmentShippedEvent.js";
 import type { InventoryReleasedEvent } from "../../modules/inventory/events/InventoryReleasedEvent.js";
 import type { InventoryReservedEvent } from "../../modules/inventory/events/InventoryReservedEvent.js";
+import type { OrderCancelledEvent } from "../../modules/orders/events/OrderCancelledEvent.js";
 import type { PaymentCompletedEvent } from "../../modules/payments/events/PaymentCompletedEvent.js";
 
 export interface EventMap {
@@ -10,4 +11,5 @@ export interface EventMap {
   "inventory.released": InventoryReleasedEvent; // Not really neccessary
   "fulfillment.shipped": FulfillmentShippedEvent;
   "fulfillment.delivered": FulfillmentDeliveredEvent;
+  "order.cancelled": OrderCancelledEvent;
 }

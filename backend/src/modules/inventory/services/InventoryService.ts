@@ -93,7 +93,7 @@ export class InventoryService {
         400,
       );
     }
-
+    console.log("Inventory Service: Release Stock: order", order);
     return this.inventoryRepository.releaseStock(
       order.items.map((item) => ({
         productId: item.productId,

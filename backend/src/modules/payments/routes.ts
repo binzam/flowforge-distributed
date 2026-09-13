@@ -25,6 +25,7 @@ import { registerInventoryReservedHandler } from "../inventory/events/inventoryR
 import { registerInventoryReleasedHandler } from "../inventory/events/inventoryReleasedHandler.js";
 import { registerFulfillmentShippedHandler } from "../fulfillments/events/fulfillmentShippedHandler.js";
 import { registerFulfillmentDeliveredHandler } from "../fulfillments/events/fulfillmentDeliveredHandler.js";
+import { registerOrderCancelledHandler } from "../orders/events/orderCancelledHandler.js";
 
 const chapaSecretKey = process.env.CHAPA_SECRET_KEY;
 if (!chapaSecretKey) {
@@ -43,7 +44,7 @@ const paymentProvider = new ChapaProvider(chapaSecretKey, chapaWebhookSecret);
 
 const paymentRepository = new PaymentRepository(pool);
 const orderRepository = new OrderRepository(pool);
-const orderService = new OrderService(orderRepository);
+const orderService = new OrderService(orderRepository, eventBus);
 const inventoryRepository = new InventoryRepository(pool);
 const inventoryService = new InventoryService(inventoryRepository);
 const fulfillmentRepository = new FulfillmentRepository(pool);
@@ -66,6 +67,8 @@ registerInventoryReleasedHandler(eventBus, orderRepository, inventoryService);
 registerFulfillmentShippedHandler(eventBus, orderService);
 
 registerFulfillmentDeliveredHandler(eventBus, orderService);
+
+registerOrderCancelledHandler(eventBus, orderRepository, inventoryService);
 
 const paymentService = new PaymentService(
   paymentRepository,

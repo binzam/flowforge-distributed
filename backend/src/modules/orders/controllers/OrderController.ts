@@ -104,4 +104,23 @@ export class OrderController {
       data: toPublicOrder(order),
     });
   };
+
+  cancelOrder = async (
+    req: Request<{ id: string }>,
+    res: Response,
+  ): Promise<void> => {
+    if (!req.user) {
+      throw new AppError("Authentication required", 401);
+    }
+    const user = req.user;
+    console.log("order controller: cancel order : user", user);
+    const order = await this.orderService.cancelOrder(
+      req.params.id,
+      user.id,
+      user.role,
+    );
+    console.log("order controller: cancel order : order", order);
+
+    res.status(200).json(order);
+  };
 }

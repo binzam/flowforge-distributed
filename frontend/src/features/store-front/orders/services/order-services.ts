@@ -22,3 +22,8 @@ export const getOrder = async (id: string) => {
   const response = await apiClient.get<OrderResponse>(`/orders/${id}`);
   return response.data;
 };
+
+export const cancleOrder = async (id: string) => {
+  const response = await apiClient.post<void>(`/orders/${id}/cancel`, {});
+  return response.data;
+};

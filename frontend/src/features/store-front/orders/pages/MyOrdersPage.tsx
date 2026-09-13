@@ -12,6 +12,7 @@ import {
   type DataTableColumnDef,
 } from "@/components/data-table/data-table";
 import { DataTablePagination } from "@/components/data-table/data-table-pagination";
+import CancelOrderButton from "../components/CancelOrderButton";
 
 const PAGE_SIZE = 10;
 
@@ -33,14 +34,14 @@ const columns: DataTableColumnDef<Order>[] = [
     header: "Customer",
     accessorFn: (row) => row.customer.name,
     cell: (info) => (
-      <span className="text-slate-600">{info.getValue<string>()}</span>
+      <span className="text-slate-400">{info.getValue<string>()}</span>
     ),
   },
   {
     accessorKey: "status",
     header: "Status",
     cell: (info) => (
-      <span className="uppercase text-slate-600">
+      <span className="uppercase text-slate-400">
         {info.getValue<OrderStatus>().replace("_", " ")}
       </span>
     ),
@@ -54,9 +55,18 @@ const columns: DataTableColumnDef<Order>[] = [
     accessorKey: "createdAt",
     header: "Created",
     cell: (info) => (
-      <span className="text-slate-600">
+      <span className="text-slate-400">
         {dateFormatter(info.getValue<string>())}
       </span>
+    ),
+  },
+  {
+    header: "Actions",
+    cell: (info) => (
+      <CancelOrderButton
+        orderId={info.row.original.id}
+        orderStatus={info.row.original.status}
+      />
     ),
   },
 ];
@@ -86,11 +96,11 @@ const MyOrdersPage = () => {
           <select
             value={status ?? ""}
             onChange={(event) => setFilter("status", event.target.value)}
-            className="border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm text-white"
+            className="border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm text-white capitalize"
           >
             <option value="">All statuses</option>
             {ORDER_STATUSES.map((item) => (
-              <option key={item} value={item}>
+              <option key={item} value={item} className="capitalize">
                 {item.replace("_", " ")}
               </option>
             ))}

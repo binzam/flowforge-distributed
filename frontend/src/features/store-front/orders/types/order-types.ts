@@ -23,6 +23,8 @@ export interface OrderProduct {
 }
 
 export interface OrderItem {
+  id: string;
+  status: string;
   product: OrderProduct;
   quantity: number;
   unitPrice: string;

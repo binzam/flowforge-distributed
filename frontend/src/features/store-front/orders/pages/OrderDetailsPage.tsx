@@ -13,6 +13,7 @@ import {
   DataTable,
   type DataTableColumnDef,
 } from "@/components/data-table/data-table";
+import CancelOrderButton from "../components/CancelOrderButton";
 
 const PAYABLE_STATUSES: OrderStatus[] = ["pending", "payment_pending"];
 
@@ -122,25 +123,28 @@ const OrderDetailsPage = () => {
         </p>
       )}
 
-      {(isPayable || isFailed) && (
-        <div className="mt-6 flex flex-wrap items-center gap-4">
-          <button
-            onClick={handlePay}
-            disabled={initializePaymentMutation.isPending}
-            className="border border-neutral-100 px-4 py-2 text-sm uppercase tracking-widest disabled:opacity-40"
-          >
-            {initializePaymentMutation.isPending
-              ? "Redirecting..."
-              : isFailed
-                ? "Retry payment"
-                : "Pay now"}
-          </button>
-          {paymentError && (
-            <p className="text-sm text-red-400">{paymentError}</p>
-          )}
-        </div>
-      )}
+      <div className="mt-6 flex flex-wrap items-center gap-4">
+        {(isPayable || isFailed) && (
+          <>
+            <button
+              onClick={handlePay}
+              disabled={initializePaymentMutation.isPending}
+              className="border border-neutral-100 px-4 py-2 text-sm uppercase tracking-widest disabled:opacity-40"
+            >
+              {initializePaymentMutation.isPending
+                ? "Redirecting..."
+                : isFailed
+                  ? "Retry payment"
+                  : "Pay now"}
+            </button>
+            {paymentError && (
+              <p className="text-sm text-red-400">{paymentError}</p>
+            )}
+          </>
+        )}
 
+        <CancelOrderButton orderId={order.id} orderStatus={order.status} />
+      </div>
       <DataTable
         className="mt-10"
         tableId="order-items"

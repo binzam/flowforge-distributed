@@ -1,6 +1,11 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { queryClient } from "@/lib/query-client";
-import { createOrder, getMyOrders, getOrder } from "../services/order-services";
+import {
+  cancleOrder,
+  createOrder,
+  getMyOrders,
+  getOrder,
+} from "../services/order-services";
 import type { CreateOrderInput, OrdersQuery } from "../types/order-types";
 
 export const useGetMyOrders = (query: OrdersQuery) =>
@@ -19,5 +24,11 @@ export const useGetOrder = (id: string) =>
 export const useCreateOrder = () =>
   useMutation({
     mutationFn: (input: CreateOrderInput) => createOrder(input),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["orders"] }),
+  });
+
+export const useCancelOrder = () =>
+  useMutation({
+    mutationFn: (id: string) => cancleOrder(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["orders"] }),
   });

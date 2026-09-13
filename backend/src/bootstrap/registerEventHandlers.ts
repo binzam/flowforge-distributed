@@ -14,6 +14,9 @@ import { registerOrderCancelledHandler } from "../modules/orders/events/orderCan
 import { registerInventoryReleasedHandler } from "../modules/inventory/events/inventoryReleasedHandler.js";
 import { OrderEventRepository } from "../modules/orders/events/OrderEventRepository.js";
 import { registerOrderEventHandler } from "../modules/orders/events/orderEventHandler.js";
+import { UserRepository } from "../modules/users/repositories/UserRepository.js";
+import { RabbitMQPublisher } from "../infrastructure/messaging/RabbitMQPublisher.js";
+import { OrderEmailPublisher } from "../modules/orders/jobs/orderEmailPublisher.js";
 
 export const registerEventHandlers = (): void => {
   const orderRepository = new OrderRepository(pool);
@@ -28,12 +31,19 @@ export const registerEventHandlers = (): void => {
     fulfillmentRepository,
     eventBus,
   );
+  const userRepository = new UserRepository(pool);
 
+  const rabbitMQPublisher = new RabbitMQPublisher();
+
+  const orderEmailPublisher = new OrderEmailPublisher(rabbitMQPublisher);
+  
   registerPaymentCompletedHandler(
     eventBus,
     orderRepository,
     orderService,
     inventoryService,
+    userRepository,
+    orderEmailPublisher,
   );
 
   registerInventoryReservedHandler(eventBus, orderService, fulfillmentService);

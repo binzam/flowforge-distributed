@@ -8,7 +8,8 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "rabbitmq:worker": "tsx src/infrastructure/messaging/testWorker.ts",
-    "rabbitmq:publish": "tsx src/infrastructure/messaging/testPublisher.ts"
+    "rabbitmq:publish": "tsx src/infrastructure/messaging/testPublisher.ts",
+    "worker:order-email": "tsx src/workers/orderEmailWorker.ts"
   },
   "keywords": [],
   "author": "",

@@ -20,4 +20,11 @@ export const config = {
   frontend: {
     url: getEnv("FRONTEND_URL"),
   },
+  smtp: {
+    host: getEnv("SMTP_HOST"),
+    port: Number(getEnv("SMTP_PORT")),
+    user: getEnv("SMTP_USER"),
+    password: getEnv("SMTP_PASSWORD"),
+    from: getEnv("SMTP_FROM"),
+  },
 };

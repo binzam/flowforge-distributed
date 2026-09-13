@@ -15,17 +15,7 @@ import { OrderService } from "../orders/services/OrderService.js";
 import { UserRepository } from "../users/repositories/UserRepository.js";
 import { SessionRepository } from "../auth/repositories/SessionRepository.js";
 import { createAuthenticate } from "../auth/middleware/authenticate.js";
-import { InventoryRepository } from "../inventory/repositories/InventoryRepository.js";
-import { InventoryService } from "../inventory/services/InventoryService.js";
-import { FulfillmentService } from "../fulfillments/services/FulfillmentService.js";
-import { FulfillmentRepository } from "../fulfillments/repositories/FulfillmentRepository.js";
 import { eventBus } from "../../infrastructure/events/eventBusInstance.js";
-import { registerPaymentCompletedHandler } from "./events/paymentCompletedHandler.js";
-import { registerInventoryReservedHandler } from "../inventory/events/inventoryReservedHandler.js";
-import { registerInventoryReleasedHandler } from "../inventory/events/inventoryReleasedHandler.js";
-import { registerFulfillmentShippedHandler } from "../fulfillments/events/fulfillmentShippedHandler.js";
-import { registerFulfillmentDeliveredHandler } from "../fulfillments/events/fulfillmentDeliveredHandler.js";
-import { registerOrderCancelledHandler } from "../orders/events/orderCancelledHandler.js";
 
 const chapaSecretKey = process.env.CHAPA_SECRET_KEY;
 if (!chapaSecretKey) {
@@ -45,30 +35,6 @@ const paymentProvider = new ChapaProvider(chapaSecretKey, chapaWebhookSecret);
 const paymentRepository = new PaymentRepository(pool);
 const orderRepository = new OrderRepository(pool);
 const orderService = new OrderService(orderRepository, eventBus);
-const inventoryRepository = new InventoryRepository(pool);
-const inventoryService = new InventoryService(inventoryRepository);
-const fulfillmentRepository = new FulfillmentRepository(pool);
-const fulfillmentService = new FulfillmentService(
-  fulfillmentRepository,
-  eventBus,
-);
-
-registerPaymentCompletedHandler(
-  eventBus,
-  orderRepository,
-  orderService,
-  inventoryService,
-);
-
-registerInventoryReservedHandler(eventBus, orderService, fulfillmentService);
-
-registerInventoryReleasedHandler(eventBus, orderRepository, inventoryService);
-
-registerFulfillmentShippedHandler(eventBus, orderService);
-
-registerFulfillmentDeliveredHandler(eventBus, orderService);
-
-registerOrderCancelledHandler(eventBus, orderRepository, inventoryService);
 
 const paymentService = new PaymentService(
   paymentRepository,

@@ -1,6 +1,7 @@
 import app from "./app.js";
 import { pool } from "./database/index.js";
 import { config } from "./config/env.js";
+import { registerEventHandlers } from "./bootstrap/registerEventHandlers.js";
 
 const startServer = async () => {
   try {
@@ -8,6 +9,7 @@ const startServer = async () => {
 
     console.log("Database connection successful");
 
+    registerEventHandlers();
     app.listen(config.port, () => {
       console.log(`FlowForge API running on port ${config.port}`);
     });

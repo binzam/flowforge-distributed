@@ -8,25 +8,22 @@ import {
   updateFulfillmentStatusSchema,
 } from "./schemas/fulfillment.schemas.js";
 import { authorize } from "../../middleware/authorize.js";
-import { createAuthenticate } from "../auth/middleware/authenticate.js";
-import { UserRepository } from "../users/repositories/UserRepository.js";
-import { SessionRepository } from "../auth/repositories/SessionRepository.js";
 import { pool } from "../../database/pool.js";
 import { FulfillmentService } from "./services/FulfillmentService.js";
 import { FulfillmentRepository } from "./repositories/FulfillmentRepository.js";
 import { eventBus } from "../../infrastructure/events/eventBusInstance.js";
+import { authenticate } from "../../middleware/authenticate.js";
 
 const router = Router();
 
-const userRepository = new UserRepository(pool);
-const sessionRepository = new SessionRepository(pool);
 const fulfillmentRepository = new FulfillmentRepository(pool);
 
-const fulfillmentService = new FulfillmentService(fulfillmentRepository, eventBus);
+const fulfillmentService = new FulfillmentService(
+  fulfillmentRepository,
+  eventBus,
+);
 
 const fulfillmentController = new FulfillmentController(fulfillmentService);
-
-const authenticate = createAuthenticate(sessionRepository, userRepository);
 
 router.get(
   "/",

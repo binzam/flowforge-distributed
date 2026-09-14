@@ -2,6 +2,10 @@ import type { Request, Response } from "express";
 import type { AuthService } from "../services/AuthService.js";
 import { toPublicUser } from "../../users/mapper/userMapper.js";
 import { AppError } from "../../../errors/AppError.js";
+import { config } from "../../../config/env.js";
+
+const ACCESS_TOKEN_MAX_AGE_MS = 1000 * 60 * 5;
+const REFRESH_TOKEN_MAX_AGE_MS = 1000 * 60 * 60 * 24 * 7;
 
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -9,17 +13,12 @@ export class AuthController {
   login = async (req: Request, res: Response): Promise<void> => {
     const { email, password } = req.body;
 
-    const { user, sessionId } = await this.authService.login({
+    const { user, accessToken, refreshToken } = await this.authService.login({
       email,
       password,
     });
 
-    res.cookie("session_id", sessionId, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 1000 * 60 * 60 * 24 * 7,
-    });
+    this.setAuthCookies(res, accessToken, refreshToken);
 
     res.status(200).json({
       data: {
@@ -27,25 +26,54 @@ export class AuthController {
       },
     });
   };
+
+  refresh = async (req: Request, res: Response): Promise<void> => {
+    const refreshToken = req.cookies.refresh_token;
+
+    if (!refreshToken) {
+      throw new AppError("Refresh token missing", 401);
+    }
+
+    const { accessToken } =
+      await this.authService.refreshAccessToken(refreshToken);
+
+    res.cookie("access_token", accessToken, {
+      httpOnly: true,
+      secure: config.nodeEnv === "production",
+      sameSite: "lax",
+      maxAge: ACCESS_TOKEN_MAX_AGE_MS,
+    });
+
+    res.status(204).send();
+  };
+
   me = async (req: Request, res: Response): Promise<void> => {
     if (!req.user) {
       throw new AppError("Authenticated user missing", 500);
     }
 
+    const user = await this.authService.getUserById(req.user.id);
+
     res.status(200).json({
       data: {
-        user: toPublicUser(req.user),
+        user: toPublicUser(user),
       },
     });
   };
-  logout = async (req: Request, res: Response): Promise<void> => {
-    const sessionId = req.cookies.session_id;
 
-    if (sessionId) {
-      await this.authService.logout(sessionId);
+  logout = async (req: Request, res: Response): Promise<void> => {
+    const refreshToken = req.cookies.refresh_token;
+
+    if (refreshToken) {
+      await this.authService.logout(refreshToken);
     }
 
-    res.clearCookie("session_id", {
+    res.clearCookie("access_token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    });
+    res.clearCookie("refresh_token", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
@@ -53,4 +81,24 @@ export class AuthController {
 
     res.status(204).send();
   };
+
+  private setAuthCookies(
+    res: Response,
+    accessToken: string,
+    refreshToken: string,
+  ): void {
+    res.cookie("access_token", accessToken, {
+      httpOnly: true,
+      secure: config.nodeEnv === "production",
+      sameSite: "lax",
+      maxAge: ACCESS_TOKEN_MAX_AGE_MS,
+    });
+
+    res.cookie("refresh_token", refreshToken, {
+      httpOnly: true,
+      secure: config.nodeEnv === "production",
+      sameSite: "lax",
+      maxAge: REFRESH_TOKEN_MAX_AGE_MS,
+    });
+  }
 }

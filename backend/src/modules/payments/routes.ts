@@ -12,10 +12,8 @@ import {
 import { validate } from "../../middleware/validate.js";
 import { OrderRepository } from "../orders/repositories/OrderRepository.js";
 import { OrderService } from "../orders/services/OrderService.js";
-import { UserRepository } from "../users/repositories/UserRepository.js";
-import { SessionRepository } from "../auth/repositories/SessionRepository.js";
-import { createAuthenticate } from "../auth/middleware/authenticate.js";
 import { eventBus } from "../../infrastructure/events/eventBusInstance.js";
+import { authenticate } from "../../middleware/authenticate.js";
 
 const chapaSecretKey = process.env.CHAPA_SECRET_KEY;
 if (!chapaSecretKey) {
@@ -50,10 +48,6 @@ const paymentController = new PaymentController(
   paymentService,
   paymentProvider,
 );
-
-const userRepository = new UserRepository(pool);
-const sessionRepository = new SessionRepository(pool);
-const authenticate = createAuthenticate(sessionRepository, userRepository);
 
 const router = Router();
 

@@ -1,9 +1,9 @@
-import type { User } from "../modules/users/types/user.types.js";
+import type { AccessTokenPayload } from "../modules/auth/types/session.types.ts";
 
 declare global {
   namespace Express {
     interface Request {
-      user?: User;
+      user?: AccessTokenPayload;
     }
   }
 }

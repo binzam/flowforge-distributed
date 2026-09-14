@@ -10,9 +10,8 @@ import {
   userIdSchema,
 } from "./schemas/user.schemas.js";
 import { validate } from "../../middleware/validate.js";
-import { SessionRepository } from "../auth/repositories/SessionRepository.js";
-import { createAuthenticate } from "../auth/middleware/authenticate.js";
 import { authorize } from "../../middleware/authorize.js";
+import { authenticate } from "../../middleware/authenticate.js";
 
 const router = Router();
 
@@ -21,10 +20,6 @@ const passwordHasher = new Argon2PasswordHasher();
 const userService = new UserService(userRepository, passwordHasher);
 
 const userController = new UserController(userService);
-
-const sessionRepository = new SessionRepository(pool);
-
-const authenticate = createAuthenticate(sessionRepository, userRepository);
 
 router.post("/", validate(createUserSchema), userController.create);
 router.get("/:id", validate(userIdSchema, "params"), userController.getById);

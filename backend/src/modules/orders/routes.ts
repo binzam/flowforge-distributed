@@ -11,13 +11,11 @@ import {
   updateOrderStatusSchema,
 } from "./schemas/order.schemas.js";
 import { validate } from "../../middleware/validate.js";
-import { UserRepository } from "../users/repositories/UserRepository.js";
-import { SessionRepository } from "../auth/repositories/SessionRepository.js";
-import { createAuthenticate } from "../auth/middleware/authenticate.js";
 import { authorize } from "../../middleware/authorize.js";
 import { eventBus } from "../../infrastructure/events/eventBusInstance.js";
 import { OrderEventRepository } from "./events/OrderEventRepository.js";
 import { OrderEventService } from "./services/OrderEventService.js";
+import { authenticate } from "../../middleware/authenticate.js";
 
 const router = Router();
 
@@ -30,10 +28,6 @@ const orderEventService = new OrderEventService(
   orderEventRepository,
 );
 const orderController = new OrderController(orderService, orderEventService);
-
-const userRepository = new UserRepository(pool);
-const sessionRepository = new SessionRepository(pool);
-const authenticate = createAuthenticate(sessionRepository, userRepository);
 
 router.post(
   "/",

@@ -14,26 +14,34 @@ import { registerOrderCancelledHandler } from "../modules/orders/events/orderCan
 import { registerInventoryReleasedHandler } from "../modules/inventory/events/inventoryReleasedHandler.js";
 import { OrderEventRepository } from "../modules/orders/events/OrderEventRepository.js";
 import { registerOrderEventHandler } from "../modules/orders/events/orderEventHandler.js";
+import { UserRepository } from "../modules/users/repositories/UserRepository.js";
+import { NodemailerEmailProvider } from "../infrastructure/email/NodemailerEmailProvider.js";
+import { EmailService } from "../infrastructure/email/EmailService.js";
 
 export const registerEventHandlers = (): void => {
   const orderRepository = new OrderRepository(pool);
   const orderEventRepository = new OrderEventRepository(pool);
-  const orderService = new OrderService(orderRepository, eventBus);
-
+  const userRepository = new UserRepository(pool);
   const inventoryRepository = new InventoryRepository(pool);
-  const inventoryService = new InventoryService(inventoryRepository);
-
   const fulfillmentRepository = new FulfillmentRepository(pool);
+
+  const orderService = new OrderService(orderRepository, eventBus);
+  const inventoryService = new InventoryService(inventoryRepository);
   const fulfillmentService = new FulfillmentService(
     fulfillmentRepository,
     eventBus,
   );
 
+  const emailProvider = new NodemailerEmailProvider();
+  const emailService = new EmailService(emailProvider);
+
   registerPaymentCompletedHandler(
     eventBus,
     orderRepository,
+    userRepository,
     orderService,
     inventoryService,
+    emailService,
   );
 
   registerInventoryReservedHandler(eventBus, orderService, fulfillmentService);

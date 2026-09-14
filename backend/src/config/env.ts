@@ -26,4 +26,7 @@ export const config = {
     password: getEnv("SMTP_PASSWORD"),
     from: getEnv("SMTP_FROM"),
   },
+  redis: {
+    url: getEnv("REDIS_URL"),
+  },
 };

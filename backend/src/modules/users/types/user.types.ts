@@ -1,6 +1,3 @@
-import type { Request } from "express";
-import type { GetUsersQuery } from "../schemas/user.schemas.js";
-
 export interface User {
   id: string;
   name: string;

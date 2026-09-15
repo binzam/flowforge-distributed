@@ -1,15 +1,11 @@
-import jwt from "jsonwebtoken";
 import { AppError } from "../../../errors/AppError.js";
 import type { PasswordHasher } from "../../../infrastructure/security/PasswordHasher.js";
 import type { UserRepository } from "../../users/repositories/UserRepository.js";
 import type { LoginInput } from "../schemas/auth.schemas.js";
 import type { User } from "../../users/types/user.types.js";
 import type { SessionRepository } from "../repositories/SessionRepository.js";
-import type { AccessTokenPayload } from "../types/session.types.js";
-import { config } from "../../../config/env.js";
-
-const ACCESS_TOKEN_TTL = "5m";
-const REFRESH_TOKEN_TTL_MS = 1000 * 60 * 60 * 24 * 7;
+import { REFRESH_TOKEN_TTL_MS } from "../config/token-config.js";
+import { signAccessToken } from "../../../middleware/accessToken.js";
 
 export class AuthService {
   constructor(
@@ -44,7 +40,7 @@ export class AuthService {
       refreshExpiresAt,
     );
 
-    const accessToken = this.signAccessToken({
+    const accessToken = await signAccessToken({
       id: user.id,
       role: user.role,
       email: user.email,
@@ -60,6 +56,7 @@ export class AuthService {
 
   async refreshAccessToken(refreshToken: string): Promise<{
     accessToken: string;
+    refreshToken: string;
   }> {
     const session = await this.sessionRepository.findById(refreshToken);
 
@@ -81,14 +78,22 @@ export class AuthService {
       throw new AppError("User associated with session not found", 401);
     }
 
-    const accessToken = this.signAccessToken({
+    await this.sessionRepository.deleteById(session.id);
+
+    const newExpiresAt = new Date(Date.now() + REFRESH_TOKEN_TTL_MS);
+    const newSession = await this.sessionRepository.create(
+      user.id,
+      newExpiresAt,
+    );
+
+    const accessToken = await signAccessToken({
       id: user.id,
       role: user.role,
       email: user.email,
       name: user.name,
     });
 
-    return { accessToken };
+    return { accessToken, refreshToken: newSession.id };
   }
 
   async getUserById(id: string): Promise<User> {
@@ -103,11 +108,5 @@ export class AuthService {
 
   async logout(refreshToken: string): Promise<void> {
     await this.sessionRepository.deleteById(refreshToken);
-  }
-
-  private signAccessToken(payload: AccessTokenPayload): string {
-    return jwt.sign(payload, config.JWT_ACCESS_SECRET, {
-      expiresIn: ACCESS_TOKEN_TTL,
-    });
   }
 }

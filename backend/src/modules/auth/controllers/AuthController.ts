@@ -3,9 +3,10 @@ import type { AuthService } from "../services/AuthService.js";
 import { toPublicUser } from "../../users/mapper/userMapper.js";
 import { AppError } from "../../../errors/AppError.js";
 import { config } from "../../../config/env.js";
-
-const ACCESS_TOKEN_MAX_AGE_MS = 1000 * 60 * 5;
-const REFRESH_TOKEN_MAX_AGE_MS = 1000 * 60 * 60 * 24 * 7;
+import {
+  ACCESS_TOKEN_MAX_AGE_MS,
+  REFRESH_TOKEN_MAX_AGE_MS,
+} from "../config/token-config.js";
 
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -34,15 +35,10 @@ export class AuthController {
       throw new AppError("Refresh token missing", 401);
     }
 
-    const { accessToken } =
+    const { accessToken, refreshToken: rotatedRefreshToken } =
       await this.authService.refreshAccessToken(refreshToken);
 
-    res.cookie("access_token", accessToken, {
-      httpOnly: true,
-      secure: config.nodeEnv === "production",
-      sameSite: "lax",
-      maxAge: ACCESS_TOKEN_MAX_AGE_MS,
-    });
+    this.setAuthCookies(res, accessToken, rotatedRefreshToken);
 
     res.status(204).send();
   };
@@ -70,12 +66,12 @@ export class AuthController {
 
     res.clearCookie("access_token", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: config.nodeEnv === "production",
       sameSite: "lax",
     });
     res.clearCookie("refresh_token", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: config.nodeEnv === "production",
       sameSite: "lax",
     });
 

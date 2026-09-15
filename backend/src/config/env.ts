@@ -29,5 +29,5 @@ export const config = {
   redis: {
     url: getEnv("REDIS_URL"),
   },
-  JWT_ACCESS_SECRET: getEnv("JWT_ACCESS_SECRET"),
+  JWT_ENCRYPTION_KEY: getEnv("JWT_ENCRYPTION_KEY"),
 };

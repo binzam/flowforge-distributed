@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import { AppError } from "../../../errors/AppError.js";
 import type { PaymentProvider } from "../../../infrastructure/payments/PaymentProvider.js";
 import type { PaymentService } from "../services/PaymentService.js";
+import type { IdempotencyService } from "../../../infrastructure/idempotency/IdempotencyService.js";
 import type {
   ChapaCallbackQuery,
   InitializePaymentInput,
@@ -11,6 +12,7 @@ export class PaymentController {
   constructor(
     private readonly paymentService: PaymentService,
     private readonly paymentProvider: PaymentProvider,
+    private readonly idempotencyService: IdempotencyService,
   ) {}
 
   initialize = async (
@@ -20,28 +22,64 @@ export class PaymentController {
     if (!req.user) {
       throw new AppError("Authentication required", 401);
     }
-    console.log("payment initializing user", req.user);
-    const [firstName, ...rest] = req.user.name.trim().split(/\s+/);
-    const lastName = rest.join(" ") || firstName;
+    const idempotencyKey = req.idempotencyKey;
+    const existing = await this.idempotencyService.get(
+      `payment-initialize:${req.user.id}:${idempotencyKey}`,
+    );
+    if (existing?.status === "completed" && existing.response) {
+      res.status(existing.response.statusCode).json(existing.response.body);
 
-    const { payment, checkoutUrl } =
-      await this.paymentService.initializePayment(
-        req.body.orderId,
-        req.user.id,
-        {
-          email: req.user.email,
-          firstName,
-          lastName,
-        },
+      return;
+    }
+
+    if (existing?.status === "processing") {
+      throw new AppError(
+        "A payment initialization request with this idempotency key is already being processed",
+        409,
       );
-    console.log("Payment Controller:Initialize", { payment, checkoutUrl });
-    res.status(201).json({
-      data: {
-        paymentId: payment.id,
-        status: payment.status,
-        checkoutUrl,
-      },
-    });
+    }
+
+    const key = `payment-initialize:${req.user.id}:${idempotencyKey}`;
+
+    const acquired = await this.idempotencyService.acquire(key);
+
+    if (!acquired) {
+      throw new AppError(
+        "A payment initialization request with this idempotency key is already being processed",
+        409,
+      );
+    }
+    try {
+      const [firstName, ...rest] = req.user.name.trim().split(/\s+/);
+      const lastName = rest.join(" ") || firstName;
+
+      const { payment, checkoutUrl } =
+        await this.paymentService.initializePayment(
+          req.body.orderId,
+          req.user.id,
+          {
+            email: req.user.email,
+            firstName,
+            lastName,
+          },
+        );
+
+      const responseBody = {
+        data: {
+          paymentId: payment.id,
+          status: payment.status,
+          checkoutUrl,
+        },
+      };
+
+      await this.idempotencyService.complete(key, 201, responseBody);
+
+      res.status(201).json(responseBody);
+    } catch (error) {
+      await this.idempotencyService.release(key);
+
+      throw error;
+    }
   };
 
   getByOrderId = async (

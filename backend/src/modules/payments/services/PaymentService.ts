@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import { AppError } from "../../../errors/AppError.js";
 import type { PaymentProvider } from "../../../infrastructure/payments/PaymentProvider.js";
 import type { OrderRepository } from "../../orders/repositories/OrderRepository.js";
@@ -11,7 +12,6 @@ import type {
 } from "../types/payment.types.js";
 import type { EventBus } from "../../../infrastructure/events/EventBus.js";
 import { PaymentCompletedEvent } from "../events/PaymentCompletedEvent.js";
-
 const CURRENCY = "ETB";
 
 export class PaymentService {
@@ -50,7 +50,13 @@ export class PaymentService {
       );
     }
 
-    const txRef = `ff-${orderId}-`;
+    const prefix = `ff-${orderId}-`;
+    const randomLength = 48 - prefix.length;
+
+    const txRef = `${prefix}${crypto
+      .randomBytes(Math.ceil(randomLength / 2))
+      .toString("hex")
+      .slice(0, randomLength)}`;
 
     const payment = await this.paymentRepository.upsertForOrder(
       orderId,

@@ -14,6 +14,8 @@ import { OrderRepository } from "../orders/repositories/OrderRepository.js";
 import { OrderService } from "../orders/services/OrderService.js";
 import { eventBus } from "../../infrastructure/events/eventBusInstance.js";
 import { authenticate } from "../../middleware/authenticate.js";
+import { requireIdempotencyKey } from "../../middleware/idempotency.js";
+import { IdempotencyService } from "../../infrastructure/idempotency/IdempotencyService.js";
 
 const chapaSecretKey = process.env.CHAPA_SECRET_KEY;
 if (!chapaSecretKey) {
@@ -33,6 +35,7 @@ const paymentProvider = new ChapaProvider(chapaSecretKey, chapaWebhookSecret);
 const paymentRepository = new PaymentRepository(pool);
 const orderRepository = new OrderRepository(pool);
 const orderService = new OrderService(orderRepository, eventBus);
+const idempotencyService = new IdempotencyService();
 
 const paymentService = new PaymentService(
   paymentRepository,
@@ -47,6 +50,7 @@ const paymentService = new PaymentService(
 const paymentController = new PaymentController(
   paymentService,
   paymentProvider,
+  idempotencyService,
 );
 
 const router = Router();
@@ -54,6 +58,7 @@ const router = Router();
 router.post(
   "/initialize",
   authenticate,
+  requireIdempotencyKey,
   validate(initializePaymentSchema),
   paymentController.initialize,
 );

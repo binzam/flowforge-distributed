@@ -112,9 +112,6 @@ const AdminOrdersPage = () => {
         getRowId={(order) => order.id}
         isLoading={isLoading}
         isError={isError}
-        loadingState={
-          <div className="py-12 text-slate-500">Loading orders...</div>
-        }
         errorState={
           <div className="py-12 text-red-600">Unable to load orders.</div>
         }

@@ -34,9 +34,6 @@ const UserDetailPage = () => {
   const { data, isLoading, isError } = useGetUserById(id);
   const user = data?.data;
 
-  if (isLoading)
-    return <div className="py-12 text-slate-500">Loading user details...</div>;
-
   if (isError || !user)
     return (
       <div>
@@ -82,6 +79,7 @@ const UserDetailPage = () => {
         tableId="user-metrics"
         columns={metricColumns}
         data={metricRows}
+        isLoading={isLoading}
         getRowId={(row) => row.metric}
       />
     </section>

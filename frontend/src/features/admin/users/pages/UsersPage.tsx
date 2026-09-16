@@ -94,9 +94,6 @@ const UsersPage = () => {
         getRowId={(user) => user.id}
         isLoading={isLoading}
         isError={isError}
-        loadingState={
-          <div className="py-12 text-slate-500">Loading users...</div>
-        }
         errorState={
           <div className="py-12 text-red-600">Unable to load users.</div>
         }

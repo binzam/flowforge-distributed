@@ -64,7 +64,7 @@ const UserDetailPage = lazy(
 
 const AppRoutes = () => {
   return (
-    <Suspense fallback={<LoadingScreen />}>
+    <Suspense fallback={<LoadingScreen label="FLOWFORGE" />}>
       <Routes>
         <Route element={<StoreFrontLayout />}>
           <Route path="/" element={<HomePage />} />

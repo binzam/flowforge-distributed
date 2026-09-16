@@ -100,8 +100,6 @@ const FulfillmentDetailPage = () => {
 
   const fulfillment = data?.data;
 
-  if (isLoading)
-    return <div className="py-12 text-slate-500">Loading fulfillment...</div>;
   if (isError || !fulfillment)
     return (
       <div>
@@ -193,6 +191,7 @@ const FulfillmentDetailPage = () => {
           className="mt-4"
           tableId="fulfillment-items"
           columns={itemsColumns}
+          isLoading={isLoading}
           data={fulfillment.items}
           getRowId={(item) => item.productId}
         />

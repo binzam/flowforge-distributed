@@ -53,8 +53,6 @@ const AdminOrderDetailsPage = () => {
   const updateStatus = useUpdateOrderStatus();
   const order = data?.data;
 
-  if (isLoading)
-    return <div className="py-12 text-slate-500">Loading order...</div>;
   if (isError || !order)
     return (
       <div>
@@ -127,6 +125,7 @@ const AdminOrderDetailsPage = () => {
         tableId="order-items"
         columns={orderItemColumns}
         data={order.items}
+        isLoading={isLoading}
         getRowId={(item) => item.product.id}
         emptyState="No items on this order."
       />

@@ -196,9 +196,6 @@ const AdminProductsPage = () => {
         getRowId={(product) => product.id}
         isLoading={isLoading}
         isError={isError}
-        loadingState={
-          <div className="py-12 text-slate-500">Loading products...</div>
-        }
         errorState={
           <div className="py-12 text-red-600">Unable to load products.</div>
         }

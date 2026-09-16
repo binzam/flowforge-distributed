@@ -34,8 +34,6 @@ const InventoryDetailPage = () => {
   const { data, isLoading, isError } = useGetInventory(productId);
   const inventory = data?.data;
 
-  if (isLoading)
-    return <div className="py-12 text-slate-500">Loading inventory...</div>;
   if (isError || !inventory)
     return (
       <div>
@@ -79,6 +77,7 @@ const InventoryDetailPage = () => {
         tableId="inventory-metrics"
         columns={metricColumns}
         data={metricRows}
+        isLoading={isLoading}
         getRowId={(row) => row.metric}
       />
     </section>

@@ -136,9 +136,6 @@ const FulfillmentsPage = () => {
         getRowId={(item) => item.id}
         isLoading={isLoading}
         isError={isError}
-        loadingState={
-          <div className="py-12 text-slate-500">Loading fulfillments...</div>
-        }
         errorState={
           <div className="py-12 text-red-600">Unable to load fulfillments.</div>
         }

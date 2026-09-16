@@ -9,6 +9,11 @@ export const initializePayment = async (input: InitializePaymentInput) => {
   const response = await apiClient.post<InitializePaymentResponse>(
     "/payments/initialize",
     input,
+    {
+      headers: {
+        "Idempotency-Key": input.idempotencyKey,
+      },
+    },
   );
   return response.data;
 };

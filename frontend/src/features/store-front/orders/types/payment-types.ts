@@ -18,6 +18,7 @@ export interface Payment {
 
 export interface InitializePaymentInput {
   orderId: string;
+  idempotencyKey: string;
 }
 
 export interface InitializePaymentResponse {

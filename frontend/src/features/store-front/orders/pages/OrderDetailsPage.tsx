@@ -63,11 +63,18 @@ const OrderDetailsPage = () => {
     }
   }, [paymentQuery.data?.data.status, id]);
 
-  const handlePay = () => {
+  const handlePay = async () => {
     if (!order) return;
+
     setPaymentError(null);
+
+    const idempotencyKey = crypto.randomUUID();
+
     initializePaymentMutation.mutate(
-      { orderId: order.id },
+      {
+        orderId: order.id,
+        idempotencyKey,
+      },
       {
         onSuccess: (response) => {
           window.location.href = response.data.checkoutUrl;
@@ -78,7 +85,6 @@ const OrderDetailsPage = () => {
       },
     );
   };
-
   if (isLoading)
     return (
       <div className="py-24 text-center text-neutral-400">Loading order...</div>

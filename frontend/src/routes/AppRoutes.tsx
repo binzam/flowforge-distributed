@@ -36,6 +36,9 @@ const OrderDetailsPage = lazy(
 const AdminDashboard = lazy(
   () => import("@/features/admin/dashboard/pages/AdminDashboard"),
 );
+const AdminProductsPage = lazy(
+  () => import("@/features/admin/products/pages/AdminProductsPage"),
+);
 const AdminOrdersPage = lazy(
   () => import("@/features/admin/orders/pages/AdminOrdersPage"),
 );
@@ -81,6 +84,7 @@ const AppRoutes = () => {
         <Route element={<RoleProtectedRoute allowedRoles={["admin"]} />}>
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
+            <Route path="products" element={<AdminProductsPage />} />
             <Route path="orders" element={<AdminOrdersPage />} />
             <Route path="orders/:id" element={<AdminOrderDetailsPage />} />
             <Route path="inventory" element={<InventoryPage />} />

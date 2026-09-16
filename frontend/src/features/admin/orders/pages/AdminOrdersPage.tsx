@@ -92,9 +92,9 @@ const AdminOrdersPage = () => {
           <select
             value={status ?? ""}
             onChange={(event) => setFilter("status", event.target.value)}
-            className="border border-slate-300 bg-white px-3 py-2 text-sm"
+            className="border border-slate-300 bg-white px-3 py-2 text-sm capitalize"
           >
-            <option value="">All statuses</option>
+            <option value="" className="capitalize">All statuses</option>
             {ORDER_STATUSES.map((item) => (
               <option key={item} value={item}>
                 {item.replace("_", " ")}

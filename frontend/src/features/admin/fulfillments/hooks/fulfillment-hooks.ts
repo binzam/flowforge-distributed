@@ -40,7 +40,7 @@ export const useUpdateFulfillmentStatus = () => {
       id: string;
       input: UpdateFulfillmentStatusInput;
     }) => updateFulfillmentStatus(id, input),
-    onSuccess: (data, variables) => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["fulfillments", variables.id],
       });

@@ -1,5 +1,10 @@
 import type { Pool } from "pg";
-import type { Payment, PaymentStatus } from "../types/payment.types.js";
+import type {
+  FindAllPaymentsResult,
+  Payment,
+  PaymentStatus,
+} from "../types/payment.types.js";
+import type { GetPaymentsQuery } from "../schemas/payment.schemas.js";
 
 export class PaymentRepository {
   constructor(private readonly db: Pool) {}
@@ -114,5 +119,68 @@ export class PaymentRepository {
     console.log("payment repository: updatestatus: result", result.rows[0]);
 
     return result.rows[0] ?? null;
+  }
+  async findAll(options: GetPaymentsQuery): Promise<FindAllPaymentsResult> {
+    const { status, limit, offset } = options;
+
+    const conditions: string[] = [];
+    const values: unknown[] = [];
+
+    if (status) {
+      values.push(status);
+      conditions.push(`p.status = $${values.length}`);
+    }
+
+    const whereClause =
+      conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
+    const countResult = await this.db.query<{ count: string }>(
+      `
+    SELECT COUNT(*) AS count
+    FROM payments p
+    ${whereClause};
+    `,
+      values,
+    );
+
+    const total = Number(countResult.rows[0]?.count ?? 0);
+
+    const dataValues = [...values];
+
+    const pagination: string[] = [];
+
+    if (limit !== undefined) {
+      dataValues.push(limit);
+      pagination.push(`LIMIT $${dataValues.length}`);
+    }
+
+    if (offset !== undefined) {
+      dataValues.push(offset);
+      pagination.push(`OFFSET $${dataValues.length}`);
+    }
+
+    const result = await this.db.query<Payment>(
+      `
+    SELECT
+      p.id,
+      p.order_id AS "orderId",
+      p.amount,
+      p.status,
+      p.provider,
+      p.provider_payment_id AS "providerPaymentId",
+      p.created_at AS "createdAt",
+      p.updated_at AS "updatedAt"
+    FROM payments p
+    ${whereClause}
+    ORDER BY p.created_at DESC
+    ${pagination.join("\n")};
+    `,
+      dataValues,
+    );
+
+    return {
+      payments: result.rows,
+      total,
+    };
   }
 }

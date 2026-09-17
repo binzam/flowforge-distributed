@@ -5,6 +5,7 @@ import type { PaymentService } from "../services/PaymentService.js";
 import type { IdempotencyService } from "../../../infrastructure/idempotency/IdempotencyService.js";
 import type {
   ChapaCallbackQuery,
+  GetPaymentsQuery,
   InitializePaymentInput,
 } from "../schemas/payment.schemas.js";
 
@@ -131,5 +132,20 @@ export class PaymentController {
     await this.paymentService.confirmPayment(res.locals.validated.tx_ref);
 
     res.status(200).json({ received: true });
+  };
+  getAll = async (
+    _req: Request,
+    res: Response<unknown, { validated: GetPaymentsQuery }>,
+  ): Promise<void> => {
+    const query = res.locals.validated;
+
+    const { payments, total } = await this.paymentService.getPayments(query);
+
+    res.status(200).json({
+      data: payments,
+      total,
+      limit: query.limit ?? null,
+      offset: query.offset ?? null,
+    });
   };
 }

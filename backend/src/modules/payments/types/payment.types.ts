@@ -26,3 +26,8 @@ export interface PayerDetails {
   firstName: string | undefined;
   lastName: string | undefined;
 }
+
+export interface FindAllPaymentsResult {
+  payments: Payment[];
+  total: number;
+}

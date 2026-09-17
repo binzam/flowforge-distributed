@@ -12,6 +12,7 @@ import type {
 } from "../types/payment.types.js";
 import type { EventBus } from "../../../infrastructure/events/EventBus.js";
 import { PaymentCompletedEvent } from "../events/PaymentCompletedEvent.js";
+import type { GetPaymentsQuery } from "../schemas/payment.schemas.js";
 const CURRENCY = "ETB";
 
 export class PaymentService {
@@ -154,5 +155,8 @@ export class PaymentService {
       await this.paymentRepository.updateStatus(payment.id, "failed");
       await this.orderService.updateStatus(payment.orderId, "failed");
     }
+  }
+  async getPayments(options: GetPaymentsQuery) {
+    return this.paymentRepository.findAll(options);
   }
 }

@@ -6,6 +6,7 @@ import { PaymentService } from "./services/PaymentService.js";
 import { ChapaProvider } from "../../infrastructure/payments/ChapaProvider.js";
 import {
   chapaCallbackQuerySchema,
+  getPaymentsQuerySchema,
   initializePaymentSchema,
   paymentOrderIdParamSchema,
 } from "./schemas/payment.schemas.js";
@@ -16,6 +17,7 @@ import { eventBus } from "../../infrastructure/events/eventBusInstance.js";
 import { authenticate } from "../../middleware/authenticate.js";
 import { requireIdempotencyKey } from "../../middleware/idempotency.js";
 import { IdempotencyService } from "../../infrastructure/idempotency/IdempotencyService.js";
+import { authorize } from "../../middleware/authorize.js";
 
 const chapaSecretKey = process.env.CHAPA_SECRET_KEY;
 if (!chapaSecretKey) {
@@ -54,6 +56,14 @@ const paymentController = new PaymentController(
 );
 
 const router = Router();
+
+router.get(
+  "/",
+  authenticate,
+  authorize("admin"),
+  validate(getPaymentsQuerySchema, "query"),
+  paymentController.getAll,
+);
 
 router.post(
   "/initialize",

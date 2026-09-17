@@ -26,6 +26,11 @@ const menuItems = [
     icon: BriefcaseBusiness,
   },
   {
+    label: "Payments",
+    path: "payments",
+    icon: CreditCard,
+  },
+  {
     label: "Inventory",
     path: "inventory",
     icon: Box,

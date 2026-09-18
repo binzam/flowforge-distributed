@@ -6,6 +6,8 @@ import {
   DataTable,
   type DataTableColumnDef,
 } from "@/components/data-table/data-table";
+import PageTableWrapper from "../../layouts/PageTableWrapper";
+import PageHeaderWrapper from "../../layouts/PageHeaderWrapper";
 
 interface InventoryMetricRow {
   metric: string;
@@ -56,30 +58,35 @@ const InventoryDetailPage = () => {
 
   return (
     <section>
-      <Link to="/admin/inventory" className="text-sm text-slate-500 underline">
-        Back to inventory
-      </Link>
-      <div className="mt-6 flex flex-wrap justify-between gap-4">
-        <div>
-          <p className="text-sm text-slate-500">Product</p>
-          <h1 className="mt-1 text-3xl font-semibold">
-            {inventory.productName}
-          </h1>
-          <p className="mt-2 text-sm text-slate-500">SKU: {inventory.sku}</p>
-          <p className="text-sm text-slate-500">
-            Last updated: {dateFormatter(inventory.updatedAt)}
-          </p>
+      <PageHeaderWrapper>
+        <Link
+          to="/admin/inventory"
+          className="text-sm text-slate-500 underline"
+        >
+          Back to inventory
+        </Link>
+        <div className="mt-2 flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p className="text-sm text-slate-500">Product</p>
+            <h1 className="mt-1 text-3xl font-semibold">
+              {inventory.productName}
+            </h1>
+            <p className="mt-2 text-sm text-slate-500">SKU: {inventory.sku}</p>
+            <p className="text-sm text-slate-500">
+              Last updated: {dateFormatter(inventory.updatedAt)}
+            </p>
+          </div>
         </div>
-      </div>
-
-      <DataTable
-        className="mt-8"
-        tableId="inventory-metrics"
-        columns={metricColumns}
-        data={metricRows}
-        isLoading={isLoading}
-        getRowId={(row) => row.metric}
-      />
+      </PageHeaderWrapper>
+      <PageTableWrapper>
+        <DataTable
+          tableId="inventory-metrics"
+          columns={metricColumns}
+          data={metricRows}
+          isLoading={isLoading}
+          getRowId={(row) => row.metric}
+        />
+      </PageTableWrapper>
     </section>
   );
 };

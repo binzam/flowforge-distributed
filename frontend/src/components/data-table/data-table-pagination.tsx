@@ -34,7 +34,7 @@ export function DataTablePagination({
 
   return (
     <div
-      className={`mt-5 flex items-center justify-between text-sm ${theme.container}`}
+      className={`flex items-center justify-between text-[12px]/4 ${theme.container}`}
     >
       <span>
         {total} {itemLabel}
@@ -44,18 +44,18 @@ export function DataTablePagination({
           type="button"
           disabled={!canGoPrevious}
           onClick={() => onPageChange(page - 1)}
-          className={`rounded border px-3 py-1 disabled:opacity-40 transition-colors ${theme.button}`}
+          className={`rounded border px-3 py-0.75 disabled:opacity-40 transition-colors ${theme.button}`}
         >
           Previous
         </button>
-        <span className="px-2 py-1">
+        <span className="px-2 py-0.75">
           {totalPages === 0 ? 0 : page + 1} / {totalPages}
         </span>
         <button
           type="button"
           disabled={!canGoNext}
           onClick={() => onPageChange(page + 1)}
-          className={`rounded border px-3 py-1 disabled:opacity-40 transition-colors ${theme.button}`}
+          className={`rounded border px-3 py-0.75 disabled:opacity-40 transition-colors ${theme.button}`}
         >
           Next
         </button>

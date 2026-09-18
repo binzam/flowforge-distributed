@@ -9,6 +9,8 @@ import {
   type DataTableColumnDef,
 } from "@/components/data-table/data-table";
 import { DataTablePagination } from "@/components/data-table/data-table-pagination";
+import PageHeaderWrapper from "../../layouts/PageHeaderWrapper";
+import PageTableWrapper from "../../layouts/PageTableWrapper";
 
 const PAGE_SIZE = 10;
 
@@ -87,7 +89,7 @@ const PaymentsPage = () => {
 
   return (
     <section>
-      <div className="flex flex-wrap items-end justify-between gap-4">
+      <PageHeaderWrapper className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <p className="text-sm text-slate-500">Operations</p>
           <h1 className="mt-1 text-3xl font-semibold">Payments</h1>
@@ -111,29 +113,30 @@ const PaymentsPage = () => {
             ))}
           </select>
         </div>
+      </PageHeaderWrapper>
+      <PageTableWrapper>
+        <DataTable
+          tableId="admin-payments"
+          columns={columns}
+          data={data?.data ?? []}
+          getRowId={(payment) => payment.id}
+          isLoading={isLoading}
+          isError={isError}
+          errorState={
+            <div className="py-12 text-red-600">Unable to load payments.</div>
+          }
+          emptyState="No payments found."
+        />
+      </PageTableWrapper>
+      <div className="sticky bottom-0 bg-white/90 px-4 md:px-6 lg:px-8 py-2 border-t border-yellow-700">
+        <DataTablePagination
+          page={page}
+          pageSize={PAGE_SIZE}
+          total={data?.total ?? 0}
+          onPageChange={setPage}
+          itemLabel="payments"
+        />
       </div>
-
-      <DataTable
-        className="mt-8"
-        tableId="admin-payments"
-        columns={columns}
-        data={data?.data ?? []}
-        getRowId={(payment) => payment.id}
-        isLoading={isLoading}
-        isError={isError}
-        errorState={
-          <div className="py-12 text-red-600">Unable to load payments.</div>
-        }
-        emptyState="No payments found."
-      />
-
-      <DataTablePagination
-        page={page}
-        pageSize={PAGE_SIZE}
-        total={data?.total ?? 0}
-        onPageChange={setPage}
-        itemLabel="payments"
-      />
     </section>
   );
 };

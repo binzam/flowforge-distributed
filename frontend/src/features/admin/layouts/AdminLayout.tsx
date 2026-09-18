@@ -12,15 +12,13 @@ const AdminLayout = () => {
 
       <div className="flex flex-col flex-1 min-w-0">
         <AdminHeader />
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
-          <div className="max-w-7xl mx-auto">
-            <Suspense
-              key={location.pathname}
-              fallback={<LoadingScreen variant="outlet" label="FLOWFORGE" />}
-            >
-              <Outlet />
-            </Suspense>
-          </div>
+        <main className="flex-1 overflow-y-auto scroll-container">
+          <Suspense
+            key={location.pathname}
+            fallback={<LoadingScreen variant="outlet" label="FLOWFORGE" />}
+          >
+            <Outlet />
+          </Suspense>
         </main>
       </div>
     </div>

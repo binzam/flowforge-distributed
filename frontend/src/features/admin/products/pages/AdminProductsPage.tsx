@@ -18,6 +18,8 @@ import type {
   ProductPayload,
   UpdateProductPayload,
 } from "../types/product-types";
+import PageHeaderWrapper from "../../layouts/PageHeaderWrapper";
+import PageTableWrapper from "../../layouts/PageTableWrapper";
 
 const AdminProductsPage = () => {
   const { data, isLoading, isError } = useGetProducts();
@@ -172,7 +174,7 @@ const AdminProductsPage = () => {
 
   return (
     <section>
-      <div className="flex flex-wrap items-end justify-between gap-4">
+      <PageHeaderWrapper className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <p className="text-sm text-slate-500">Manage</p>
           <h1 className="mt-1 text-3xl font-semibold">Products</h1>
@@ -186,22 +188,21 @@ const AdminProductsPage = () => {
           <Plus className="h-4 w-4" />
           Add Product
         </button>
-      </div>
-
-      <DataTable
-        className="mt-8"
-        tableId="admin-products"
-        columns={columns}
-        data={data?.data ?? []}
-        getRowId={(product) => product.id}
-        isLoading={isLoading}
-        isError={isError}
-        errorState={
-          <div className="py-12 text-red-600">Unable to load products.</div>
-        }
-        emptyState="No products found."
-      />
-
+      </PageHeaderWrapper>
+      <PageTableWrapper>
+        <DataTable
+          tableId="admin-products"
+          columns={columns}
+          data={data?.data ?? []}
+          getRowId={(product) => product.id}
+          isLoading={isLoading}
+          isError={isError}
+          errorState={
+            <div className="py-12 text-red-600">Unable to load products.</div>
+          }
+          emptyState="No products found."
+        />
+      </PageTableWrapper>
       <ProductFormModal
         open={isModalOpen}
         mode={modalMode}

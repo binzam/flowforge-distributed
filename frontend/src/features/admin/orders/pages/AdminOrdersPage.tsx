@@ -12,6 +12,8 @@ import {
   type DataTableColumnDef,
 } from "@/components/data-table/data-table";
 import { DataTablePagination } from "@/components/data-table/data-table-pagination";
+import PageHeaderWrapper from "../../layouts/PageHeaderWrapper";
+import PageTableWrapper from "../../layouts/PageTableWrapper";
 
 const PAGE_SIZE = 10;
 
@@ -77,8 +79,8 @@ const AdminOrdersPage = () => {
 
   return (
     <section>
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
+      <PageHeaderWrapper className="flex flex-wrap items-center justify-between gap-4">
+        <div className="">
           <p className="text-sm text-slate-500">Operations</p>
           <h1 className="mt-1 text-3xl font-semibold">Orders</h1>
         </div>
@@ -94,7 +96,9 @@ const AdminOrdersPage = () => {
             onChange={(event) => setFilter("status", event.target.value)}
             className="border border-slate-300 bg-white px-3 py-2 text-sm capitalize"
           >
-            <option value="" className="capitalize">All statuses</option>
+            <option value="" className="capitalize">
+              All statuses
+            </option>
             {ORDER_STATUSES.map((item) => (
               <option key={item} value={item}>
                 {item.replace("_", " ")}
@@ -102,29 +106,30 @@ const AdminOrdersPage = () => {
             ))}
           </select>
         </div>
+      </PageHeaderWrapper>
+      <PageTableWrapper>
+        <DataTable
+          tableId="admin-orders"
+          columns={columns}
+          data={data?.data ?? []}
+          getRowId={(order) => order.id}
+          isLoading={isLoading}
+          isError={isError}
+          errorState={
+            <div className="py-12 text-red-600">Unable to load orders.</div>
+          }
+          emptyState="No orders found."
+        />
+      </PageTableWrapper>
+      <div className="sticky bottom-0 bg-white/90 px-4 md:px-6 lg:px-8 py-2 border-t border-yellow-700">
+        <DataTablePagination
+          page={page}
+          pageSize={PAGE_SIZE}
+          total={data?.total ?? 0}
+          onPageChange={setPage}
+          itemLabel="orders"
+        />
       </div>
-
-      <DataTable
-        className="mt-8"
-        tableId="admin-orders"
-        columns={columns}
-        data={data?.data ?? []}
-        getRowId={(order) => order.id}
-        isLoading={isLoading}
-        isError={isError}
-        errorState={
-          <div className="py-12 text-red-600">Unable to load orders.</div>
-        }
-        emptyState="No orders found."
-      />
-
-      <DataTablePagination
-        page={page}
-        pageSize={PAGE_SIZE}
-        total={data?.total ?? 0}
-        onPageChange={setPage}
-        itemLabel="orders"
-      />
     </section>
   );
 };

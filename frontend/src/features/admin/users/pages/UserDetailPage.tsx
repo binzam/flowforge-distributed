@@ -6,6 +6,8 @@ import {
   DataTable,
   type DataTableColumnDef,
 } from "@/components/data-table/data-table";
+import PageHeaderWrapper from "../../layouts/PageHeaderWrapper";
+import PageTableWrapper from "../../layouts/PageTableWrapper";
 
 interface UserMetricRow {
   metric: string;
@@ -63,25 +65,27 @@ const UserDetailPage = () => {
 
   return (
     <section>
-      <Link to="/admin/users" className="text-sm text-slate-500 underline">
-        Back to users
-      </Link>
-      <div className="mt-6 flex flex-wrap justify-between gap-4">
-        <div>
-          <p className="text-sm text-slate-500">User Profile</p>
-          <h1 className="mt-1 text-3xl font-semibold">{user.name}</h1>
-          <p className="mt-2 text-sm text-slate-500">ID: {user.id}</p>
+      <PageHeaderWrapper>
+        <Link to="/admin/users" className="text-sm text-slate-500 underline">
+          Back to users
+        </Link>
+        <div className="mt-6 flex flex-wrap justify-between gap-4">
+          <div>
+            <p className="text-sm text-slate-500">User Profile</p>
+            <h1 className="mt-1 text-3xl font-semibold">{user.name}</h1>
+            <p className="mt-2 text-sm text-slate-500">ID: {user.id}</p>
+          </div>
         </div>
-      </div>
-
-      <DataTable
-        className="mt-8"
-        tableId="user-metrics"
-        columns={metricColumns}
-        data={metricRows}
-        isLoading={isLoading}
-        getRowId={(row) => row.metric}
-      />
+      </PageHeaderWrapper>
+      <PageTableWrapper>
+        <DataTable
+          tableId="user-metrics"
+          columns={metricColumns}
+          data={metricRows}
+          isLoading={isLoading}
+          getRowId={(row) => row.metric}
+        />
+      </PageTableWrapper>
     </section>
   );
 };

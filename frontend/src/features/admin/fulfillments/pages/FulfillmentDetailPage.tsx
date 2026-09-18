@@ -11,6 +11,8 @@ import {
   DataTable,
   type DataTableColumnDef,
 } from "@/components/data-table/data-table";
+import PageHeaderWrapper from "../../layouts/PageHeaderWrapper";
+import PageTableWrapper from "../../layouts/PageTableWrapper";
 
 interface FulfillmentMetricRow {
   metric: string;
@@ -143,107 +145,112 @@ const FulfillmentDetailPage = () => {
 
   return (
     <section>
-      <Link
-        to="/admin/fulfillments"
-        className="text-sm text-slate-500 underline"
-      >
-        Back to fulfillments
-      </Link>
-      <div className="mt-6 flex flex-wrap justify-between gap-4">
-        <div>
-          <p className="text-sm text-slate-500">Fulfillment Details</p>
-          <h1 className="mt-1 text-3xl font-semibold">
-            {fulfillment.id.slice(0, 8)}...
-          </h1>
-          <p className="mt-2 text-sm text-slate-500">
-            Customer: {fulfillment.customerName}
-          </p>
-          <p className="text-sm text-slate-500">
-            Email: {fulfillment.customerEmail}
-          </p>
-          <div className="mt-3">
-            <span
-              className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${statusColor}`}
-            >
-              {(fulfillment.status as FulfillmentStatus)
-                .charAt(0)
-                .toUpperCase() +
-                (fulfillment.status as FulfillmentStatus).slice(1)}
-            </span>
+      <PageHeaderWrapper>
+        <Link
+          to="/admin/fulfillments"
+          className="text-sm text-slate-500 underline"
+        >
+          Back to fulfillments
+        </Link>
+        <div className="mt-2 flex flex-wrap justify-between gap-4">
+          <div>
+            <p className="text-sm text-slate-500">Fulfillment Details</p>
+            <h1 className="mt-1 text-3xl font-semibold">
+              {fulfillment.id.slice(0, 8)}...
+            </h1>
+            <p className="mt-2 text-sm text-slate-500">
+              Customer: {fulfillment.customerName}
+            </p>
+            <p className="text-sm text-slate-500">
+              Email: {fulfillment.customerEmail}
+            </p>
+          </div>
+          <div className="text-right">
+            <p className="text-sm text-slate-500">Order Total</p>
+            <p className="mt-1 text-2xl font-semibold">
+              {fulfillment.totalAmount}
+            </p>
+            <div className="mt-3">
+              <span
+                className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${statusColor}`}
+              >
+                {(fulfillment.status as FulfillmentStatus)
+                  .charAt(0)
+                  .toUpperCase() +
+                  (fulfillment.status as FulfillmentStatus).slice(1)}
+              </span>
+            </div>
           </div>
         </div>
-        <div className="text-right">
-          <p className="text-sm text-slate-500">Order Total</p>
-          <p className="mt-1 text-2xl font-semibold">
-            {fulfillment.totalAmount}
-          </p>
-        </div>
-      </div>
-
-      <div className="mt-8">
+      </PageHeaderWrapper>
+      <PageTableWrapper>
         <div>
-          <p className="text-sm text-slate-500">Order Items</p>
-          <h3 className="mt-1 text-lg font-semibold">
-            Items in Fulfillment ({fulfillment.items.length})
-          </h3>
-        </div>
-        <DataTable
-          className="mt-4"
-          tableId="fulfillment-items"
-          columns={itemsColumns}
-          isLoading={isLoading}
-          data={fulfillment.items}
-          getRowId={(item) => item.productId}
-        />
-      </div>
-
-      <div className="mt-8">
-        <p className="text-sm text-slate-500">Details</p>
-        <h3 className="mt-1 text-lg font-semibold">Fulfillment Information</h3>
-        <DataTable
-          className="mt-4"
-          tableId="fulfillment-metrics"
-          columns={metricColumns}
-          data={metricRows}
-          getRowId={(row) => row.metric}
-        />
-      </div>
-
-      {allowedTransitions.length > 0 && (
-        <div className="mt-8 border-t border-slate-200 pt-8">
           <div>
-            <p className="text-sm text-slate-500">Update Status</p>
+            <p className="text-sm text-slate-500">Order Items</p>
             <h3 className="mt-1 text-lg font-semibold">
-              Change Fulfillment Status
+              Items in Fulfillment ({fulfillment.items.length})
             </h3>
           </div>
 
-          <div className="mt-4 flex flex-wrap gap-3">
-            <select
-              value={selectedStatus}
-              onChange={(e) =>
-                setSelectedStatus(e.target.value as FulfillmentStatus)
-              }
-              className="border border-slate-300 px-3 py-2 text-sm"
-              disabled={isPending}
-            >
-              <option value="">Select new status...</option>
-              {allowedTransitions.map((status) => (
-                <option key={status} value={status}>
-                  {status.charAt(0).toUpperCase() + status.slice(1)}
-                </option>
-              ))}
-            </select>
-            <button
-              onClick={handleStatusUpdate}
-              disabled={!selectedStatus || isPending}
-              className="bg-blue-600 text-white px-4 py-2 text-sm font-medium rounded hover:bg-blue-700 disabled:bg-slate-400 disabled:cursor-not-allowed"
-            >
-              {isPending ? "Updating..." : "Update Status"}
-            </button>
-          </div>
+          <DataTable
+            tableId="fulfillment-items"
+            columns={itemsColumns}
+            isLoading={isLoading}
+            data={fulfillment.items}
+            getRowId={(item) => item.productId}
+          />
         </div>
-      )}
+      </PageTableWrapper>
+      <PageTableWrapper>
+        <div className="">
+          <p className="text-sm text-slate-500">Details</p>
+          <h3 className="mt-1 text-lg font-semibold">
+            Fulfillment Information
+          </h3>
+          <DataTable
+            tableId="fulfillment-metrics"
+            columns={metricColumns}
+            data={metricRows}
+            getRowId={(row) => row.metric}
+          />
+        </div>
+
+        {allowedTransitions.length > 0 && (
+          <div className=" border-t border-slate-200 pt-8">
+            <div>
+              <p className="text-sm text-slate-500">Update Status</p>
+              <h3 className="mt-1 text-lg font-semibold">
+                Change Fulfillment Status
+              </h3>
+            </div>
+
+            <div className="mt-4 flex flex-wrap gap-3">
+              <select
+                value={selectedStatus}
+                onChange={(e) =>
+                  setSelectedStatus(e.target.value as FulfillmentStatus)
+                }
+                className="border border-slate-300 px-3 py-2 text-sm"
+                disabled={isPending}
+              >
+                <option value="">Select new status...</option>
+                {allowedTransitions.map((status) => (
+                  <option key={status} value={status}>
+                    {status.charAt(0).toUpperCase() + status.slice(1)}
+                  </option>
+                ))}
+              </select>
+              <button
+                onClick={handleStatusUpdate}
+                disabled={!selectedStatus || isPending}
+                className="bg-blue-600 text-white px-4 py-2 text-sm font-medium rounded hover:bg-blue-700 disabled:bg-slate-400 disabled:cursor-not-allowed"
+              >
+                {isPending ? "Updating..." : "Update Status"}
+              </button>
+            </div>
+          </div>
+        )}
+      </PageTableWrapper>
     </section>
   );
 };

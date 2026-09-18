@@ -8,6 +8,8 @@ import { Link } from "react-router-dom";
 import { dateFormatter } from "@/utils/date-formatter";
 import { useGetUsers } from "../hooks/user-hooks";
 import { useListQueryParams } from "@/hooks/use-list-query-params";
+import PageTableWrapper from "../../layouts/PageTableWrapper";
+import PageHeaderWrapper from "../../layouts/PageHeaderWrapper";
 
 const PAGE_SIZE = 10;
 
@@ -63,7 +65,7 @@ const UsersPage = () => {
   });
   return (
     <section>
-      <div className="flex flex-wrap items-end justify-between gap-4">
+      <PageHeaderWrapper className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <p className="text-sm text-slate-500">Manage</p>
           <h1 className="mt-1 text-3xl font-semibold">Users</h1>
@@ -84,29 +86,30 @@ const UsersPage = () => {
             <option value="warehouse">Warehouse</option>
           </select>
         </div>
+      </PageHeaderWrapper>
+      <PageTableWrapper>
+        <DataTable
+          tableId="admin-users"
+          columns={columns}
+          data={data?.data ?? []}
+          getRowId={(user) => user.id}
+          isLoading={isLoading}
+          isError={isError}
+          errorState={
+            <div className="py-12 text-red-600">Unable to load users.</div>
+          }
+          emptyState="No users found."
+        />
+      </PageTableWrapper>
+      <div className="sticky bottom-0 bg-white/90 px-4 md:px-6 lg:px-8 py-2 border-t border-yellow-700">
+        <DataTablePagination
+          page={page}
+          pageSize={PAGE_SIZE}
+          total={data?.total ?? 0}
+          onPageChange={setPage}
+          itemLabel="users"
+        />
       </div>
-
-      <DataTable
-        className="mt-8"
-        tableId="admin-users"
-        columns={columns}
-        data={data?.data ?? []}
-        getRowId={(user) => user.id}
-        isLoading={isLoading}
-        isError={isError}
-        errorState={
-          <div className="py-12 text-red-600">Unable to load users.</div>
-        }
-        emptyState="No users found."
-      />
-
-      <DataTablePagination
-        page={page}
-        pageSize={PAGE_SIZE}
-        total={data?.total ?? 0}
-        onPageChange={setPage}
-        itemLabel="users"
-      />
     </section>
   );
 };

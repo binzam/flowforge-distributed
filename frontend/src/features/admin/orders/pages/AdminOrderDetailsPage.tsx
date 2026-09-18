@@ -8,6 +8,8 @@ import {
   DataTable,
   type DataTableColumnDef,
 } from "@/components/data-table/data-table";
+import PageTableWrapper from "../../layouts/PageTableWrapper";
+import PageHeaderWrapper from "../../layouts/PageHeaderWrapper";
 
 type OrderItem = Order["items"][number];
 
@@ -80,59 +82,60 @@ const AdminOrderDetailsPage = () => {
 
   return (
     <section>
-      <Link to="/admin/orders" className="text-sm text-slate-500 underline">
-        Back to orders
-      </Link>
-      <div className="mt-6 flex flex-wrap justify-between gap-4">
-        <div>
-          <p className="text-sm text-slate-500">Order</p>
-          <h1 className="mt-1 text-3xl font-semibold">
-            #{order.id.slice(0, 8)}
-          </h1>
-          <p className="mt-2 text-sm text-slate-500">
-            Customer: {order.customer?.name ?? "Unknown"}
-          </p>
-          <p className="text-sm text-slate-500">
-            {dateFormatter(order.createdAt)}
-          </p>
-        </div>
-        <div className="text-right">
-          <p className="text-sm text-slate-500">Current status</p>
-          <p className="mt-2 font-semibold uppercase">
-            {order.status.replace("_", " ")}
-          </p>
+      <PageHeaderWrapper>
+        <Link to="/admin/orders" className="text-sm text-slate-500 underline">
+          Back to orders
+        </Link>
+        <div className="flex flex-wrap justify-between items-center gap-4">
+          <div>
+            <p className="text-sm text-slate-500">Order</p>
+            <p className="mt-2 text-sm text-slate-500">
+              Customer: {order.customer?.name ?? "Unknown"}
+            </p>
+            <p className="text-sm text-slate-500">
+              {dateFormatter(order.createdAt)}
+            </p>
+          </div>
+          <div className="text-right">
+            <p className="text-sm text-slate-500">Current status</p>
+            <p className="mt-2 font-semibold uppercase">
+              {order.status.replace("_", " ")}
+            </p>
 
-          <select
-            disabled={updateStatus.isPending || availableStatuses.length === 0}
-            value=""
-            onChange={(event) => changeStatus(event.target.value)}
-            className="mt-3 border border-slate-300 bg-white px-3 py-2 text-sm"
-          >
-            <option value="">
-              {updateStatus.isPending ? "Updating..." : "Change status"}
-            </option>
-            {availableStatuses.map((status) => (
-              <option key={status} value={status}>
-                {status.replace("_", " ")}
+            <select
+              disabled={
+                updateStatus.isPending || availableStatuses.length === 0
+              }
+              value=""
+              onChange={(event) => changeStatus(event.target.value)}
+              className="mt-3 border border-slate-300 bg-white px-3 py-2 text-sm"
+            >
+              <option value="">
+                {updateStatus.isPending ? "Updating..." : "Change status"}
               </option>
-            ))}
-          </select>
+              {availableStatuses.map((status) => (
+                <option key={status} value={status}>
+                  {status.replace("_", " ")}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
-      </div>
-
-      <DataTable
-        className="mt-8"
-        tableId="order-items"
-        columns={orderItemColumns}
-        data={order.items}
-        isLoading={isLoading}
-        getRowId={(item) => item.product.id}
-        emptyState="No items on this order."
-      />
-
-      <p className="mt-6 text-right text-lg font-semibold">
-        Total: ${Number(order.totalAmount).toFixed(2)}
-      </p>
+      </PageHeaderWrapper>
+      <PageTableWrapper>
+        <DataTable
+          className="mt-8"
+          tableId="order-items"
+          columns={orderItemColumns}
+          data={order.items}
+          isLoading={isLoading}
+          getRowId={(item) => item.product.id}
+          emptyState="No items on this order."
+        />
+        <p className="mt-6 text-right text-lg font-semibold">
+          Total: ${Number(order.totalAmount).toFixed(2)}
+        </p>
+      </PageTableWrapper>
     </section>
   );
 };

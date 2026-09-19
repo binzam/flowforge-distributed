@@ -126,6 +126,7 @@ export class OrderService {
       this.eventBus.publish(
         new OrderCancelledEvent({
           orderId: updated.id,
+          userId: updated.userId,
         }),
       );
     }

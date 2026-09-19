@@ -5,6 +5,7 @@ interface PaymentCompletedPayload {
   orderId: string;
   amount: string;
   txRef: string;
+  userId: string;
 }
 
 export class PaymentCompletedEvent implements DomainEvent {

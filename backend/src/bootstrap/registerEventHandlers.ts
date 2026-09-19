@@ -1,3 +1,4 @@
+import { pool } from "../database/index.js";
 import { eventBus } from "../infrastructure/events/eventBusInstance.js";
 import { OrderRepository } from "../modules/orders/repositories/OrderRepository.js";
 import { OrderService } from "../modules/orders/services/OrderService.js";
@@ -5,7 +6,6 @@ import { InventoryRepository } from "../modules/inventory/repositories/Inventory
 import { InventoryService } from "../modules/inventory/services/InventoryService.js";
 import { FulfillmentRepository } from "../modules/fulfillments/repositories/FulfillmentRepository.js";
 import { FulfillmentService } from "../modules/fulfillments/services/FulfillmentService.js";
-import { pool } from "../database/index.js";
 import { registerPaymentCompletedHandler } from "../modules/payments/events/paymentCompletedHandler.js";
 import { registerInventoryReservedHandler } from "../modules/inventory/events/inventoryReservedHandler.js";
 import { registerFulfillmentShippedHandler } from "../modules/fulfillments/events/fulfillmentShippedHandler.js";
@@ -17,6 +17,9 @@ import { registerOrderEventHandler } from "../modules/orders/events/orderEventHa
 import { UserRepository } from "../modules/users/repositories/UserRepository.js";
 import { NodemailerEmailProvider } from "../infrastructure/email/NodemailerEmailProvider.js";
 import { EmailService } from "../infrastructure/email/EmailService.js";
+import { registerNotificationHandlers } from "../modules/notifications/events/notificationHandlers.js";
+import { NotificationService } from "../modules/notifications/services/NotificationService.js";
+import { NotificationRepository } from "../modules/notifications/repositories/NotificationRepository.js";
 
 export const registerEventHandlers = (): void => {
   const orderRepository = new OrderRepository(pool);
@@ -24,6 +27,7 @@ export const registerEventHandlers = (): void => {
   const userRepository = new UserRepository(pool);
   const inventoryRepository = new InventoryRepository(pool);
   const fulfillmentRepository = new FulfillmentRepository(pool);
+  const notificationRepository = new NotificationRepository(pool);
 
   const orderService = new OrderService(orderRepository, eventBus);
   const inventoryService = new InventoryService(inventoryRepository);
@@ -31,6 +35,7 @@ export const registerEventHandlers = (): void => {
     fulfillmentRepository,
     eventBus,
   );
+  const notificationService = new NotificationService(notificationRepository);
 
   const emailProvider = new NodemailerEmailProvider();
   const emailService = new EmailService(emailProvider);
@@ -55,4 +60,6 @@ export const registerEventHandlers = (): void => {
   registerOrderCancelledHandler(eventBus, orderRepository, inventoryService);
 
   registerOrderEventHandler(eventBus, orderEventRepository);
+
+  registerNotificationHandlers(eventBus, notificationService, orderRepository);
 };

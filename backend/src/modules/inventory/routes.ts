@@ -1,8 +1,6 @@
 import { Router } from "express";
 import { pool } from "../../database/index.js";
 import { validate } from "../../middleware/validate.js";
-import { UserRepository } from "../users/repositories/UserRepository.js";
-import { SessionRepository } from "../auth/repositories/SessionRepository.js";
 import { authorize } from "../../middleware/authorize.js";
 import {
   createInventorySchema,

@@ -140,6 +140,12 @@ export class PaymentService {
     }
 
     if (verified.status === "success") {
+      const order = await this.orderRepository.findById(payment.orderId);
+
+      if (!order) {
+        throw new AppError(`Order not found for payment: ${payment.id}`, 404);
+      }
+
       await this.paymentRepository.updateStatus(payment.id, "successful");
 
       await this.orderService.markAsPaid(payment.orderId);
@@ -147,6 +153,7 @@ export class PaymentService {
         new PaymentCompletedEvent({
           paymentId: payment.id,
           orderId: payment.orderId,
+          userId: order.userId,
           amount: payment.amount,
           txRef,
         }),

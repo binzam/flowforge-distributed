@@ -31,7 +31,7 @@ export class UserController {
   };
 
   getAll = async (
-    req: Request,
+    _req: Request,
     res: Response<unknown, { validated: GetUsersQuery }>,
   ): Promise<void> => {
     const query = res.locals.validated;

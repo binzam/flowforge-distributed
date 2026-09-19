@@ -3,6 +3,7 @@ import type {
   CreateUserRecord,
   FindUsersResult,
   User,
+  UserRole,
 } from "../types/user.types.js";
 import { AppError } from "../../../errors/AppError.js";
 import type { GetUsersQuery } from "../schemas/user.schemas.js";
@@ -139,5 +140,24 @@ export class UserRepository {
       users: result.rows,
       total,
     };
+  }
+  async findByRoles(roles: UserRole[]): Promise<User[]> {
+    const result = await this.db.query<User>(
+      `
+    SELECT
+      id,
+      name,
+      email,
+      password_hash AS "passwordHash",
+      role,
+      created_at AS "createdAt",
+      updated_at AS "updatedAt"
+    FROM users
+    WHERE role = ANY($1::text[]);
+    `,
+      [roles],
+    );
+
+    return result.rows;
   }
 }

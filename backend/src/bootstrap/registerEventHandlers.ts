@@ -61,5 +61,5 @@ export const registerEventHandlers = (): void => {
 
   registerOrderEventHandler(eventBus, orderEventRepository);
 
-  registerNotificationHandlers(eventBus, notificationService, orderRepository);
+  registerNotificationHandlers(eventBus, notificationService, orderRepository, userRepository);
 };

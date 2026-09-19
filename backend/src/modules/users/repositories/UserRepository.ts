@@ -153,7 +153,7 @@ export class UserRepository {
       created_at AS "createdAt",
       updated_at AS "updatedAt"
     FROM users
-    WHERE role = ANY($1::text[]);
+    WHERE role = ANY($1::user_role[]);
     `,
       [roles],
     );

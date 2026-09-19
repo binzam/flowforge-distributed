@@ -8,7 +8,7 @@ declare module "axios" {
   }
 }
 
-const baseURL = import.meta.env.VITE_BASE_URL;
+export const baseURL = import.meta.env.VITE_BASE_URL;
 
 if (!baseURL) {
   throw new Error("VITE_BASE_URL environment variable is not defined");

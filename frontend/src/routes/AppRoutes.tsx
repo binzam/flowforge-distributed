@@ -1,13 +1,12 @@
 import { lazy, Suspense } from "react";
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 
 import PublicRoute from "./PublicRoute";
 import RoleProtectedRoute from "./RoleProtectedRoute";
 import LoadingScreen from "@/components/LoadingScreen";
 
 import StoreFrontLayout from "@/features/store-front/layouts/StoreFrontLayout";
-import AdminLayout from "@/features/admin/layouts/AdminLayout";
-
+import BackOfficeLayout from "@/features/back-office/layouts/BackOfficeLayout";
 // Auth pages
 const LoginPage = lazy(() => import("@/features/auth/pages/LoginPage"));
 const SignUpPage = lazy(() => import("@/features/auth/pages/SignupPage"));
@@ -16,7 +15,7 @@ const SignUpPage = lazy(() => import("@/features/auth/pages/SignupPage"));
 const HomePage = lazy(
   () => import("@/features/store-front/home/pages/HomePage"),
 );
-const ProductsPage = lazy(
+const StoreFrontProductsPage = lazy(
   () => import("@/features/store-front/products/pages/ProductsPage"),
 );
 const CartPage = lazy(
@@ -25,44 +24,48 @@ const CartPage = lazy(
 const CheckoutPage = lazy(
   () => import("@/features/store-front/checkout/pages/CheckoutPage"),
 );
-const MyOrdersPage = lazy(
-  () => import("@/features/store-front/orders/pages/MyOrdersPage"),
+const CustomerOrdersPage = lazy(
+  () => import("@/features/store-front/orders/pages/CustomerOrdersPage"),
 );
-const OrderDetailsPage = lazy(
-  () => import("@/features/store-front/orders/pages/OrderDetailsPage"),
+const CustomerOrderDetailsPage = lazy(
+  () => import("@/features/store-front/orders/pages/CustomerOrderDetailsPage"),
 );
 
-// Admin pages
-const AdminDashboard = lazy(
-  () => import("@/features/admin/dashboard/pages/AdminDashboard"),
+// Backoffice pages
+const DashboardPage = lazy(
+  () => import("@/features/back-office/dashboard/pages/DashboardPage"),
 );
-const AdminProductsPage = lazy(
-  () => import("@/features/admin/products/pages/AdminProductsPage"),
+const BackOfficeProductsPage = lazy(
+  () => import("@/features/back-office/products/pages/BackOfficeProductsPage"),
 );
-const AdminOrdersPage = lazy(
-  () => import("@/features/admin/orders/pages/AdminOrdersPage"),
+const BackOfficeOrdersPage = lazy(
+  () => import("@/features/back-office/orders/pages/BackOfficeOrdersPage"),
 );
-const AdminOrderDetailsPage = lazy(
-  () => import("@/features/admin/orders/pages/AdminOrderDetailsPage"),
+const BackOfficeOrderDetailsPage = lazy(
+  () =>
+    import("@/features/back-office/orders/pages/BackOfficeOrderDetailsPage"),
 );
 const PaymentsPage = lazy(
-  () => import("@/features/admin/payments/pages/PaymentsPage"),
+  () => import("@/features/back-office/payments/pages/PaymentsPage"),
 );
 const InventoryPage = lazy(
-  () => import("@/features/admin/inventory/pages/InventoryPage"),
+  () => import("@/features/back-office/inventory/pages/InventoryPage"),
 );
 const InventoryDetailPage = lazy(
-  () => import("@/features/admin/inventory/pages/InventoryDetailPage"),
+  () => import("@/features/back-office/inventory/pages/InventoryDetailPage"),
 );
 const FulfillmentsPage = lazy(
-  () => import("@/features/admin/fulfillments/pages/FulfillmentsPage"),
+  () => import("@/features/back-office/fulfillments/pages/FulfillmentsPage"),
 );
 const FulfillmentDetailPage = lazy(
-  () => import("@/features/admin/fulfillments/pages/FulfillmentDetailPage"),
+  () =>
+    import("@/features/back-office/fulfillments/pages/FulfillmentDetailPage"),
 );
-const UsersPage = lazy(() => import("@/features/admin/users/pages/UsersPage"));
+const UsersPage = lazy(
+  () => import("@/features/back-office/users/pages/UsersPage"),
+);
 const UserDetailPage = lazy(
-  () => import("@/features/admin/users/pages/UserDetailPage"),
+  () => import("@/features/back-office/users/pages/UserDetailPage"),
 );
 
 const AppRoutes = () => {
@@ -71,29 +74,28 @@ const AppRoutes = () => {
       <Routes>
         <Route element={<StoreFrontLayout />}>
           <Route path="/" element={<HomePage />} />
-          <Route path="/products" element={<ProductsPage />} />
-          <Route path="/about" element={<ProductsPage />} />
-          <Route path="/studio" element={<ProductsPage />} />
-          <Route path="/collections" element={<ProductsPage />} />
+          <Route path="/products" element={<StoreFrontProductsPage />} />
+          <Route path="/about" element={<StoreFrontProductsPage />} />
+          <Route path="/studio" element={<StoreFrontProductsPage />} />
+          <Route path="/collections" element={<StoreFrontProductsPage />} />
           <Route path="/cart" element={<CartPage />} />
 
           <Route element={<RoleProtectedRoute allowedRoles={["customer"]} />}>
-            <Route path="/orders" element={<MyOrdersPage />} />
-            <Route path="/orders/:id" element={<OrderDetailsPage />} />
+            <Route path="/orders" element={<CustomerOrdersPage />} />
+            <Route path="/orders/:id" element={<CustomerOrderDetailsPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
           </Route>
         </Route>
 
-        <Route element={<RoleProtectedRoute allowedRoles={["admin"]} />}>
-          <Route path="/admin" element={<AdminLayout />}>
-            <Route index element={<AdminDashboard />} />
-            <Route path="products" element={<AdminProductsPage />} />
-            <Route path="orders" element={<AdminOrdersPage />} />
-            <Route path="orders/:id" element={<AdminOrderDetailsPage />} />
-            <Route path="payments" element={<PaymentsPage />} />
+        <Route
+          element={<RoleProtectedRoute allowedRoles={["admin", "warehouse"]} />}
+        >
+          <Route path="/portal" element={<BackOfficeLayout />}>
+            <Route index element={<DashboardPage />} />
+            <Route path="products" element={<BackOfficeProductsPage />} />
+            <Route path="orders" element={<BackOfficeOrdersPage />} />
+            <Route path="orders/:id" element={<BackOfficeOrderDetailsPage />} />
             <Route path="inventory" element={<InventoryPage />} />
-            <Route path="users" element={<UsersPage />} />
-            <Route path="users/:id" element={<UserDetailPage />} />
             <Route
               path="inventory/:productId"
               element={<InventoryDetailPage />}
@@ -103,6 +105,12 @@ const AppRoutes = () => {
               path="fulfillments/:id"
               element={<FulfillmentDetailPage />}
             />
+
+            <Route element={<RoleProtectedRoute allowedRoles={["admin"]} />}>
+              <Route path="payments" element={<PaymentsPage />} />
+              <Route path="users" element={<UsersPage />} />
+              <Route path="users/:id" element={<UserDetailPage />} />
+            </Route>
           </Route>
         </Route>
 
@@ -110,6 +118,7 @@ const AppRoutes = () => {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/sign-up" element={<SignUpPage />} />
         </Route>
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Suspense>
   );

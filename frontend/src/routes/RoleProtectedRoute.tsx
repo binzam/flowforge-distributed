@@ -15,10 +15,8 @@ const RoleProtectedRoute = ({ allowedRoles }: RoleProtectedRouteProps) => {
   }
 
   if (!allowedRoles.includes(user.data.user.role)) {
-    if (user.data.user.role === "admin")
-      return <Navigate to="/admin" replace />;
-    if (user.data.user.role === "warehouse")
-      return <Navigate to="/warehouse" replace />;
+    if (user.data.user.role === "admin" || user.data.user.role === "warehouse")
+      return <Navigate to="/portal" replace />;
     return <Navigate to="/" replace />;
   }
 

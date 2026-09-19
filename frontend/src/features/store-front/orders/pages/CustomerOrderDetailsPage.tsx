@@ -1,0 +1,171 @@
+import { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import { queryClient } from "@/lib/query-client";
+import { useGetOrder } from "../hooks/order-hooks";
+import {
+  getPaymentErrorMessage,
+  useGetPaymentForOrder,
+  useInitializePayment,
+} from "../hooks/payment-hooks";
+import type { OrderStatus, OrderItem } from "../types/order-types";
+import { dateFormatter } from "@/utils/date-formatter";
+import {
+  DataTable,
+  type DataTableColumnDef,
+} from "@/components/data-table/data-table";
+import CancelOrderButton from "../components/CancelOrderButton";
+
+const PAYABLE_STATUSES: OrderStatus[] = ["pending", "payment_pending"];
+
+const orderItemColumns: DataTableColumnDef<OrderItem>[] = [
+  {
+    id: "product",
+    header: "Product",
+    accessorFn: (row) => row.product.name,
+    cell: (info) => info.getValue<string>(),
+  },
+  {
+    accessorKey: "quantity",
+    header: "Quantity",
+    cell: (info) => info.getValue<number>(),
+  },
+  {
+    accessorKey: "unitPrice",
+    header: "Unit price",
+    cell: (info) => `$${Number(info.getValue<string>()).toFixed(2)}`,
+  },
+  {
+    id: "lineTotal",
+    header: "Line total",
+    accessorFn: (row) => Number(row.unitPrice) * row.quantity,
+    cell: (info) => `$${info.getValue<number>().toFixed(2)}`,
+  },
+];
+
+const CustomerOrderDetailsPage = () => {
+  const { id = "" } = useParams();
+  const { data, isLoading, isError } = useGetOrder(id);
+  const order = data?.data;
+
+  const [paymentError, setPaymentError] = useState<string | null>(null);
+
+  const initializePaymentMutation = useInitializePayment();
+
+  const paymentQuery = useGetPaymentForOrder(
+    id,
+    order?.status === "payment_pending",
+  );
+
+  useEffect(() => {
+    const paymentStatus = paymentQuery.data?.data.status;
+    if (paymentStatus === "successful" || paymentStatus === "failed") {
+      queryClient.invalidateQueries({ queryKey: ["orders", id] });
+    }
+  }, [paymentQuery.data?.data.status, id]);
+
+  const handlePay = async () => {
+    if (!order) return;
+
+    setPaymentError(null);
+
+    const idempotencyKey = crypto.randomUUID();
+
+    initializePaymentMutation.mutate(
+      {
+        orderId: order.id,
+        idempotencyKey,
+      },
+      {
+        onSuccess: (response) => {
+          window.location.href = response.data.checkoutUrl;
+        },
+        onError: (error) => {
+          setPaymentError(getPaymentErrorMessage(error));
+        },
+      },
+    );
+  };
+  if (isLoading)
+    return (
+      <div className="py-24 text-center text-neutral-400">Loading order...</div>
+    );
+  if (isError || !order)
+    return (
+      <div className="py-24 text-center text-red-400">
+        Unable to load this order.
+      </div>
+    );
+
+  const isPayable = PAYABLE_STATUSES.includes(order.status);
+  const isFailed = order.status === "failed";
+  const isConfirmingPayment =
+    order.status === "payment_pending" &&
+    paymentQuery.data?.data.status !== "successful" &&
+    paymentQuery.data?.data.status !== "failed";
+
+  return (
+    <section className="py-12">
+      <Link to="/orders" className="text-sm text-neutral-400 underline">
+        Back to orders
+      </Link>
+      <div className="mt-8 flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p className="text-xs tracking-[0.3em] text-neutral-500">ORDER</p>
+          <h1 className="mt-3 text-4xl font-semibold">
+            #{order.id.slice(0, 8)}
+          </h1>
+          <p className="mt-2 text-sm text-neutral-500">
+            {dateFormatter(order.createdAt)}
+          </p>
+        </div>
+        <span className="border border-neutral-700 px-3 py-1 text-xs uppercase tracking-widest">
+          {order.status.replace("_", " ")}
+        </span>
+      </div>
+
+      {isConfirmingPayment && (
+        <p className="mt-6 border border-neutral-700 bg-neutral-900/50 px-4 py-3 text-sm text-neutral-300">
+          Confirming your payment with Chapa. This can take a few seconds...
+        </p>
+      )}
+
+      <div className="mt-6 flex flex-wrap items-center gap-4">
+        {(isPayable || isFailed) && (
+          <>
+            <button
+              onClick={handlePay}
+              disabled={initializePaymentMutation.isPending}
+              className="border border-neutral-100 px-4 py-2 text-sm uppercase tracking-widest disabled:opacity-40"
+            >
+              {initializePaymentMutation.isPending
+                ? "Redirecting..."
+                : isFailed
+                  ? "Retry payment"
+                  : "Pay now"}
+            </button>
+            {paymentError && (
+              <p className="text-sm text-red-400">{paymentError}</p>
+            )}
+          </>
+        )}
+
+        <CancelOrderButton orderId={order.id} orderStatus={order.status} />
+      </div>
+      <DataTable
+        className="mt-10"
+        tableId="order-items"
+        columns={orderItemColumns}
+        data={order.items}
+        getRowId={(item) => item.product.id}
+        emptyState="No items on this order."
+        variant="dark"
+      />
+
+      <p className="mt-8 text-right text-xl">
+        Total <strong>${Number(order.totalAmount).toFixed(2)}</strong>
+      </p>
+    </section>
+  );
+};
+
+export default CustomerOrderDetailsPage;

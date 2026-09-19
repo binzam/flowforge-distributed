@@ -14,7 +14,7 @@ import { DataTablePagination } from "@/components/data-table/data-table-paginati
 import PageTableWrapper from "../../layouts/PageTableWrapper";
 import PageHeaderWrapper from "../../layouts/PageHeaderWrapper";
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 10;
 
 const FULFILLMENT_STATUS_COLORS: Record<FulfillmentStatus, string> = {
   pending: "bg-yellow-100 text-yellow-800",
@@ -115,7 +115,6 @@ const FulfillmentsPage = () => {
             value={filters.status ?? ""}
             onChange={(event) => {
               setFilter("status", event.target.value || undefined);
-              setPage(0);
             }}
             className="border border-slate-300 px-3 py-2 text-sm"
           >

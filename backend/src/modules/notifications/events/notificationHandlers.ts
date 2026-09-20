@@ -1,21 +1,32 @@
 import type { EventBus } from "../../../infrastructure/events/EventBus.js";
+import type { WebSocketServer } from "../../../infrastructure/websocket/WebSocketServer.js";
 import type { OrderRepository } from "../../orders/repositories/OrderRepository.js";
 import type { UserRepository } from "../../users/repositories/UserRepository.js";
 import type { NotificationService } from "../services/NotificationService.js";
+import type { CreateNotificationInput } from "../types/notification.types.js";
 
 export const registerNotificationHandlers = (
   eventBus: EventBus,
   notificationService: NotificationService,
   orderRepository: OrderRepository,
   userRepository: UserRepository,
+  websocketServer: WebSocketServer,
 ): void => {
+  const createAndEmitNotification = async (
+    input: CreateNotificationInput,
+  ): Promise<void> => {
+    const notification = await notificationService.create(input);
+
+    websocketServer.emitToUser(notification.userId, notification);
+  };
+
   eventBus.subscribe("payment.completed", async (event) => {
     const { orderId, paymentId, userId } = event.payload;
     console.log(
       "registerNotificationHandlers : payment.completed : EVENT",
       event,
     );
-    await notificationService.create({
+    await createAndEmitNotification({
       userId: userId,
       type: "payment.completed",
       title: "Payment successful",
@@ -28,8 +39,7 @@ export const registerNotificationHandlers = (
     const staff = await userRepository.findByRoles(["admin", "warehouse"]);
     for (const user of staff) {
       const isAdmin = user.role === "admin";
-
-      await notificationService.create({
+      await createAndEmitNotification({
         userId: user.id,
         type: "payment.completed",
         title: isAdmin ? "New paid order" : "New order to fulfill",
@@ -48,7 +58,7 @@ export const registerNotificationHandlers = (
       "registerNotificationHandlers : fulfillment.shipped : EVENT",
       event,
     );
-    const { orderId } = event.payload;
+    const { orderId, fulfillmentId } = event.payload;
 
     const order = await orderRepository.findById(orderId);
 
@@ -57,13 +67,14 @@ export const registerNotificationHandlers = (
       return;
     }
 
-    await notificationService.create({
+    await createAndEmitNotification({
       userId: order.userId,
       type: "fulfillment.shipped",
       title: "Order shipped",
       message: "Your order has been shipped.",
       data: {
         orderId,
+        fulfillmentId,
       },
     });
   });
@@ -72,7 +83,7 @@ export const registerNotificationHandlers = (
       "registerNotificationHandlers : fulfillment.delivered : EVENT",
       event,
     );
-    const { orderId } = event.payload;
+    const { orderId, fulfillmentId } = event.payload;
 
     const order = await orderRepository.findById(orderId);
 
@@ -80,14 +91,14 @@ export const registerNotificationHandlers = (
       console.error(`Order not found: ${orderId}`);
       return;
     }
-
-    await notificationService.create({
+    await createAndEmitNotification({
       userId: order.userId,
       type: "fulfillment.delivered",
       title: "Order delivered",
       message: "Your order has been delivered.",
       data: {
         orderId,
+        fulfillmentId,
       },
     });
   });
@@ -97,8 +108,7 @@ export const registerNotificationHandlers = (
       event,
     );
     const { orderId, userId } = event.payload;
-
-    await notificationService.create({
+    await createAndEmitNotification({
       userId: userId,
       type: "order.cancelled",
       title: "Order cancelled",

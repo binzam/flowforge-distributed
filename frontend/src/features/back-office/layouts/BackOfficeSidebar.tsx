@@ -1,5 +1,6 @@
 import { useGetCurrentUser } from "@/features/auth/hooks/auth-hook";
 import {
+  Bell,
   Box,
   BriefcaseBusiness,
   CreditCard,
@@ -53,6 +54,12 @@ const menuItems = [
     path: "users",
     icon: Users,
     allowedRoles: ["admin"],
+  },
+  {
+    label: "Notifications",
+    path: "notifications",
+    icon: Bell,
+    allowedRoles: ["admin", "warehouse"],
   },
 ];
 const uuidRegex =

@@ -20,8 +20,11 @@ import { EmailService } from "../infrastructure/email/EmailService.js";
 import { registerNotificationHandlers } from "../modules/notifications/events/notificationHandlers.js";
 import { NotificationService } from "../modules/notifications/services/NotificationService.js";
 import { NotificationRepository } from "../modules/notifications/repositories/NotificationRepository.js";
+import type { WebSocketServer } from "../infrastructure/websocket/WebSocketServer.js";
 
-export const registerEventHandlers = (): void => {
+export const registerEventHandlers = (
+  websocketServer: WebSocketServer,
+): void => {
   const orderRepository = new OrderRepository(pool);
   const orderEventRepository = new OrderEventRepository(pool);
   const userRepository = new UserRepository(pool);
@@ -61,5 +64,11 @@ export const registerEventHandlers = (): void => {
 
   registerOrderEventHandler(eventBus, orderEventRepository);
 
-  registerNotificationHandlers(eventBus, notificationService, orderRepository, userRepository);
+  registerNotificationHandlers(
+    eventBus,
+    notificationService,
+    orderRepository,
+    userRepository,
+    websocketServer,
+  );
 };

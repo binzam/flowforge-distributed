@@ -16,8 +16,8 @@ const startServer = async () => {
     await redisClient.connect();
     console.log("Redis connection successful");
 
-    registerEventHandlers();
-    initializeWebSocketServer(httpServer);
+    const websocketServer = initializeWebSocketServer(httpServer);
+    registerEventHandlers(websocketServer);
     httpServer.listen(config.port, () => {
       console.log(`FlowForge API running on port ${config.port}`);
     });

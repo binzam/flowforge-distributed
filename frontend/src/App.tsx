@@ -1,9 +1,12 @@
-import { useNotificationSocket } from "./hooks/use-notification-socket";
+import { NotificationSocketWrapper } from "./features/notifications/components/NotificationSocketWrapper";
 import AppRoutes from "./routes/AppRoutes";
 
 function App() {
-  useNotificationSocket();
-  return <AppRoutes />;
+  return (
+    <NotificationSocketWrapper>
+      <AppRoutes />
+    </NotificationSocketWrapper>
+  );
 }
 
 export default App;

@@ -1,5 +1,6 @@
 import { useLocation } from "react-router-dom";
 import { useLogoutUser } from "../../auth/hooks/auth-hook";
+import NotificationBell from "@/features/notifications/components/NotificationBell";
 
 const uuidRegex =
   /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -38,6 +39,7 @@ const BackOfficeHeader = () => {
 
       {/* Right side (e.g., Profile, Notifications) */}
       <div className="flex items-center gap-4">
+        <NotificationBell />
         <button
           onClick={() => logoutUser()}
           className="px-4 py-2 bg-gray-50 text-black border-black border text-sm transition-colors"

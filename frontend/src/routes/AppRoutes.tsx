@@ -67,6 +67,10 @@ const UsersPage = lazy(
 const UserDetailPage = lazy(
   () => import("@/features/back-office/users/pages/UserDetailPage"),
 );
+// Shared Pages
+const NotificationsPage = lazy(
+  () => import("@/features/notifications/pages/NotificationsPage"),
+);
 
 const AppRoutes = () => {
   return (
@@ -84,6 +88,7 @@ const AppRoutes = () => {
             <Route path="/orders" element={<CustomerOrdersPage />} />
             <Route path="/orders/:id" element={<CustomerOrderDetailsPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
+            <Route path="/notifications" element={<NotificationsPage />} />
           </Route>
         </Route>
 
@@ -105,7 +110,7 @@ const AppRoutes = () => {
               path="fulfillments/:id"
               element={<FulfillmentDetailPage />}
             />
-
+            <Route path="notifications" element={<NotificationsPage />} />
             <Route element={<RoleProtectedRoute allowedRoles={["admin"]} />}>
               <Route path="payments" element={<PaymentsPage />} />
               <Route path="users" element={<UsersPage />} />

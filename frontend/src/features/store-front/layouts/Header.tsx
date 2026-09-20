@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useGetCurrentUser, useLogoutUser } from "../../auth/hooks/auth-hook";
 import { useCartStore } from "../cart/store/cart-store";
 import { getCartItemCount } from "../cart/store/cart-utils";
+import NotificationBell from "@/features/notifications/components/NotificationBell";
 
 export const Header = () => {
   const { data: user } = useGetCurrentUser();
@@ -78,6 +79,7 @@ export const Header = () => {
               )}
             </Link>
           )}
+          <NotificationBell />
         </div>
       </div>
     </header>

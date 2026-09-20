@@ -4,6 +4,7 @@ import { config } from "../../config/env.js";
 import { parseCookies } from "./parseCookies.js";
 import { verifyAccessToken } from "../../middleware/accessToken.js";
 import type { AccessTokenPayload } from "../../modules/auth/types/session.types.js";
+import type { Notification } from "../../modules/notifications/types/notification.types.js";
 
 export class WebSocketServer {
   private readonly io: Server;
@@ -18,6 +19,9 @@ export class WebSocketServer {
 
     this.registerAuthentication();
     this.registerConnectionHandler();
+  }
+  public emitToUser(userId: string, notification: Notification): void {
+    this.io.to(`user:${userId}`).emit("notification", notification);
   }
   private registerAuthentication(): void {
     this.io.use(async (socket, next) => {

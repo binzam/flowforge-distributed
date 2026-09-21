@@ -178,7 +178,7 @@ export function DataTable<TData extends RowData>({
           ))}
         </thead>
         <tbody>
-          {rows.length === 0 ? (
+          {!isLoading && rows.length === 0 ? (
             <tr>
               <td
                 colSpan={columns.length}

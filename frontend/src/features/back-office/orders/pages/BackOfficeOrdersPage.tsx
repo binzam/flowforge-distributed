@@ -70,7 +70,7 @@ const BackOfficeOrdersPage = () => {
   ] as const);
   const status = filters.status as OrderStatus | undefined;
 
-  const { data, isLoading, isError } = useGetOrders({
+  const { data, isLoading, isError, isFetching } = useGetOrders({
     status,
     userId: filters.userId,
     limit: PAGE_SIZE,
@@ -113,7 +113,7 @@ const BackOfficeOrdersPage = () => {
           columns={columns}
           data={data?.data ?? []}
           getRowId={(order) => order.id}
-          isLoading={isLoading}
+          isLoading={isLoading || isFetching}
           isError={isError}
           errorState={
             <div className="py-12 text-red-600">Unable to load orders.</div>

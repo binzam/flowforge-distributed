@@ -1,11 +1,17 @@
 import { Link } from "react-router-dom";
 import { useGetUnreadNotificationsCount } from "../hooks/notification-hooks";
 import { Bell, Loader } from "lucide-react";
+import { useGetCurrentUser } from "@/features/auth/hooks/auth-hook";
 
 const NotificationBell = () => {
+  const { data: user } = useGetCurrentUser();
   const { data, isLoading, isFetching } = useGetUnreadNotificationsCount();
   const unreadCount = data?.data?.unreadCount || 0;
- 
+
+  if (!user) {
+    return null;
+  }
+
   if (isLoading || isFetching) {
     return (
       <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100">

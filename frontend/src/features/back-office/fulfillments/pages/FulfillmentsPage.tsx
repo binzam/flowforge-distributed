@@ -1,6 +1,6 @@
 import {
-  DataTable,
-  type DataTableColumnDef,
+    DataTable,
+    type DataTableColumnDef,
 } from "@/components/data-table/data-table";
 import { DataTablePagination } from "@/components/data-table/data-table-pagination";
 import { useListQueryParams } from "@/hooks/use-list-query-params";
@@ -10,8 +10,8 @@ import PageHeaderWrapper from "../../layouts/PageHeaderWrapper";
 import PageTableWrapper from "../../layouts/PageTableWrapper";
 import { useGetFulfillments } from "../hooks/fulfillment-hooks";
 import type {
-  FulfillmentListItem,
-  FulfillmentStatus,
+    FulfillmentListItem,
+    FulfillmentStatus,
 } from "../types/fulfillment-types";
 
 const PAGE_SIZE = 10;
@@ -104,7 +104,7 @@ const FulfillmentsPage = () => {
   });
 
   return (
-    <section>
+    <section className="flex flex-col h-full">
       <PageHeaderWrapper className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <p className="text-sm text-slate-500">Manage</p>

@@ -78,7 +78,7 @@ const BackOfficeOrdersPage = () => {
   });
 
   return (
-    <section>
+    <section className="flex flex-col h-full">
       <PageHeaderWrapper className="flex flex-wrap items-center justify-between gap-4">
         <div className="">
           <p className="text-sm text-slate-500">Operations</p>

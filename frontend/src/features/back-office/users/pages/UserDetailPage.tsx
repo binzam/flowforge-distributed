@@ -64,7 +64,7 @@ const UserDetailPage = () => {
   }
 
   return (
-    <section>
+    <section className="flex flex-col h-full">
       <PageHeaderWrapper>
         <Link to="/portal/users" className="text-sm text-slate-500 underline">
           Back to users

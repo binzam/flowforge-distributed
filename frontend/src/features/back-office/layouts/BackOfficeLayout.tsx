@@ -12,7 +12,7 @@ const BackOfficeLayout = () => {
 
       <div className="flex flex-col flex-1 min-w-0">
         <BackOfficeHeader />
-        <main className="flex-1 overflow-y-auto scroll-container">
+        <main className="flex-1 flex flex-col overflow-y-auto scroll-container">
           <Suspense
             key={location.pathname}
             fallback={<LoadingScreen variant="outlet" label="FLOWFORGE" />}

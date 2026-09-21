@@ -57,7 +57,7 @@ const InventoryDetailPage = () => {
   ];
 
   return (
-    <section>
+    <section className="flex flex-col h-full">
       <PageHeaderWrapper>
         <Link
           to="/portal/inventory"

@@ -1,6 +1,6 @@
 import {
-  DataTable,
-  type DataTableColumnDef,
+    DataTable,
+    type DataTableColumnDef,
 } from "@/components/data-table/data-table";
 import { dateFormatter } from "@/utils/date-formatter";
 import type { ReactNode } from "react";
@@ -9,8 +9,8 @@ import { Link, useParams } from "react-router-dom";
 import PageHeaderWrapper from "../../layouts/PageHeaderWrapper";
 import PageTableWrapper from "../../layouts/PageTableWrapper";
 import {
-  useGetFulfillment,
-  useUpdateFulfillmentStatus,
+    useGetFulfillment,
+    useUpdateFulfillmentStatus,
 } from "../hooks/fulfillment-hooks";
 import type { FulfillmentStatus, OrderItem } from "../types/fulfillment-types";
 
@@ -144,7 +144,7 @@ const FulfillmentDetailPage = () => {
   ];
 
   return (
-    <section>
+    <section className="flex flex-col h-full">
       <PageHeaderWrapper>
         <Link
           to="/portal/fulfillments"

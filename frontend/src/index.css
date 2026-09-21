@@ -7,6 +7,15 @@
   --color-green: #5f8d4e;
   --color-dark-green: #285430;
 }
+
+.Toastify__toast {
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+  font-size: 14px;
+  font-weight: 500;
+}
+
 html,
 body {
   font-family: "Inter", sans-serif;

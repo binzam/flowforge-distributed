@@ -1,25 +1,25 @@
-import { useCallback, useMemo, useState } from "react";
-import { Pencil, Plus, Trash2 } from "lucide-react";
 import {
-  DataTable,
-  type DataTableColumnDef,
+    DataTable,
+    type DataTableColumnDef,
 } from "@/components/data-table/data-table";
 import { dateFormatter } from "@/utils/date-formatter";
+import { Pencil, Plus, Trash2 } from "lucide-react";
+import { useCallback, useMemo, useState } from "react";
+import PageHeaderWrapper from "../../layouts/PageHeaderWrapper";
+import PageTableWrapper from "../../layouts/PageTableWrapper";
 import ProductFormModal from "../components/ProductFormModal";
 import {
-  useCreateProduct,
-  useDeleteProduct,
-  useGetProducts,
-  useUpdateProduct,
+    useCreateProduct,
+    useDeleteProduct,
+    useGetProducts,
+    useUpdateProduct,
 } from "../hooks/product-hooks";
 import { type ProductFormValues } from "../schemas/product-schema";
 import type {
-  Product,
-  ProductPayload,
-  UpdateProductPayload,
+    Product,
+    ProductPayload,
+    UpdateProductPayload,
 } from "../types/product-types";
-import PageHeaderWrapper from "../../layouts/PageHeaderWrapper";
-import PageTableWrapper from "../../layouts/PageTableWrapper";
 
 const BackOfficeProductsPage = () => {
   const { data, isLoading, isError } = useGetProducts();
@@ -173,7 +173,7 @@ const BackOfficeProductsPage = () => {
   );
 
   return (
-    <section>
+    <section className="flex flex-col h-full">
       <PageHeaderWrapper className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <p className="text-sm text-slate-500">Manage</p>

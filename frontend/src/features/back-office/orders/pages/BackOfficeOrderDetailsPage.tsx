@@ -1,6 +1,6 @@
 import {
-  DataTable,
-  type DataTableColumnDef,
+    DataTable,
+    type DataTableColumnDef,
 } from "@/components/data-table/data-table";
 import { dateFormatter } from "@/utils/date-formatter";
 import { Link, useParams } from "react-router-dom";
@@ -81,7 +81,7 @@ const BackOfficeOrderDetailsPage = () => {
   };
 
   return (
-    <section>
+    <section className="flex flex-col h-full">
       <PageHeaderWrapper>
         <Link to="/portal/orders" className="text-sm text-slate-500 underline">
           Back to orders

@@ -64,7 +64,7 @@ const UsersPage = () => {
     role: filters.role as UsersQuery["role"],
   });
   return (
-    <section>
+    <section className="flex flex-col h-full">
       <PageHeaderWrapper className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <p className="text-sm text-slate-500">Manage</p>

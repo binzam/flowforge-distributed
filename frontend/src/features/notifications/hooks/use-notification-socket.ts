@@ -1,15 +1,15 @@
-import { useGetCurrentUser } from "@/features/auth/hooks/auth-hook";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 import type { Notification } from "@/features/notifications/types/notification-types";
-import { useEffect } from "react";
-import socket from "@/lib/socket";
-import { toast } from "react-toastify";
 import { queryClient } from "@/lib/query-client";
+import socket from "@/lib/socket";
+import { useEffect } from "react";
+import { toast } from "react-toastify";
 
 export const useNotificationSocket = () => {
-  const { data: user } = useGetCurrentUser();
+  const { user } = useAuth();
 
   useEffect(() => {
-    if (!user?.data.user.id) {
+    if (!user) {
       return;
     }
     const handleConnect = () => {
@@ -36,5 +36,5 @@ export const useNotificationSocket = () => {
       socket.off("notification", handleNotification);
       socket.disconnect();
     };
-  }, [user?.data.user.id]);
+  }, [user]);
 };

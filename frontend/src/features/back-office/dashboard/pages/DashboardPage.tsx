@@ -1,9 +1,9 @@
-import { useGetCurrentUser } from "@/features/auth/hooks/auth-hook";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 import { Link } from "react-router-dom";
 
 const DashboardPage = () => {
-  const { data } = useGetCurrentUser();
-  const userType = data?.data.user.role;
+  const { user } = useAuth();
+  const userType = user?.role;
   return (
     <div className="p-4 md:p-6 lg:p-8">
       <div>

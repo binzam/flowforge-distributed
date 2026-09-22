@@ -2,6 +2,7 @@ import axios from "axios";
 import { getApiError } from "./api-error";
 import { queryClient } from "./query-client";
 
+const REFRESH_QUEUE_TIMEOUT_MS = 10000;
 declare module "axios" {
   export interface InternalAxiosRequestConfig {
     _retry?: boolean;
@@ -76,16 +77,27 @@ apiClient.interceptors.response.use(
       throw getApiError(error);
     }
 
-    // Mark this specific request so a second 401 after a successful
-    // refresh (a genuinely unauthorized request, not an expired token)
-    // fails immediately instead of looping.
     originalRequest._retry = true;
 
     if (isRefreshing) {
-      // A refresh is already in flight
-      // Queue this request instead of firing a second /auth/refresh call, then retry once it settles.
       await new Promise<void>((resolve, reject) => {
-        refreshQueue.push({ resolve, reject });
+        const item: RefreshQueueItem = { resolve, reject };
+
+        const timeoutId = setTimeout(() => {
+          refreshQueue = refreshQueue.filter((queued) => queued !== item);
+          reject(new Error("Token refresh timed out"));
+        }, REFRESH_QUEUE_TIMEOUT_MS);
+
+        item.resolve = () => {
+          clearTimeout(timeoutId);
+          resolve();
+        };
+        item.reject = (err: unknown) => {
+          clearTimeout(timeoutId);
+          reject(err);
+        };
+
+        refreshQueue.push(item);
       }).catch((queuedError: unknown) => {
         throw getApiError(queuedError);
       });
@@ -100,7 +112,6 @@ apiClient.interceptors.response.use(
     } catch (refreshError) {
       isRefreshing = false;
       processQueue(refreshError);
-      // The refresh token itself is invalid/expired so Drop all cached data{except products}.
       queryClient.removeQueries({
         predicate: (query) => {
           return (

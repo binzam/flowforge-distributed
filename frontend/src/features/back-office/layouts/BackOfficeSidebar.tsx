@@ -1,4 +1,4 @@
-import { useGetCurrentUser } from "@/features/auth/hooks/auth-hook";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 import {
   Bell,
   Box,
@@ -68,8 +68,8 @@ const uuidRegex =
 const BackOfficeSidebar = () => {
   const location = useLocation();
   const isDetailsPage = uuidRegex.test(location.pathname);
-  const { data: user } = useGetCurrentUser();
-  const userRole = user?.data?.user?.role;
+  const { user } = useAuth();
+  const userRole = user?.role;
 
   const visibleMenuItems = menuItems.filter((item) =>
     userRole ? item.allowedRoles.includes(userRole) : false,

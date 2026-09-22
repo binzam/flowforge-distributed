@@ -1,13 +1,13 @@
+import { useAuth } from "@/features/auth/hooks/use-auth";
+import { useCreateOrder } from "@/features/store-front/orders/hooks/order-hooks";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { useGetCurrentUser } from "@/features/auth/hooks/auth-hook";
-import { useCreateOrder } from "@/features/store-front/orders/hooks/order-hooks";
 import { useCartStore } from "../store/cart-store";
 import { getCartTotal } from "../store/cart-utils";
 
 const CartPage = () => {
   const navigate = useNavigate();
-  const { data: user } = useGetCurrentUser();
+  const { user } = useAuth();
   const items = useCartStore((state) => state.items);
   const increaseQuantity = useCartStore((state) => state.increaseQuantity);
   const decreaseQuantity = useCartStore((state) => state.decreaseQuantity);
@@ -16,7 +16,7 @@ const CartPage = () => {
   const createOrderMutation = useCreateOrder();
 
   const handleCreateOrder = () => {
-    if (!user?.data.user) {
+    if (!user) {
       navigate("/login");
       return;
     }
@@ -99,7 +99,7 @@ const CartPage = () => {
         >
           {createOrderMutation.isPending
             ? "CREATING..."
-            : user?.data.user
+            : user
               ? "CREATE ORDER"
               : "LOGIN TO CREATE ORDER"}
         </button>

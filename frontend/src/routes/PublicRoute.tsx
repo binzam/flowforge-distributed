@@ -1,23 +1,12 @@
 import { Navigate, Outlet } from "react-router-dom";
 import LoadingScreen from "@/components/LoadingScreen";
-import { useGetCurrentUser } from "@/features/auth/hooks/auth-hook";
+import { useAuth } from "@/features/auth/hooks/use-auth";
+import { getHomeRouteForRole } from "@/features/auth/utils/role-routes";
 
 const PublicRoute = () => {
-  const { data: user, isLoading } = useGetCurrentUser();
-
-  if (isLoading) {
-    return <LoadingScreen />;
-  }
-
-  if (user != null) {
-    const destination =
-      user.data.user.role === "admin" || user.data.user.role === "warehouse"
-        ? "/portal"
-        : "/";
-    return <Navigate to={destination} replace />;
-  }
-
+  const { user, isLoading } = useAuth();
+  if (isLoading) return <LoadingScreen />;
+  if (user) return <Navigate to={getHomeRouteForRole(user.role)} replace />;
   return <Outlet />;
 };
-
 export default PublicRoute;

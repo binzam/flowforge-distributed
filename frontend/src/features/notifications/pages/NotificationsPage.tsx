@@ -1,11 +1,11 @@
-import { CheckCheck, Bell } from "lucide-react";
+import { useAuth } from "@/features/auth/hooks/use-auth";
+import PageHeaderWrapper from "@/features/back-office/layouts/PageHeaderWrapper";
+import { Bell, CheckCheck } from "lucide-react";
 import NotificationCard from "../components/NotificationCard";
 import {
   useGetNotifications,
   useMarkAllNotificationAsRead,
 } from "../hooks/notification-hooks";
-import { useGetCurrentUser } from "@/features/auth/hooks/auth-hook";
-import PageHeaderWrapper from "@/features/back-office/layouts/PageHeaderWrapper";
 
 const NotificationSkeleton = () => (
   <div className="flex items-start gap-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm animate-pulse">
@@ -19,11 +19,11 @@ const NotificationSkeleton = () => (
 );
 
 const NotificationsPage = () => {
-  const { data: user } = useGetCurrentUser();
+  const { user } = useAuth();
   const { data, isLoading } = useGetNotifications();
   const { mutate: markAllRead, isPending } = useMarkAllNotificationAsRead();
 
-  const userRole = user?.data?.user?.role;
+  const userRole = user?.role;
   const unreadCount = data?.unreadCount || 0;
 
   return (

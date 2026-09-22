@@ -1,12 +1,12 @@
-import type { Product } from "../types/product-types";
-import { useCartStore } from "../../cart/store/cart-store";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 import { toast } from "react-toastify";
-import { useGetCurrentUser } from "@/features/auth/hooks/auth-hook";
+import { useCartStore } from "../../cart/store/cart-store";
+import type { Product } from "../types/product-types";
 
 const ProductCard = ({ product }: { product: Product }) => {
   const addItem = useCartStore((state) => state.addItem);
-  const { data: currentUser } = useGetCurrentUser();
-  const role = currentUser?.data.user.role;
+  const { user } = useAuth();
+  const role = user?.role;
   const canAddToCart = role === undefined || role === "customer";
 
   const handleAddToCart = () => {

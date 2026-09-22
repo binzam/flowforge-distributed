@@ -1,10 +1,10 @@
+import { useAuth } from "@/features/auth/hooks/use-auth";
+import { Bell, Loader } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useGetUnreadNotificationsCount } from "../hooks/notification-hooks";
-import { Bell, Loader } from "lucide-react";
-import { useGetCurrentUser } from "@/features/auth/hooks/auth-hook";
 
 const NotificationBell = () => {
-  const { data: user } = useGetCurrentUser();
+  const { user } = useAuth();
   const { data, isLoading, isFetching } = useGetUnreadNotificationsCount();
   const unreadCount = data?.data?.unreadCount || 0;
 

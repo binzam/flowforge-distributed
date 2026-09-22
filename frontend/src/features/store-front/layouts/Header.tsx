@@ -1,16 +1,17 @@
-import { Search, ShoppingCart, User, Menu } from "lucide-react";
+import { useAuth } from "@/features/auth/hooks/use-auth";
+import NotificationBell from "@/features/notifications/components/NotificationBell";
+import { Menu, Search, ShoppingCart, User } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useGetCurrentUser, useLogoutUser } from "../../auth/hooks/auth-hook";
+import { useLogoutUser } from "../../auth/hooks/auth-hook";
 import { useCartStore } from "../cart/store/cart-store";
 import { getCartItemCount } from "../cart/store/cart-utils";
-import NotificationBell from "@/features/notifications/components/NotificationBell";
 
 export const Header = () => {
-  const { data: user } = useGetCurrentUser();
+  const { user } = useAuth();
   const cartItemCount = getCartItemCount(useCartStore((state) => state.items));
 
   const { mutate: logoutUser, isPending: isLoggingOut } = useLogoutUser();
-  const role = user?.data.user.role;
+  const role = user?.role;
   const canAddToCart = role === undefined || role === "customer";
   return (
     <header className="sticky top-0 z-50 w-full border-b border-neutral-800 bg-neutral-950/80 backdrop-blur-md">
@@ -49,7 +50,7 @@ export const Header = () => {
           <button className="hover:text-white transition-colors">
             <Search className="h-5 w-5" />
           </button>
-          {!user?.data ? (
+          {!user ? (
             <Link to="/login" className="hover:text-white transition-colors">
               <User className="h-5 w-5" />
             </Link>
@@ -58,7 +59,7 @@ export const Header = () => {
               {isLoggingOut ? "Good Bye" : "Logout"}
             </button>
           )}
-          {user?.data.user.role === "customer" && (
+          {user?.role === "customer" && (
             <Link
               to="/orders"
               className="hover:text-white transition-colors text-xs tracking-widest"

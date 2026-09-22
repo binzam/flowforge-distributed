@@ -51,6 +51,7 @@ export const useLogoutUser = () => {
   return useMutation({
     mutationFn: logoutUser,
     onSettled: () => {
+      queryClient.setQueryData(["user"], null);
       queryClient.clear();
       navigate("/login", { replace: true });
     },

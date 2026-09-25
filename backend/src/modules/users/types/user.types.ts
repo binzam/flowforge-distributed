@@ -2,10 +2,11 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  passwordHash: string;
   createdAt: Date;
   updatedAt: Date;
   role: UserRole;
+  passwordHash: string | null;
+  googleId: string | null;
 }
 
 export interface PublicUser {

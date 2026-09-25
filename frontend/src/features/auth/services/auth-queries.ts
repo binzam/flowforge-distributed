@@ -1,6 +1,9 @@
 import { apiClient } from "@/lib/api-client";
 import type { LoginFormValues, SignUpFormValues } from "../schemas/auth-schema";
-import type { GetUserResponse } from "../types/auth-service-types";
+import type {
+  GetUserResponse,
+  GoogleLoginResponse,
+} from "../types/auth-service-types";
 
 // Login
 export const loginUser = async (data: LoginFormValues) => {
@@ -27,4 +30,12 @@ export const signUpUser = async (data: SignUpFormValues): Promise<void> => {
 export const logoutUser = async () => {
   const response = await apiClient.post("/auth/logout", {});
   return response.data;
+};
+
+// Login with google
+export const loginWithGoogle = async (
+  idToken: string,
+): Promise<GoogleLoginResponse> => {
+  const res = await apiClient.post("/auth/google", { idToken });
+  return res.data;
 };

@@ -3,6 +3,7 @@ import { queryClient } from "@/lib/query-client";
 import {
   getCurrentUser,
   loginUser,
+  loginWithGoogle,
   logoutUser,
   signUpUser,
 } from "../services/auth-queries";
@@ -54,6 +55,19 @@ export const useLogoutUser = () => {
       queryClient.setQueryData(["user"], null);
       queryClient.clear();
       navigate("/login", { replace: true });
+    },
+  });
+};
+
+// Login with google
+export const useGoogleLogin = () => {
+  const navigate = useNavigate();
+
+  return useMutation({
+    mutationFn: loginWithGoogle,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["user"] });
+      navigate("/");
     },
   });
 };

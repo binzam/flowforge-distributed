@@ -9,6 +9,17 @@ import { AppError } from "../../../errors/AppError.js";
 import type { GetUsersQuery } from "../schemas/user.schemas.js";
 import { handlePostgresError } from "../../../errors/postgresErrors.js";
 
+const SELECT_FIELDS = `
+  id,
+  name,
+  email,
+  password_hash AS "passwordHash",
+  google_id AS "googleId",
+  role,
+  created_at AS "createdAt",
+  updated_at AS "updatedAt"
+`;
+
 export class UserRepository {
   constructor(private readonly db: Pool) {}
 
@@ -42,17 +53,75 @@ export class UserRepository {
       return handlePostgresError(error);
     }
   }
+
+  async createFromGoogle(input: {
+    name: string;
+    email: string;
+    googleId: string;
+  }): Promise<User> {
+    try {
+      const result = await this.db.query<User>(
+        `
+        INSERT INTO users (
+          name,
+          email,
+          google_id
+        )
+        VALUES ($1, $2, $3)
+        RETURNING ${SELECT_FIELDS};
+      `,
+        [input.name, input.email, input.googleId],
+      );
+
+      const user = result.rows[0];
+      if (!user) {
+        throw new AppError("Failed to create user", 500);
+      }
+      return user;
+    } catch (error) {
+      return handlePostgresError(error);
+    }
+  }
+
+  async linkGoogleId(userId: string, googleId: string): Promise<User> {
+    try {
+      const result = await this.db.query<User>(
+        `
+        UPDATE users
+        SET google_id = $2, updated_at = NOW()
+        WHERE id = $1
+        RETURNING ${SELECT_FIELDS};
+      `,
+        [userId, googleId],
+      );
+
+      const user = result.rows[0];
+      if (!user) {
+        throw new AppError("User not found", 404);
+      }
+      return user;
+    } catch (error) {
+      return handlePostgresError(error);
+    }
+  }
+
+  async findByGoogleId(googleId: string): Promise<User | null> {
+    const result = await this.db.query<User>(
+      `
+      SELECT ${SELECT_FIELDS}
+      FROM users
+      WHERE google_id = $1;
+    `,
+      [googleId],
+    );
+
+    return result.rows[0] ?? null;
+  }
+
   async findByEmail(email: string): Promise<User | null> {
     const result = await this.db.query<User>(
       `
-      SELECT
-        id,
-        name,
-        email,
-        password_hash AS "passwordHash",
-        role,
-        created_at AS "createdAt",
-        updated_at AS "updatedAt"
+      SELECT ${SELECT_FIELDS}
       FROM users
       WHERE email = $1;
     `,
@@ -65,14 +134,7 @@ export class UserRepository {
   async findById(id: string): Promise<User | null> {
     const result = await this.db.query<User>(
       `
-      SELECT
-        id,
-        name,
-        email,
-        password_hash AS "passwordHash",
-        role,
-        created_at AS "createdAt",
-        updated_at AS "updatedAt"
+      SELECT ${SELECT_FIELDS}
       FROM users
       WHERE id = $1;
     `,
@@ -144,14 +206,7 @@ export class UserRepository {
   async findByRoles(roles: UserRole[]): Promise<User[]> {
     const result = await this.db.query<User>(
       `
-    SELECT
-      id,
-      name,
-      email,
-      password_hash AS "passwordHash",
-      role,
-      created_at AS "createdAt",
-      updated_at AS "updatedAt"
+    SELECT ${SELECT_FIELDS}
     FROM users
     WHERE role = ANY($1::user_role[]);
     `,

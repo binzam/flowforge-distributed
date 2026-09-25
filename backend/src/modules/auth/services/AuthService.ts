@@ -1,5 +1,6 @@
 import { AppError } from "../../../errors/AppError.js";
 import type { PasswordHasher } from "../../../infrastructure/security/PasswordHasher.js";
+import type { GoogleAuthVerifier } from "../../../infrastructure/security/GoogleAuthVerifier.js";
 import type { UserRepository } from "../../users/repositories/UserRepository.js";
 import type { LoginInput } from "../schemas/auth.schemas.js";
 import type { User } from "../../users/types/user.types.js";
@@ -12,6 +13,7 @@ export class AuthService {
     private readonly userRepository: UserRepository,
     private readonly passwordHasher: PasswordHasher,
     private readonly sessionRepository: SessionRepository,
+    private readonly googleAuthVerifier: GoogleAuthVerifier,
   ) {}
 
   async login(input: LoginInput): Promise<{
@@ -21,7 +23,7 @@ export class AuthService {
   }> {
     const user = await this.userRepository.findByEmail(input.email);
 
-    if (!user) {
+    if (!user || !user.passwordHash) {
       throw new AppError("Invalid email or password", 401);
     }
 
@@ -34,24 +36,38 @@ export class AuthService {
       throw new AppError("Invalid email or password", 401);
     }
 
-    const refreshExpiresAt = new Date(Date.now() + REFRESH_TOKEN_TTL_MS);
-    const session = await this.sessionRepository.create(
-      user.id,
-      refreshExpiresAt,
-    );
+    return this.issueSession(user);
+  }
 
-    const accessToken = await signAccessToken({
-      id: user.id,
-      role: user.role,
-      email: user.email,
-      name: user.name,
-    });
+  async loginWithGoogle(idToken: string): Promise<{
+    user: User;
+    accessToken: string;
+    refreshToken: string;
+  }> {
+    const payload = await this.googleAuthVerifier.verify(idToken);
 
-    return {
-      user,
-      accessToken,
-      refreshToken: session.id,
-    };
+    if (!payload.emailVerified) {
+      throw new AppError("Google account email is not verified", 401);
+    }
+
+    let user = await this.userRepository.findByGoogleId(payload.googleId);
+
+    if (!user) {
+      const existingUser = await this.userRepository.findByEmail(payload.email);
+
+      user = existingUser
+        ? await this.userRepository.linkGoogleId(
+            existingUser.id,
+            payload.googleId,
+          )
+        : await this.userRepository.createFromGoogle({
+            name: payload.name,
+            email: payload.email,
+            googleId: payload.googleId,
+          });
+    }
+
+    return this.issueSession(user);
   }
 
   async refreshAccessToken(refreshToken: string): Promise<{
@@ -80,20 +96,10 @@ export class AuthService {
 
     await this.sessionRepository.deleteById(session.id);
 
-    const newExpiresAt = new Date(Date.now() + REFRESH_TOKEN_TTL_MS);
-    const newSession = await this.sessionRepository.create(
-      user.id,
-      newExpiresAt,
-    );
+    const { accessToken, refreshToken: newRefreshToken } =
+      await this.issueSession(user);
 
-    const accessToken = await signAccessToken({
-      id: user.id,
-      role: user.role,
-      email: user.email,
-      name: user.name,
-    });
-
-    return { accessToken, refreshToken: newSession.id };
+    return { accessToken, refreshToken: newRefreshToken };
   }
 
   async getUserById(id: string): Promise<User> {
@@ -108,5 +114,26 @@ export class AuthService {
 
   async logout(refreshToken: string): Promise<void> {
     await this.sessionRepository.deleteById(refreshToken);
+  }
+
+  private async issueSession(user: User): Promise<{
+    user: User;
+    accessToken: string;
+    refreshToken: string;
+  }> {
+    const refreshExpiresAt = new Date(Date.now() + REFRESH_TOKEN_TTL_MS);
+    const session = await this.sessionRepository.create(
+      user.id,
+      refreshExpiresAt,
+    );
+
+    const accessToken = await signAccessToken({
+      id: user.id,
+      role: user.role,
+      email: user.email,
+      name: user.name,
+    });
+
+    return { user, accessToken, refreshToken: session.id };
   }
 }

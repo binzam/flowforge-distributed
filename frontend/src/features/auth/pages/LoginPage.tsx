@@ -2,13 +2,19 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff, ArrowRight, Loader2 } from "lucide-react";
-import { useLoginUser } from "../hooks/auth-hook";
+import { useLoginUser, useGoogleLogin } from "../hooks/auth-hook";
 import { loginFormSchema, type LoginFormValues } from "../schemas/auth-schema";
 import { Link } from "react-router-dom";
+import GoogleSignInButton from "../components/GoogleSignInButton";
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const { mutate: login, isPending, error: apiError } = useLoginUser();
+  const {
+    mutate: loginWithGoogle,
+    isPending: isGooglePending,
+    error: googleError,
+  } = useGoogleLogin();
 
   const {
     register,
@@ -25,6 +31,13 @@ const LoginPage = () => {
   const onSubmit = (data: LoginFormValues) => {
     login(data);
   };
+
+  const handleGoogleCredential = (idToken: string) => {
+    loginWithGoogle(idToken);
+  };
+
+  const combinedError = apiError || googleError;
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-neutral-950 px-4 py-12 sm:px-6 lg:px-8 selection:bg-white selection:text-black">
       <div className="w-full max-w-md space-y-10">
@@ -45,15 +58,34 @@ const LoginPage = () => {
         </div>
 
         {/* Error Alert */}
-        {apiError && (
+        {combinedError && (
           <div className="p-4 bg-neutral-900 border border-red-900/50 text-red-500 text-xs font-medium tracking-widest uppercase text-center">
-            {apiError.message || "Authentication failed."}
+            {combinedError.message || "Authentication failed."}
           </div>
         )}
 
+        {/* Google Sign-In */}
+        <div className="space-y-6">
+          {isGooglePending ? (
+            <div className="flex justify-center py-3">
+              <Loader2 className="w-4 h-4 animate-spin text-white" />
+            </div>
+          ) : (
+            <GoogleSignInButton onCredential={handleGoogleCredential} />
+          )}
+
+          <div className="flex items-center gap-4">
+            <div className="h-px flex-1 bg-neutral-800" />
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-500">
+              Or
+            </span>
+            <div className="h-px flex-1 bg-neutral-800" />
+          </div>
+        </div>
+
         {/* Form */}
         <form
-          className="mt-8 space-y-6"
+          className="space-y-6"
           onSubmit={handleSubmit(onSubmit)}
           noValidate
         >

@@ -30,4 +30,7 @@ export const config = {
     url: getEnv("REDIS_URL"),
   },
   JWT_ENCRYPTION_KEY: getEnv("JWT_ENCRYPTION_KEY"),
+  google: {
+    clientId: getEnv("GOOGLE_CLIENT_ID"),
+  },
 };

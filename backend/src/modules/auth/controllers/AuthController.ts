@@ -28,6 +28,21 @@ export class AuthController {
     });
   };
 
+  googleLogin = async (req: Request, res: Response): Promise<void> => {
+    const { idToken } = req.body;
+
+    const { user, accessToken, refreshToken } =
+      await this.authService.loginWithGoogle(idToken);
+
+    this.setAuthCookies(res, accessToken, refreshToken);
+
+    res.status(200).json({
+      data: {
+        user: toPublicUser(user),
+      },
+    });
+  };
+
   refresh = async (req: Request, res: Response): Promise<void> => {
     const refreshToken = req.cookies.refresh_token;
 

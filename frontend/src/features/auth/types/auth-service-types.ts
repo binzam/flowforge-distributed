@@ -17,3 +17,9 @@ export interface LoginUserResponse {
     user: User;
   };
 }
+
+export interface GoogleLoginResponse {
+  data: {
+    user: User;
+  };
+}

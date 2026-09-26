@@ -1,24 +1,25 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Eye,
-  EyeOff,
-  ArrowRight,
-  Loader2,
-} from "lucide-react";
-import { useSignUpUser } from "../hooks/auth-hook";
+import { Eye, EyeOff, ArrowRight, Loader2 } from "lucide-react";
+import { useGoogleLogin, useSignUpUser } from "../hooks/auth-hook";
 import {
   signUpFormSchema,
   type SignUpFormValues,
 } from "../schemas/auth-schema";
 import { Link } from "react-router-dom";
+import GoogleSignInButton from "../components/GoogleSignInButton";
 
 const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const { mutate: signUp, isPending, error: apiError } = useSignUpUser();
+  const {
+    mutate: loginWithGoogle,
+    isPending: isGooglePending,
+    error: googleError,
+  } = useGoogleLogin();
 
   const {
     register,
@@ -37,6 +38,12 @@ const SignUpPage = () => {
   const onSubmit = (data: SignUpFormValues) => {
     signUp(data);
   };
+
+  const handleGoogleCredential = (idToken: string) => {
+    loginWithGoogle(idToken);
+  };
+
+  const combinedError = apiError || googleError;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-neutral-950 px-4 py-12 sm:px-6 lg:px-8 selection:bg-white selection:text-black">
@@ -58,12 +65,31 @@ const SignUpPage = () => {
         </div>
 
         {/* Error Alert */}
-        {apiError && (
+        {combinedError && (
           <div className="p-4 bg-neutral-900 border border-red-900/50 text-red-500 text-xs font-medium tracking-widest uppercase text-center">
-            {apiError.message || "Failed to create account."}
+            {combinedError.message || "Authentication failed."}
           </div>
         )}
+        <div className="space-y-6">
+          {isGooglePending ? (
+            <div className="flex justify-center py-3">
+              <Loader2 className="w-4 h-4 animate-spin text-white" />
+            </div>
+          ) : (
+            <GoogleSignInButton
+              text="signup_with"
+              onCredential={handleGoogleCredential}
+            />
+          )}
 
+          <div className="flex items-center gap-4">
+            <div className="h-px flex-1 bg-neutral-800" />
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-500">
+              Or
+            </span>
+            <div className="h-px flex-1 bg-neutral-800" />
+          </div>
+        </div>
         {/* Form */}
         <form
           className="mt-8 space-y-5"

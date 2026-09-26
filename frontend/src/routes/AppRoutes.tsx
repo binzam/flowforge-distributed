@@ -10,6 +10,9 @@ import BackOfficeLayout from "@/features/back-office/layouts/BackOfficeLayout";
 // Auth pages
 const LoginPage = lazy(() => import("@/features/auth/pages/LoginPage"));
 const SignUpPage = lazy(() => import("@/features/auth/pages/SignupPage"));
+const GoogleCallbackPage = lazy(
+  () => import("@/features/auth/pages/GoogleCallbackPage"),
+);
 
 // Storefront pages
 const HomePage = lazy(
@@ -122,6 +125,7 @@ const AppRoutes = () => {
         <Route element={<PublicRoute />}>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/sign-up" element={<SignUpPage />} />
+          <Route path="/auth/callback" element={<GoogleCallbackPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

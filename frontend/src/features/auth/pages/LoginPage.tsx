@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff, ArrowRight, Loader2 } from "lucide-react";
@@ -36,6 +36,20 @@ const LoginPage = () => {
     loginWithGoogle(idToken);
   };
 
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) return;
+
+      if (event.data?.type === "GOOGLE_AUTH_SUCCESS") {
+        const idToken = event.data.idToken;
+        handleGoogleCredential(idToken);
+      }
+    };
+
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, []);
+
   const combinedError = apiError || googleError;
 
   return (
@@ -71,7 +85,15 @@ const LoginPage = () => {
               <Loader2 className="w-4 h-4 animate-spin text-white" />
             </div>
           ) : (
-            <GoogleSignInButton onCredential={handleGoogleCredential} />
+            <GoogleSignInButton
+              uxMode="popup"
+              text="signin_with"
+              onCredential={handleGoogleCredential}
+            />
+            // <GoogleSignInButton
+            //   uxMode="new_tab"
+            //   redirectUri={`${window.location.origin}/auth/callback`}
+            // />
           )}
 
           <div className="flex items-center gap-4">

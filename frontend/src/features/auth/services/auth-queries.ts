@@ -3,10 +3,11 @@ import type { LoginFormValues, SignUpFormValues } from "../schemas/auth-schema";
 import type {
   GetUserResponse,
   GoogleLoginResponse,
+  LoginUserResponse,
 } from "../types/auth-service-types";
 
 // Login
-export const loginUser = async (data: LoginFormValues) => {
+export const loginUser = async (data: LoginFormValues): Promise<LoginUserResponse> => {
   const response = await apiClient.post("/auth/login", data);
   return response.data;
 };

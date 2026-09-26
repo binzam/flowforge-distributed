@@ -247,6 +247,7 @@ const SignUpPage = () => {
             <Link
               to="/login"
               className="text-white hover:text-neutral-300 underline underline-offset-4 decoration-neutral-700 hover:decoration-neutral-300 transition-all"
+              viewTransition
             >
               Sign in here
             </Link>

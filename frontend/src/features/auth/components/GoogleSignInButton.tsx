@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface GoogleCredentialResponse {
   credential: string;
@@ -50,29 +50,22 @@ const loadGoogleScript = (): Promise<void> => {
   }
 
   googleScriptPromise = new Promise<void>((resolve, reject) => {
-    const existing = document.querySelector<HTMLScriptElement>(
-      `script[src="${GSI_SCRIPT_SRC}"]`,
-    );
-
-    if (existing) {
-      existing.addEventListener("load", () => resolve());
-      existing.addEventListener("error", () =>
-        reject(new Error("Failed to load Google script")),
-      );
-      return;
-    }
-
     const script = document.createElement("script");
     script.src = GSI_SCRIPT_SRC;
     script.async = true;
     script.defer = true;
-    script.addEventListener("load", () => resolve());
-    script.addEventListener("error", () =>
-      reject(new Error("Failed to load Google script")),
+    script.addEventListener("load", () => resolve(), { once: true });
+    script.addEventListener(
+      "error",
+      () => reject(new Error("Failed to load Google script")),
+      { once: true },
     );
     document.head.appendChild(script);
   }).catch((error) => {
     googleScriptPromise = null;
+    document
+      .querySelectorAll<HTMLScriptElement>(`script[src="${GSI_SCRIPT_SRC}"]`)
+      .forEach((el) => el.remove());
     throw error;
   });
 
@@ -103,31 +96,22 @@ const GoogleSignInButton = ({
 }: GoogleSignInButtonProps) => {
   const buttonRef = useRef<HTMLDivElement>(null);
 
-  const handleCustomNewTabClick = () => {
-    if (!GOOGLE_CLIENT_ID) return;
-    const targetRedirect = redirectUri || window.location.origin;
-    const params = new URLSearchParams({
-      client_id: GOOGLE_CLIENT_ID,
-      redirect_uri: targetRedirect,
-      response_type: "id_token token",
-      scope: scope,
-      nonce: Math.random().toString(36).substring(2),
-    });
+  const onCredentialRef = useRef(onCredential);
+  useEffect(() => {
+    onCredentialRef.current = onCredential;
+  });
 
-    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
-    window.open(authUrl, "_blank");
-  };
+  const [isReady, setIsReady] = useState(() => !GOOGLE_CLIENT_ID);
 
   useEffect(() => {
+    if (uxMode === "new_tab") return;
+
     if (!GOOGLE_CLIENT_ID) {
       console.error(
         "VITE_GOOGLE_CLIENT_ID is not set : Google sign-in cannot render.",
       );
       return;
     }
-
-    // If using 'new_tab' mode, rendered via standard button click
-    if (uxMode === "new_tab") return;
 
     let cancelled = false;
 
@@ -140,8 +124,8 @@ const GoogleSignInButton = ({
           ux_mode: uxMode,
           login_uri: loginUri,
           callback:
-            uxMode === "popup" && onCredential
-              ? (response) => onCredential(response.credential)
+            uxMode === "popup"
+              ? (response) => onCredentialRef.current?.(response.credential)
               : undefined,
         });
 
@@ -152,17 +136,35 @@ const GoogleSignInButton = ({
           width: 360,
           text,
         });
+
+        if (!cancelled) setIsReady(true);
       })
       .catch((error) => {
         console.error(error);
+        if (!cancelled) setIsReady(true);
       });
 
     return () => {
       cancelled = true;
     };
-  }, [onCredential, text, uxMode, loginUri]);
+  }, [text, uxMode, loginUri]);
 
   if (uxMode === "new_tab") {
+    const handleCustomNewTabClick = () => {
+      if (!GOOGLE_CLIENT_ID) return;
+      const targetRedirect = redirectUri || window.location.origin;
+      const params = new URLSearchParams({
+        client_id: GOOGLE_CLIENT_ID,
+        redirect_uri: targetRedirect,
+        response_type: "id_token token",
+        scope: scope,
+        nonce: Math.random().toString(36).substring(2),
+      });
+
+      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
+      window.open(authUrl, "_blank");
+    };
+
     return (
       <button
         type="button"
@@ -197,7 +199,20 @@ const GoogleSignInButton = ({
     );
   }
 
-  return <div ref={buttonRef} className="flex justify-center" />;
+  return (
+    <div className="relative flex min-h-10 justify-center">
+      {!isReady && (
+        <div
+          className="absolute inset-0 h-10 w-full max-w-90 animate-pulse rounded-md bg-neutral-800"
+          aria-hidden="true"
+        />
+      )}
+      <div
+        ref={buttonRef}
+        className={isReady ? "flex justify-center" : "invisible"}
+      />
+    </div>
+  );
 };
 
 export default GoogleSignInButton;

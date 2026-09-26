@@ -9,6 +9,7 @@ import {
 } from "../services/auth-queries";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { getHomeRouteForRole } from "../utils/role-routes";
 
 // Get Logged in User
 export const useGetCurrentUser = () => {
@@ -26,9 +27,10 @@ export const useLoginUser = () => {
 
   return useMutation({
     mutationFn: loginUser,
-    onSuccess: async () => {
+    onSuccess: async (data) => {
+      queryClient.setQueryData(["user"], data);
       await queryClient.invalidateQueries({ queryKey: ["user"] });
-      navigate("/");
+      navigate(getHomeRouteForRole(data.data.user.role), { replace: true });
     },
   });
 };
@@ -65,9 +67,10 @@ export const useGoogleLogin = () => {
 
   return useMutation({
     mutationFn: loginWithGoogle,
-    onSuccess: async () => {
+    onSuccess: async (data) => {
+      queryClient.setQueryData(["user"], data);
       await queryClient.invalidateQueries({ queryKey: ["user"] });
-      navigate("/");
+      navigate(getHomeRouteForRole(data.data.user.role), { replace: true });
     },
   });
 };

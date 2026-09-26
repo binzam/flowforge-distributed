@@ -26,7 +26,11 @@ export class GoogleAuthClient implements GoogleAuthVerifier {
 
     const payload = ticket.getPayload();
 
-    if (!payload || !payload.sub || !payload.email) {
+    if (
+      !payload ||
+      typeof payload.sub !== "string" ||
+      typeof payload.email !== "string"
+    ) {
       throw new AppError("Invalid Google token", 401);
     }
 

@@ -45,26 +45,28 @@ export class AuthService {
     refreshToken: string;
   }> {
     const payload = await this.googleAuthVerifier.verify(idToken);
-
+    console.log("Auth Service: Login with google : payload", payload);
     if (!payload.emailVerified) {
       throw new AppError("Google account email is not verified", 401);
     }
 
     let user = await this.userRepository.findByGoogleId(payload.googleId);
-
+    console.log("Auth Service: Login with google : user", user);
     if (!user) {
       const existingUser = await this.userRepository.findByEmail(payload.email);
 
-      user = existingUser
-        ? await this.userRepository.linkGoogleId(
-            existingUser.id,
-            payload.googleId,
-          )
-        : await this.userRepository.createFromGoogle({
-            name: payload.name,
-            email: payload.email,
-            googleId: payload.googleId,
-          });
+      if (existingUser) {
+        user = await this.userRepository.linkGoogleId(
+          existingUser.id,
+          payload.googleId,
+        );
+      } else {
+        user = await this.userRepository.createFromGoogle({
+          name: payload.name,
+          email: payload.email,
+          googleId: payload.googleId,
+        });
+      }
     }
 
     return this.issueSession(user);

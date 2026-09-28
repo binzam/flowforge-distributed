@@ -85,15 +85,15 @@ const LoginPage = () => {
               <Loader2 className="w-4 h-4 animate-spin text-white" />
             </div>
           ) : (
-            // <GoogleSignInButton
-            //   uxMode="popup"
-            //   text="signin_with"
-            //   onCredential={handleGoogleCredential}
-            // />
             <GoogleSignInButton
-              uxMode="new_tab"
-              redirectUri={`${window.location.origin}/auth/callback`}
+              uxMode="popup"
+              text="signin_with"
+              onCredential={handleGoogleCredential}
             />
+            // <GoogleSignInButton
+            //   uxMode="new_tab"
+            //   redirectUri={`${window.location.origin}/auth/callback`}
+            // />
           )}
 
           <div className="flex items-center gap-4">

@@ -47,6 +47,14 @@ export const Header = () => {
         </nav>
 
         <div className="flex items-center gap-5 text-neutral-400">
+          {user?.role !== "customer" && (
+            <Link
+              to="/portal"
+              className="hover:text-white transition-colors text-xs tracking-widest"
+            >
+              Portal
+            </Link>
+          )}
           <button className="hover:text-white transition-colors">
             <Search className="h-5 w-5" />
           </button>
@@ -59,6 +67,7 @@ export const Header = () => {
               {isLoggingOut ? "Good Bye" : "Logout"}
             </button>
           )}
+
           {user?.role === "customer" && (
             <Link
               to="/orders"

@@ -19,7 +19,7 @@ const ProductCard = ({ product }: { product: Product }) => {
   };
 
   return (
-    <div key={product.id} className="group cursor-pointer">
+    <div key={product.id} className="border-gradient group cursor-pointer overflow-hidden">
       <div className="relative aspect-3/4 w-full overflow-hidden bg-neutral-900 mb-4">
         <div className="absolute inset-0 bg-neutral-800 transition-transform duration-500 group-hover:scale-105" />
 
@@ -34,7 +34,7 @@ const ProductCard = ({ product }: { product: Product }) => {
           </div>
         )}
       </div>
-      <div className="flex justify-between items-start text-sm">
+      <div className="p-3 flex justify-between items-start text-sm">
         <div>
           <h3 className="font-medium text-white">{product.name}</h3>
           <p className="mt-1 text-neutral-500">{product.description}</p>

@@ -4,6 +4,7 @@ import {
   Box,
   BriefcaseBusiness,
   CreditCard,
+  Home,
   LayoutDashboard,
   Package,
   ShieldCheck,
@@ -13,6 +14,12 @@ import {
 import { NavLink, useLocation } from "react-router-dom";
 
 const menuItems = [
+  {
+    label: "Store Front",
+    path: "/",
+    icon: Home,
+    allowedRoles: ["admin", "warehouse"],
+  },
   {
     label: "Dashboard",
     path: "/portal",

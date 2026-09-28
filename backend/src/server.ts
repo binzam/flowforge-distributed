@@ -5,6 +5,7 @@ import { config } from "./config/env.js";
 import { registerEventHandlers } from "./bootstrap/registerEventHandlers.js";
 import { redisClient } from "./infrastructure/redis/redisClient.js";
 import { initializeWebSocketServer } from "./infrastructure/websocket/index.js";
+import { KafkaConsumer } from "./infrastructure/kafka/KafkaConsumer.js";
 
 const startServer = async () => {
   try {
@@ -18,6 +19,15 @@ const startServer = async () => {
 
     const websocketServer = initializeWebSocketServer(httpServer);
     registerEventHandlers(websocketServer);
+    const kafkaConsumer = new KafkaConsumer("flowforge-api");
+
+    await kafkaConsumer.connect();
+    await kafkaConsumer.subscribe("flowforge.events");
+
+    await kafkaConsumer.run(async (message) => {
+      console.log("Kafka message received:", message);
+    });
+    console.log("Kafka producer connected and message published");
     httpServer.listen(config.port, () => {
       console.log(`FlowForge API running on port ${config.port}`);
     });

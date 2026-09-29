@@ -17,10 +17,11 @@ export const useGetNotifications = (query: GetNotificationsQuery = {}) => {
     queryFn: () => getNotifications(query),
   });
 };
-export const useGetUnreadNotificationsCount = () => {
+export const useGetUnreadNotificationsCount = (isLoggedIn: boolean) => {
   return useQuery({
     queryKey: ["unread-notifications"],
     queryFn: () => getUnreadNotificationsCount(),
+    enabled: isLoggedIn,
   });
 };
 

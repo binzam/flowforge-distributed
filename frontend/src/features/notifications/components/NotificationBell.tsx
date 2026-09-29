@@ -5,7 +5,9 @@ import { useGetUnreadNotificationsCount } from "../hooks/notification-hooks";
 
 const NotificationBell = () => {
   const { user } = useAuth();
-  const { data, isLoading, isFetching } = useGetUnreadNotificationsCount();
+  const { data, isLoading, isFetching } = useGetUnreadNotificationsCount(
+    user?.id !== undefined,
+  );
   const unreadCount = data?.data?.unreadCount || 0;
 
   if (!user) {

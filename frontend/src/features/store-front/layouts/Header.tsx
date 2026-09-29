@@ -47,7 +47,7 @@ export const Header = () => {
         </nav>
 
         <div className="flex items-center gap-5 text-neutral-400">
-          {user?.role !== "customer" && (
+          {user?.role === "admin" && (
             <Link
               to="/portal"
               className="hover:text-white transition-colors text-xs tracking-widest"

@@ -10,24 +10,32 @@ import { KafkaConsumer } from "./infrastructure/kafka/KafkaConsumer.js";
 const startServer = async () => {
   try {
     const httpServer = http.createServer(app);
-    await pool.query("SELECT 1");
 
+    // PostgreSQL
+    await pool.query("SELECT 1");
     console.log("Database connection successful");
 
+    // Redis
     await redisClient.connect();
     console.log("Redis connection successful");
 
+    // WebSocket
     const websocketServer = initializeWebSocketServer(httpServer);
     registerEventHandlers(websocketServer);
+
+    // Kafka
     const kafkaConsumer = new KafkaConsumer("flowforge-api");
 
     await kafkaConsumer.connect();
     await kafkaConsumer.subscribe("flowforge.events");
 
-    await kafkaConsumer.run(async (message) => {
+    void kafkaConsumer.run(async (message) => {
       console.log("Kafka message received:", message);
     });
-    console.log("Kafka producer connected and message published");
+
+    console.log("Kafka consumer connected");
+
+    // HTTP server
     httpServer.listen(config.port, () => {
       console.log(`FlowForge API running on port ${config.port}`);
     });

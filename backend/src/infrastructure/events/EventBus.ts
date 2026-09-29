@@ -1,7 +1,7 @@
 import type { EventMap } from "./EventMap.js";
 
 export interface EventBus {
-  publish<K extends keyof EventMap>(event: EventMap[K]): void;
+  publish<K extends keyof EventMap>(event: EventMap[K]): Promise<void>;
 
   subscribe<K extends keyof EventMap>(
     eventType: K,

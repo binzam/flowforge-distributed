@@ -4,9 +4,9 @@ import { kafka } from "./KafkaClient.js";
 export class KafkaConsumer {
   private readonly consumer: Consumer;
 
-  constructor(private readonly groupId: string) {
+  constructor(groupId: string) {
     this.consumer = kafka.consumer({
-      groupId: this.groupId,
+      groupId,
     });
   }
 

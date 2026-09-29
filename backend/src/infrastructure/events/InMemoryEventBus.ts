@@ -5,7 +5,7 @@ import type { EventMap } from "./EventMap.js";
 export class InMemoryEventBus implements EventBus {
   private readonly emitter = new EventEmitter();
 
-  publish<K extends keyof EventMap>(event: EventMap[K]): void {
+  async publish<K extends keyof EventMap>(event: EventMap[K]): Promise<void> {
     this.emitter.emit(event.type, event);
   }
 

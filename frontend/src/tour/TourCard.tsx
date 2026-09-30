@@ -131,7 +131,7 @@ export function TourCard({
           </div>
         </div>
 
-        <div className="flex shrink-0 items-center justify-between border-t border-ink-900/[0.06] bg-surface-sunken/60 px-5 py-3">
+        <div className="flex flex-col-reverse gap-4 shrink-0 items-center justify-between border-t border-ink-900/[0.06] bg-surface-sunken/60 px-5 py-3">
           <div className="flex items-center gap-1.5">
             {Array.from({ length: totalSteps }).map((_, i) => (
               <button
@@ -155,7 +155,7 @@ export function TourCard({
               <button
                 type="button"
                 onClick={onPrev}
-                className="inline-flex cursor-pointer items-center gap-1 rounded-lg px-2.5 py-1.5 text-[13px] font-medium text-text-muted transition-colors hover:bg-ink-900/5 hover:text-text-primary"
+                className="inline-flex cursor-pointer items-center gap-1 rounded-lg px-2.5 py-1 text-[13px] font-medium text-text-muted transition-colors hover:bg-ink-900/5 hover:text-text-primary"
               >
                 <ArrowLeft size={14} strokeWidth={2.25} />
                 Back
@@ -164,7 +164,7 @@ export function TourCard({
             <button
               type="button"
               onClick={onNext}
-              className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-amber-500 px-3 py-1.5 text-[13px] font-semibold text-ink-950 shadow-sm transition-colors hover:bg-amber-600"
+              className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-amber-500 px-3 py-1 text-[13px] font-semibold text-ink-950 shadow-sm transition-colors hover:bg-amber-600"
             >
               {isLast ? "Finish" : "Next"}
               {isLast ? (

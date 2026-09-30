@@ -1,6 +1,6 @@
 import {
-    DataTable,
-    type DataTableColumnDef,
+  DataTable,
+  type DataTableColumnDef,
 } from "@/components/data-table/data-table";
 import { dateFormatter } from "@/utils/date-formatter";
 import { Pencil, Plus, Trash2 } from "lucide-react";
@@ -9,17 +9,18 @@ import PageHeaderWrapper from "../../layouts/PageHeaderWrapper";
 import PageTableWrapper from "../../layouts/PageTableWrapper";
 import ProductFormModal from "../components/ProductFormModal";
 import {
-    useCreateProduct,
-    useDeleteProduct,
-    useGetProducts,
-    useUpdateProduct,
+  useCreateProduct,
+  useDeleteProduct,
+  useGetProducts,
+  useUpdateProduct,
 } from "../hooks/product-hooks";
 import { type ProductFormValues } from "../schemas/product-schema";
 import type {
-    Product,
-    ProductPayload,
-    UpdateProductPayload,
+  Product,
+  ProductPayload,
+  UpdateProductPayload,
 } from "../types/product-types";
+import { tourAttr } from "@/tour/tour-targets";
 
 const BackOfficeProductsPage = () => {
   const { data, isLoading, isError } = useGetProducts();
@@ -146,11 +147,13 @@ const BackOfficeProductsPage = () => {
       {
         id: "actions",
         header: "Actions",
+        // Extract 'row' which contains the 'index'
         cell: ({ row }) => (
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={() => openEditModal(row.original)}
+              {...(row.index === 0 ? tourAttr("product-edit-button") : {})}
               className="inline-flex items-center gap-1 border border-slate-300 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 transition-colors hover:border-slate-400 hover:text-slate-900"
             >
               <Pencil className="h-3.5 w-3.5" />
@@ -160,6 +163,7 @@ const BackOfficeProductsPage = () => {
               type="button"
               onClick={() => handleDelete(row.original)}
               disabled={isDeleting}
+              {...(row.index === 0 ? tourAttr("product-delete-button") : {})}
               className="inline-flex items-center gap-1 border border-red-200 bg-red-50 px-2.5 py-1.5 text-xs font-medium text-red-700 transition-colors hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
             >
               <Trash2 className="h-3.5 w-3.5" />
@@ -190,18 +194,26 @@ const BackOfficeProductsPage = () => {
         </button>
       </PageHeaderWrapper>
       <PageTableWrapper>
-        <DataTable
-          tableId="admin-products"
-          columns={columns}
-          data={data?.data ?? []}
-          getRowId={(product) => product.id}
-          isLoading={isLoading}
-          isError={isError}
-          errorState={
-            <div className="py-12 text-red-600">Unable to load products.</div>
-          }
-          emptyState="No products found."
-        />
+        <div {...tourAttr("products-table")}>
+          <DataTable
+            tableId="admin-products"
+            columns={columns}
+            data={data?.data ?? []}
+            getRowId={(product) => product.id}
+            isLoading={isLoading}
+            isError={isError}
+            errorState={
+              <div className="py-12 text-red-600">Unable to load products.</div>
+            }
+            emptyState="No products found."
+            getRowProps={(_, index) => {
+              if (index === 0) {
+                return tourAttr("products-table-first-row");
+              }
+              return {};
+            }}
+          />
+        </div>
       </PageTableWrapper>
       <ProductFormModal
         open={isModalOpen}

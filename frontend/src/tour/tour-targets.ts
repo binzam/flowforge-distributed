@@ -4,8 +4,12 @@ import { menuItems, type MenuTourId } from "@/config/menu-items";
  * Targets that are NOT sidebar links
  */
 export type ExtraTourId =
+  | "products-table-first-row"
+  | "product-delete-button"
+  | "product-edit-button"
+  | "products-table"
   | "orders-table"
-  | "orders-status-filter";
+  | "orders-table-filter";
 
 export type TourTargetId = MenuTourId | ExtraTourId;
 

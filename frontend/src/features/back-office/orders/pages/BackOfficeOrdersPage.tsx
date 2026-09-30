@@ -85,7 +85,7 @@ const BackOfficeOrdersPage = () => {
           <p className="text-sm text-slate-500">Operations</p>
           <h1 className="mt-1 text-3xl font-semibold">Orders</h1>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2" {...tourAttr("orders-table-filter")}>
           <input
             value={filters.userId ?? ""}
             onChange={(event) => setFilter("userId", event.target.value)}

@@ -15,6 +15,10 @@ export interface DataTableProps<TData extends RowData> {
   data: TData[];
   getRowId?: (row: TData) => string;
   tableId?: string;
+  getRowProps?: (
+    row: TData,
+    index: number,
+  ) => React.HTMLAttributes<HTMLTableRowElement>;
   isLoading?: boolean;
   isError?: boolean;
   loadingState?: ReactNode;
@@ -53,6 +57,7 @@ export function DataTable<TData extends RowData>({
   columns,
   data,
   getRowId,
+  getRowProps,
   tableId,
   isLoading = false,
   isError = false,
@@ -188,9 +193,10 @@ export function DataTable<TData extends RowData>({
               </td>
             </tr>
           ) : (
-            rows.map((row) => (
+            rows.map((row, index) => (
               <tr
                 key={row.id}
+                {...(getRowProps ? getRowProps(row.original, index) : {})}
                 className={`border-b last:border-0 ${theme.row}`}
               >
                 {row.getAllCells().map((cell) => (

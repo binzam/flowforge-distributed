@@ -25,6 +25,45 @@ export function createDashboardTour({
       title: "Products",
       content: "Create, edit, and organize everything you sell.",
       placement: "right",
+      onBeforeShow: () => navigate("/portal/products"),
+    },
+    {
+      target: "products-table",
+      title: "Products Table",
+      content: "All products are listed here.",
+      placement: "top",
+      onBeforeShow: () => navigate("/portal/products"),
+      padding: 10,
+      radius: 0,
+    },
+    {
+      target: "products-table-first-row",
+      title: "Manage a Product",
+      content:
+        "This row represents a single product. Let's look at what you can do with it.",
+      placement: "bottom",
+      onBeforeShow: () => navigate("/portal/products"),
+      padding: 4,
+    },
+    {
+      target: "product-edit-button",
+      title: "Edit Product",
+      content:
+        "Click this to update the product's price, SKU, name, or description.",
+      placement: "left",
+      onBeforeShow: () => navigate("/portal/products"),
+      padding: 4,
+      radius: 4,
+    },
+    {
+      target: "product-delete-button",
+      title: "Delete Product",
+      content:
+        "Remove this product from your catalog entirely. (Don't worry, it asks for confirmation first!)",
+      placement: "left",
+      onBeforeShow: () => navigate("/portal/products"),
+      padding: 4,
+      radius: 4,
     },
     {
       target: "dashboard-orders",
@@ -39,6 +78,15 @@ export function createDashboardTour({
       placement: "top",
       onBeforeShow: () => navigate("/portal/orders"),
       padding: 10,
+      radius: 0,
+    },
+    {
+      target: "orders-table-filter",
+      title: "Orders Table Filter",
+      content:
+        "Filters can be applied to the orders table by searching for a specfic users orderes or by the status of the order.",
+      placement: "bottom",
+      radius: 4,
     },
     {
       target: "dashboard-payments",

@@ -1,10 +1,11 @@
 import { useLocation } from "react-router-dom";
 import { useLogoutUser } from "../../auth/hooks/auth-hook";
 import NotificationBell from "@/features/notifications/components/NotificationBell";
+import { Compass } from "lucide-react";
 
 const uuidRegex =
   /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const BackOfficeHeader = () => {
+const BackOfficeHeader = ({ onStartTour }: { onStartTour: () => void }) => {
   const { mutate: logoutUser, isPending: isLoggingOut } = useLogoutUser();
   const location = useLocation();
   const isDetailsPage = uuidRegex.test(location.pathname);
@@ -39,6 +40,14 @@ const BackOfficeHeader = () => {
 
       {/* Right side (e.g., Profile, Notifications) */}
       <div className="flex items-center gap-4">
+        <button
+          data-tour="start-tour-button"
+          onClick={onStartTour}
+          className="flex cursor-pointer items-center gap-1.5 rounded-lg bg-slate-900 px-3.5 py-2.5 text-[13px] font-semibold text-white transition-colors hover:bg-ink-800"
+        >
+          <Compass size={15} strokeWidth={2.25} />
+          Take a tour
+        </button>
         <NotificationBell />
         <button
           onClick={() => logoutUser()}

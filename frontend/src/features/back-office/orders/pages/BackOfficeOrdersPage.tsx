@@ -4,6 +4,7 @@ import {
 } from "@/components/data-table/data-table";
 import { DataTablePagination } from "@/components/data-table/data-table-pagination";
 import { useListQueryParams } from "@/hooks/use-list-query-params";
+import { tourAttr } from "@/tour/tour-targets";
 import { dateFormatter } from "@/utils/date-formatter";
 import { Link } from "react-router-dom";
 import {
@@ -80,7 +81,7 @@ const BackOfficeOrdersPage = () => {
   return (
     <section className="flex flex-col h-full">
       <PageHeaderWrapper className="flex flex-wrap items-center justify-between gap-4">
-        <div className="">
+        <div>
           <p className="text-sm text-slate-500">Operations</p>
           <h1 className="mt-1 text-3xl font-semibold">Orders</h1>
         </div>
@@ -108,18 +109,20 @@ const BackOfficeOrdersPage = () => {
         </div>
       </PageHeaderWrapper>
       <PageTableWrapper>
-        <DataTable
-          tableId="admin-orders"
-          columns={columns}
-          data={data?.data ?? []}
-          getRowId={(order) => order.id}
-          isLoading={isLoading || isFetching}
-          isError={isError}
-          errorState={
-            <div className="py-12 text-red-600">Unable to load orders.</div>
-          }
-          emptyState="No orders found."
-        />
+        <div {...tourAttr("orders-table")}>
+          <DataTable
+            tableId="admin-orders"
+            columns={columns}
+            data={data?.data ?? []}
+            getRowId={(order) => order.id}
+            isLoading={isLoading || isFetching}
+            isError={isError}
+            errorState={
+              <div className="py-12 text-red-600">Unable to load orders.</div>
+            }
+            emptyState="No orders found."
+          />
+        </div>
       </PageTableWrapper>
       <div className="sticky bottom-0 bg-white/90 px-4 md:px-6 lg:px-8 py-2 border-t border-yellow-700">
         <DataTablePagination

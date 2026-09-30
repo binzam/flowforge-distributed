@@ -6,6 +6,69 @@
   --color-light-green: #a4be7b;
   --color-green: #5f8d4e;
   --color-dark-green: #285430;
+
+  --color-ink-950: #0b1f1a;
+  --color-ink-900: #10241e;
+  --color-ink-800: #163329;
+  --color-ink-700: #1e4436;
+  --color-ink-600: #2a5c48;
+
+  --color-surface: #f7f5f0;
+  --color-surface-raised: #ffffff;
+  --color-surface-sunken: #efece3;
+
+  --color-amber-50: #fdf3e3;
+  --color-amber-100: #f9e2b8;
+  --color-amber-300: #eab763;
+  --color-amber-500: #c98a3e;
+  --color-amber-600: #a86c2c;
+  --color-amber-700: #85541f;
+
+  --color-clay-500: #b3432b;
+  --color-clay-600: #96371f;
+
+  --color-text-primary: #16211d;
+  --color-text-muted: #5b675f;
+  --color-text-faint: #8b968e;
+
+
+  --shadow-card:
+    0 1px 2px rgba(16, 36, 30, 0.04), 0 8px 24px -12px rgba(16, 36, 30, 0.18);
+  --shadow-popover:
+    0 12px 40px -8px rgba(16, 36, 30, 0.35), 0 2px 8px rgba(16, 36, 30, 0.12);
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    background-color: var(--color-surface);
+  }
+  ::selection {
+    background-color: var(--color-amber-300);
+    color: var(--color-ink-950);
+  }
+}
+
+@keyframes tour-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(250, 248, 248, 0.9);
+  }
+  50% {
+    box-shadow: 0 0 0 7px rgba(201, 138, 62, 0);
+  }
+}
+
+@layer utilities {
+  .font-tabular {
+    font-variant-numeric: tabular-nums;
+  }
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-ink-600) transparent;
+  }
 }
 
 .Toastify__toast {

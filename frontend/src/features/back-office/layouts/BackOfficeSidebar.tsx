@@ -1,74 +1,9 @@
+import { getMenuItemsForRole } from "@/config/menu-items";
 import { useAuth } from "@/features/auth/hooks/use-auth";
-import {
-  Bell,
-  Box,
-  BriefcaseBusiness,
-  CreditCard,
-  Home,
-  LayoutDashboard,
-  Package,
-  ShieldCheck,
-  Truck,
-  Users,
-} from "lucide-react";
+import { tourAttr } from "@/tour/tour-targets";
+import { ShieldCheck } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 
-const menuItems = [
-  {
-    label: "Store Front",
-    path: "/",
-    icon: Home,
-    allowedRoles: ["admin", "warehouse"],
-  },
-  {
-    label: "Dashboard",
-    path: "/portal",
-    icon: LayoutDashboard,
-    allowedRoles: ["admin", "warehouse"],
-  },
-  {
-    label: "Products",
-    path: "products",
-    icon: Package,
-    allowedRoles: ["admin", "warehouse"],
-  },
-  {
-    label: "Orders",
-    path: "orders",
-    icon: BriefcaseBusiness,
-    allowedRoles: ["admin", "warehouse"],
-  },
-  {
-    label: "Payments",
-    path: "payments",
-    icon: CreditCard,
-    allowedRoles: ["admin"],
-  },
-  {
-    label: "Inventory",
-    path: "inventory",
-    icon: Box,
-    allowedRoles: ["admin", "warehouse"],
-  },
-  {
-    label: "Fulfillments",
-    path: "fulfillments",
-    icon: Truck,
-    allowedRoles: ["admin", "warehouse"],
-  },
-  {
-    label: "Users",
-    path: "users",
-    icon: Users,
-    allowedRoles: ["admin"],
-  },
-  {
-    label: "Notifications",
-    path: "notifications",
-    icon: Bell,
-    allowedRoles: ["admin", "warehouse"],
-  },
-];
 const uuidRegex =
   /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -78,13 +13,12 @@ const BackOfficeSidebar = () => {
   const { user } = useAuth();
   const userRole = user?.role;
 
-  const visibleMenuItems = menuItems.filter((item) =>
-    userRole ? item.allowedRoles.includes(userRole) : false,
-  );
+  const visibleMenuItems = getMenuItemsForRole(userRole);
+
   return (
     <aside className="w-74 hidden md:flex flex-col bg-white border-r border-yellow-700 shrink-0">
       <div
-        className={`flex items-center px-6 sm:px-8 border-b border-yellow-700  transition-all duration-300 ease-in-out  ${
+        className={`flex items-center px-6 sm:px-8 border-b border-yellow-700 transition-all duration-300 ease-in-out ${
           isDetailsPage ? "h-16" : "h-[7rem]"
         }`}
       >
@@ -97,9 +31,10 @@ const BackOfficeSidebar = () => {
       </div>
 
       <nav className="flex-1 overflow-y-auto p-2 flex flex-col gap-4">
-        {visibleMenuItems.map(({ label, path, icon: Icon }) => (
+        {visibleMenuItems.map(({ label, path, icon: Icon, tourId }) => (
           <NavLink
             key={path}
+            {...tourAttr(tourId)}
             to={path}
             end={path === "/portal"}
             className={({ isActive }) =>

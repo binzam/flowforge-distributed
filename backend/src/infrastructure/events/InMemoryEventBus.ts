@@ -15,4 +15,6 @@ export class InMemoryEventBus implements EventBus {
   ): void {
     this.emitter.on(eventType, handler);
   }
+
+  async start(): Promise<void> {}
 }

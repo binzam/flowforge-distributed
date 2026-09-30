@@ -5,7 +5,7 @@ import { config } from "./config/env.js";
 import { registerEventHandlers } from "./bootstrap/registerEventHandlers.js";
 import { redisClient } from "./infrastructure/redis/redisClient.js";
 import { initializeWebSocketServer } from "./infrastructure/websocket/index.js";
-import { KafkaConsumer } from "./infrastructure/kafka/KafkaConsumer.js";
+import { eventBus } from "./infrastructure/events/eventBusInstance.js";
 
 const startServer = async () => {
   try {
@@ -21,19 +21,13 @@ const startServer = async () => {
 
     // WebSocket
     const websocketServer = initializeWebSocketServer(httpServer);
+
+    // Domain event handlers
     registerEventHandlers(websocketServer);
 
     // Kafka
-    const kafkaConsumer = new KafkaConsumer("flowforge-api");
-
-    await kafkaConsumer.connect();
-    await kafkaConsumer.subscribe("flowforge.events");
-
-    void kafkaConsumer.run(async (message) => {
-      console.log("Kafka message received:", message);
-    });
-
-    console.log("Kafka consumer connected");
+    await eventBus.start();
+    console.log("Kafka event bus started");
 
     // HTTP server
     httpServer.listen(config.port, () => {

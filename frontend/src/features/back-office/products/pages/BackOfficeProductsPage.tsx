@@ -20,7 +20,7 @@ import type {
   ProductPayload,
   UpdateProductPayload,
 } from "../types/product-types";
-import { tourAttr } from "@/tour/tour-targets";
+import { target } from "@/tour/onboarding"
 
 const BackOfficeProductsPage = () => {
   const { data, isLoading, isError } = useGetProducts();
@@ -153,7 +153,7 @@ const BackOfficeProductsPage = () => {
             <button
               type="button"
               onClick={() => openEditModal(row.original)}
-              {...(row.index === 0 ? tourAttr("product-edit-button") : {})}
+              {...(row.index === 0 ? target("product-edit-button") : {})}
               className="inline-flex items-center gap-1 border border-slate-300 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 transition-colors hover:border-slate-400 hover:text-slate-900"
             >
               <Pencil className="h-3.5 w-3.5" />
@@ -163,7 +163,7 @@ const BackOfficeProductsPage = () => {
               type="button"
               onClick={() => handleDelete(row.original)}
               disabled={isDeleting}
-              {...(row.index === 0 ? tourAttr("product-delete-button") : {})}
+              {...(row.index === 0 ? target("product-delete-button") : {})}
               className="inline-flex items-center gap-1 border border-red-200 bg-red-50 px-2.5 py-1.5 text-xs font-medium text-red-700 transition-colors hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
             >
               <Trash2 className="h-3.5 w-3.5" />
@@ -194,7 +194,7 @@ const BackOfficeProductsPage = () => {
         </button>
       </PageHeaderWrapper>
       <PageTableWrapper>
-        <div {...tourAttr("products-table")}>
+        <div {...target("products-table")}>
           <DataTable
             tableId="admin-products"
             columns={columns}
@@ -208,7 +208,7 @@ const BackOfficeProductsPage = () => {
             emptyState="No products found."
             getRowProps={(_, index) => {
               if (index === 0) {
-                return tourAttr("products-table-first-row");
+                return target("products-table-first-row");
               }
               return {};
             }}

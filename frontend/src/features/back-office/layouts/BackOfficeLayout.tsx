@@ -1,24 +1,15 @@
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import LoadingScreen from "@/components/LoadingScreen";
+import { useOnboarding } from "@/tour/onboarding";
+import { useDashboardTour } from "@/tour/use-dashboard-tour";
+import { Suspense } from "react";
+import { Outlet, useLocation } from "react-router-dom";
 import BackOfficeHeader from "./BackOfficeHeader";
 import BackOfficeSidebar from "./BackOfficeSidebar";
-import { Suspense, useMemo, useState } from "react";
-import LoadingScreen from "@/components/LoadingScreen";
-import { useAutoStartTour, useTour } from "@/tour";
-import { createDashboardTour } from "@/tour/dashboardTour";
-import { useAuth } from "@/features/auth/hooks/use-auth";
 
 const BackOfficeLayout = () => {
   const location = useLocation();
-  const navigate = useNavigate();
-  const { user } = useAuth();
-  const [view] = useState<"dashboard" | "members">("dashboard");
-  const { startTour } = useTour();
-
-  const dashboardTour = useMemo(
-    () => createDashboardTour({ role: user?.role, navigate }),
-    [user?.role, navigate],
-  );
-  useAutoStartTour(dashboardTour, { enabled: view === "dashboard" });
+  const { startTour } = useOnboarding();
+  const dashboardTour = useDashboardTour();
 
   function handleStartTour() {
     startTour(dashboardTour);

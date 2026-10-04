@@ -1,16 +1,16 @@
 import { AuthProvider } from "./features/auth/providers/AuthProvider";
 import { NotificationSocketWrapper } from "./features/notifications/components/NotificationSocketWrapper";
 import AppRoutes from "./routes/AppRoutes";
-import { TourProvider } from "./tour";
+import { OnboardingProvider } from "./tour/OnboardingProvider";
 
 function App() {
   return (
     <AuthProvider>
-      <TourProvider>
+      <OnboardingProvider>
         <NotificationSocketWrapper>
           <AppRoutes />
         </NotificationSocketWrapper>
-      </TourProvider>
+      </OnboardingProvider>
     </AuthProvider>
   );
 }

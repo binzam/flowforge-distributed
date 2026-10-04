@@ -1,6 +1,6 @@
 import { getMenuItemsForRole } from "@/config/menu-items";
 import { useAuth } from "@/features/auth/hooks/use-auth";
-import { tourAttr } from "@/tour/tour-targets";
+import { target } from "@/tour/onboarding";
 import { ShieldCheck } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 
@@ -34,7 +34,7 @@ const BackOfficeSidebar = () => {
         {visibleMenuItems.map(({ label, path, icon: Icon, tourId }) => (
           <NavLink
             key={path}
-            {...tourAttr(tourId)}
+            {...target(tourId)}
             to={path}
             end={path === "/portal"}
             className={({ isActive }) =>

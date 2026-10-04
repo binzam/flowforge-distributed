@@ -4,7 +4,7 @@ import {
 } from "@/components/data-table/data-table";
 import { DataTablePagination } from "@/components/data-table/data-table-pagination";
 import { useListQueryParams } from "@/hooks/use-list-query-params";
-import { tourAttr } from "@/tour/tour-targets";
+import { target } from "@/tour/onboarding";
 import { dateFormatter } from "@/utils/date-formatter";
 import { Link } from "react-router-dom";
 import {
@@ -85,7 +85,7 @@ const BackOfficeOrdersPage = () => {
           <p className="text-sm text-slate-500">Operations</p>
           <h1 className="mt-1 text-3xl font-semibold">Orders</h1>
         </div>
-        <div className="flex flex-wrap gap-2" {...tourAttr("orders-table-filter")}>
+        <div className="flex flex-wrap gap-2" {...target("orders-table-filter")}>
           <input
             value={filters.userId ?? ""}
             onChange={(event) => setFilter("userId", event.target.value)}
@@ -109,7 +109,7 @@ const BackOfficeOrdersPage = () => {
         </div>
       </PageHeaderWrapper>
       <PageTableWrapper>
-        <div {...tourAttr("orders-table")}>
+        <div {...target("orders-table")}>
           <DataTable
             tableId="admin-orders"
             columns={columns}

@@ -62,6 +62,7 @@ body {
 
 .scroll-container {
   scrollbar-width: thin;
+  scrollbar-gutter: stable;
 }
 
 .scroll-container::-webkit-scrollbar {

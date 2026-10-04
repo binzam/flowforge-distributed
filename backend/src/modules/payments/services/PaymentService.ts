@@ -149,7 +149,7 @@ export class PaymentService {
       await this.paymentRepository.updateStatus(payment.id, "successful");
 
       await this.orderService.markAsPaid(payment.orderId);
-      this.eventBus.publish(
+      await this.eventBus.publish(
         new PaymentCompletedEvent({
           paymentId: payment.id,
           orderId: payment.orderId,

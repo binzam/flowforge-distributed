@@ -48,7 +48,7 @@ export const registerPaymentCompletedHandler = (
     try {
       await inventoryService.reserveStock(order);
 
-      eventBus.publish(
+      await eventBus.publish(
         new InventoryReservedEvent({
           orderId,
         }),

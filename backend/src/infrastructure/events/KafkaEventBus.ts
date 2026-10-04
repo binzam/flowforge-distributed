@@ -14,6 +14,8 @@ export class KafkaEventBus implements EventBus {
   ) {}
 
   async publish<K extends keyof EventMap>(event: EventMap[K]): Promise<void> {
+    console.log("KafkaEventBus : publish : EVENT", event);
+
     await this.producer.publish("flowforge.events", {
       type: event.type,
       occurredAt: event.occurredAt.toISOString(),
@@ -33,6 +35,7 @@ export class KafkaEventBus implements EventBus {
   }
 
   async start(): Promise<void> {
+    await this.producer.connect();
     await this.consumer.connect();
 
     await this.consumer.subscribe("flowforge.events");

@@ -1,7 +1,8 @@
 import { useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, X } from "lucide-react";
-import { useForm } from "react-hook-form";
+import { useForm, type DefaultValues } from "react-hook-form";
+import { PRODUCT_CATEGORY_OPTIONS } from "../constants/product-categories";
 import {
   productFormSchema,
   type ProductFormValues,
@@ -17,11 +18,12 @@ interface ProductFormModalProps {
   onSubmit: (values: ProductFormValues) => void;
 }
 
-const defaultValues: ProductFormValues = {
+const defaultValues: DefaultValues<ProductFormValues> = {
   name: "",
   description: "",
   sku: "",
   price: "",
+  category: undefined,
 };
 
 const ProductFormModal = ({
@@ -52,6 +54,7 @@ const ProductFormModal = ({
             description: product.description ?? "",
             sku: product.sku,
             price: product.price,
+            category: product.category,
           }
         : defaultValues,
     );
@@ -176,6 +179,36 @@ const ProductFormModal = ({
               />
               {errors.price && (
                 <p className="text-xs text-red-600">{errors.price.message}</p>
+              )}
+            </div>
+
+            <div className="space-y-1 md:col-span-2">
+              <label
+                htmlFor="category"
+                className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-600"
+              >
+                Category
+              </label>
+              <select
+                id="category"
+                {...register("category")}
+                className={`w-full border bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition-colors ${
+                  errors.category
+                    ? "border-red-300"
+                    : "border-slate-300 focus:border-slate-900"
+                }`}
+              >
+                <option value="">Select a category</option>
+                {PRODUCT_CATEGORY_OPTIONS.map(({ value, label }) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+              {errors.category && (
+                <p className="text-xs text-red-600">
+                  {errors.category.message}
+                </p>
               )}
             </div>
           </div>

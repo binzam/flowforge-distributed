@@ -3,27 +3,58 @@ import {
   type DataTableColumnDef,
 } from "@/components/data-table/data-table";
 import { dateFormatter } from "@/utils/date-formatter";
-import { Pencil, Plus, Trash2 } from "lucide-react";
-import { useCallback, useMemo, useState } from "react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Pencil,
+  Plus,
+  Search,
+  Trash2,
+} from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import PageHeaderWrapper from "../../layouts/PageHeaderWrapper";
 import PageTableWrapper from "../../layouts/PageTableWrapper";
 import ProductFormModal from "../components/ProductFormModal";
+import {
+  isProductCategory,
+  PRODUCT_CATEGORY_LABELS,
+  PRODUCT_CATEGORY_OPTIONS,
+  type ProductCategory,
+} from "../constants/product-categories";
 import {
   useCreateProduct,
   useDeleteProduct,
   useGetProducts,
   useUpdateProduct,
 } from "../hooks/product-hooks";
+import { useDebouncedValue } from "../hooks/use-debounced-value";
 import { type ProductFormValues } from "../schemas/product-schema";
 import type {
+  GetProductsParams,
   Product,
   ProductPayload,
-  UpdateProductPayload,
 } from "../types/product-types";
-import { target } from "@/tour/onboarding"
+import { target } from "@/tour/onboarding";
+
+const PAGE_SIZE = 10;
 
 const BackOfficeProductsPage = () => {
-  const { data, isLoading, isError } = useGetProducts();
+  const [searchInput, setSearchInput] = useState("");
+  const [category, setCategory] = useState<ProductCategory | "">("");
+  const [page, setPage] = useState(1);
+
+  const debouncedSearch = useDebouncedValue(searchInput.trim());
+  const offset = (page - 1) * PAGE_SIZE;
+
+  const params: GetProductsParams = {
+    search: debouncedSearch || undefined,
+    category: category || undefined,
+    limit: PAGE_SIZE,
+    offset,
+  };
+
+  const { data, isLoading, isError, isPlaceholderData } =
+    useGetProducts(params);
   const { mutate: createProduct, isPending: isCreating } = useCreateProduct();
   const { mutate: updateProduct, isPending: isUpdating } = useUpdateProduct();
   const { mutate: deleteProduct, isPending: isDeleting } = useDeleteProduct();
@@ -31,6 +62,31 @@ const BackOfficeProductsPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<"create" | "edit">("create");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  const total = data?.total ?? 0;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const rangeStart = total === 0 ? 0 : offset + 1;
+  const rangeEnd = offset + (data?.data.length ?? 0);
+  const hasFilters = debouncedSearch !== "" || category !== "";
+
+  // If the current page no longer exists (e.g. the last item on the last page
+  // was deleted), step back to the last valid page.
+  useEffect(() => {
+    if (!isPlaceholderData && page > totalPages) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setPage(totalPages);
+    }
+  }, [isPlaceholderData, page, totalPages]);
+
+  const handleSearchChange = (value: string) => {
+    setSearchInput(value);
+    setPage(1);
+  };
+
+  const handleCategoryChange = (value: string) => {
+    setCategory(isProductCategory(value) ? value : "");
+    setPage(1);
+  };
 
   const openCreateModal = () => {
     setModalMode("create");
@@ -51,13 +107,16 @@ const BackOfficeProductsPage = () => {
 
   const handleSubmit = (values: ProductFormValues) => {
     const normalizedDescription = values.description?.trim();
-    const payload = {
-      ...values,
+    const payload: ProductPayload = {
+      name: values.name,
       description: normalizedDescription ? normalizedDescription : null,
+      sku: values.sku,
+      price: values.price,
+      category: values.category,
     };
 
     if (modalMode === "create") {
-      createProduct(payload as ProductPayload, {
+      createProduct(payload, {
         onSuccess: () => closeModal(),
       });
       return;
@@ -67,15 +126,8 @@ const BackOfficeProductsPage = () => {
       return;
     }
 
-    const patchPayload: UpdateProductPayload = {
-      name: payload.name,
-      description: payload.description,
-      sku: payload.sku,
-      price: payload.price,
-    };
-
     updateProduct(
-      { id: selectedProduct.id, payload: patchPayload },
+      { id: selectedProduct.id, payload },
       { onSuccess: () => closeModal() },
     );
   };
@@ -109,6 +161,15 @@ const BackOfficeProductsPage = () => {
         header: "SKU",
         cell: (info) => (
           <span className="text-slate-600">{info.getValue<string>()}</span>
+        ),
+      },
+      {
+        accessorKey: "category",
+        header: "Category",
+        cell: (info) => (
+          <span className="text-slate-600">
+            {PRODUCT_CATEGORY_LABELS[info.getValue<ProductCategory>()]}
+          </span>
         ),
       },
       {
@@ -194,7 +255,40 @@ const BackOfficeProductsPage = () => {
         </button>
       </PageHeaderWrapper>
       <PageTableWrapper>
-        <div {...target("products-table")}>
+        <div className="mb-4 flex flex-wrap items-center gap-3">
+          <div className="relative w-full max-w-xs">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <input
+              type="search"
+              value={searchInput}
+              onChange={(event) => handleSearchChange(event.target.value)}
+              placeholder="Search by product name"
+              aria-label="Search products by name"
+              className="w-full border border-slate-300 bg-white py-2 pl-9 pr-3 text-sm text-slate-900 outline-none transition-colors focus:border-slate-900"
+            />
+          </div>
+
+          <select
+            value={category}
+            onChange={(event) => handleCategoryChange(event.target.value)}
+            aria-label="Filter products by category"
+            className="border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition-colors focus:border-slate-900"
+          >
+            <option value="">All categories</option>
+            {PRODUCT_CATEGORY_OPTIONS.map(({ value, label }) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div
+          className={
+            isPlaceholderData ? "opacity-60 transition-opacity" : undefined
+          }
+          {...target("products-table")}
+        >
           <DataTable
             tableId="admin-products"
             columns={columns}
@@ -205,7 +299,11 @@ const BackOfficeProductsPage = () => {
             errorState={
               <div className="py-12 text-red-600">Unable to load products.</div>
             }
-            emptyState="No products found."
+            emptyState={
+              hasFilters
+                ? "No products match your filters."
+                : "No products found."
+            }
             getRowProps={(_, index) => {
               if (index === 0) {
                 return target("products-table-first-row");
@@ -214,6 +312,40 @@ const BackOfficeProductsPage = () => {
             }}
           />
         </div>
+
+        {total > 0 && (
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm text-slate-600">
+            <p>
+              Showing {rangeStart}–{rangeEnd} of {total}
+            </p>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setPage((current) => Math.max(1, current - 1))}
+                disabled={page <= 1}
+                className="inline-flex items-center gap-1 border border-slate-300 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 transition-colors hover:border-slate-400 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                <ChevronLeft className="h-3.5 w-3.5" />
+                Previous
+              </button>
+              <span className="px-1 text-xs">
+                Page {page} of {totalPages}
+              </span>
+              <button
+                type="button"
+                onClick={() =>
+                  setPage((current) => Math.min(totalPages, current + 1))
+                }
+                disabled={page >= totalPages || isPlaceholderData}
+                className="inline-flex items-center gap-1 border border-slate-300 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 transition-colors hover:border-slate-400 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                Next
+                <ChevronRight className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          </div>
+        )}
       </PageTableWrapper>
       <ProductFormModal
         open={isModalOpen}

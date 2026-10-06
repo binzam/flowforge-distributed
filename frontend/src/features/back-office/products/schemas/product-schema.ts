@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { PRODUCT_CATEGORIES } from "../constants/product-categories";
 
 export const productFormSchema = z.object({
   name: z
@@ -25,6 +26,7 @@ export const productFormSchema = z.object({
     .refine((value) => Number(value) >= 0, {
       message: "Price cannot be negative",
     }),
+  category: z.enum(PRODUCT_CATEGORIES, { message: "Category is required" }),
 });
 
 export type ProductFormValues = z.infer<typeof productFormSchema>;

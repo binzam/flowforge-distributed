@@ -1,11 +1,29 @@
 import type { Pool } from "pg";
 import { AppError } from "../../../errors/AppError.js";
 import { handlePostgresError } from "../../../errors/postgresErrors.js";
-import type { Product } from "../types/product.types.js";
+import type { FindProductsResult, Product } from "../types/product.types.js";
 import type {
-  UpdateProductInput,
   CreateProductInput,
+  GetProductsQuery,
+  UpdateProductInput,
 } from "../schemas/product.schemas.js";
+
+const PRODUCT_COLUMNS = `
+  id,
+  name,
+  description,
+  sku,
+  price,
+  category,
+  is_active AS "isActive",
+  created_at AS "createdAt",
+  updated_at AS "updatedAt"
+`;
+
+// Escapes LIKE/ILIKE wildcards so user input like "50%" or "a_b" is matched literally.
+function escapeLikePattern(value: string): string {
+  return value.replace(/[\\%_]/g, "\\$&");
+}
 
 export class ProductRepository {
   constructor(private readonly db: Pool) {}
@@ -18,20 +36,19 @@ export class ProductRepository {
           name,
           description,
           sku,
-          price
-        )
-        VALUES ($1, $2, $3, $4)
-        RETURNING
-          id,
-          name,
-          description,
-          sku,
           price,
-          is_active AS "isActive",
-          created_at AS "createdAt",
-          updated_at AS "updatedAt";
+          category
+        )
+        VALUES ($1, $2, $3, $4, $5)
+        RETURNING ${PRODUCT_COLUMNS};
         `,
-        [input.name, input.description, input.sku, input.price],
+        [
+          input.name,
+          input.description ?? null,
+          input.sku,
+          input.price,
+          input.category,
+        ],
       );
 
       const product = result.rows[0];
@@ -49,15 +66,7 @@ export class ProductRepository {
   async findById(id: string): Promise<Product | null> {
     const result = await this.db.query<Product>(
       `
-      SELECT
-        id,
-        name,
-        description,
-        sku,
-        price,
-        is_active AS "isActive",
-        created_at AS "createdAt",
-        updated_at AS "updatedAt"
+      SELECT ${PRODUCT_COLUMNS}
       FROM products
       WHERE id = $1;
       `,
@@ -67,25 +76,53 @@ export class ProductRepository {
     return result.rows[0] ?? null;
   }
 
-  async findAll(): Promise<Product[]> {
-    const result = await this.db.query<Product>(
-      `
-      SELECT
-        id,
-        name,
-        description,
-        sku,
-        price,
-        is_active AS "isActive",
-        created_at AS "createdAt",
-        updated_at AS "updatedAt"
-      FROM products
-      WHERE is_active = TRUE
-      ORDER BY created_at DESC;
-      `,
-    );
+  async findAll(options: GetProductsQuery): Promise<FindProductsResult> {
+    const { category, search, limit, offset } = options;
 
-    return result.rows;
+    const values: unknown[] = [];
+    const conditions: string[] = ["is_active = TRUE"];
+
+    if (category !== undefined) {
+      values.push(category);
+      conditions.push(`category = $${values.length}`);
+    }
+
+    if (search !== undefined) {
+      values.push(`%${escapeLikePattern(search)}%`);
+      conditions.push(`name ILIKE $${values.length}`);
+    }
+
+    const whereClause = `WHERE ${conditions.join(" AND ")}`;
+
+    const limitPlaceholder = `$${values.length + 1}`;
+    const offsetPlaceholder = `$${values.length + 2}`;
+
+    const [countResult, productsResult] = await Promise.all([
+      this.db.query<{ total: string }>(
+        `
+        SELECT COUNT(*) AS total
+        FROM products
+        ${whereClause};
+        `,
+        values,
+      ),
+      this.db.query<Product>(
+        `
+        SELECT ${PRODUCT_COLUMNS}
+        FROM products
+        ${whereClause}
+        ORDER BY created_at DESC, id DESC
+        LIMIT ${limitPlaceholder}
+        OFFSET ${offsetPlaceholder};
+        `,
+        [...values, limit, offset],
+      ),
+    ]);
+
+    return {
+      products: productsResult.rows,
+      total: Number(countResult.rows[0]?.total ?? 0),
+    };
   }
 
   async update(id: string, input: UpdateProductInput): Promise<Product> {
@@ -113,6 +150,11 @@ export class ProductRepository {
         values.push(input.price);
       }
 
+      if (input.category !== undefined) {
+        fields.push(`category = $${values.length + 1}`);
+        values.push(input.category);
+      }
+
       fields.push(`updated_at = NOW()`);
 
       values.push(id);
@@ -122,15 +164,7 @@ export class ProductRepository {
         UPDATE products
         SET ${fields.join(", ")}
         WHERE id = $${values.length}
-        RETURNING
-          id,
-          name,
-          description,
-          sku,
-          price,
-          is_active AS "isActive",
-          created_at AS "createdAt",
-          updated_at AS "updatedAt";
+        RETURNING ${PRODUCT_COLUMNS};
         `,
         values,
       );
@@ -164,21 +198,14 @@ export class ProductRepository {
       throw new AppError("Product not found", 404);
     }
   }
+
   async findBySku(sku: string): Promise<Product | null> {
     const result = await this.db.query<Product>(
       `
-    SELECT
-      id,
-      name,
-      description,
-      sku,
-      price,
-      is_active AS "isActive",
-      created_at AS "createdAt",
-      updated_at AS "updatedAt"
-    FROM products
-    WHERE sku = $1;
-    `,
+      SELECT ${PRODUCT_COLUMNS}
+      FROM products
+      WHERE sku = $1;
+      `,
       [sku],
     );
 

@@ -1,14 +1,16 @@
 import { AppError } from "../../../errors/AppError.js";
 import type {
   CreateProductInput,
+  GetProductsQuery,
   UpdateProductInput,
 } from "../schemas/product.schemas.js";
 import type { ProductRepository } from "../repositories/ProductRepository.js";
+import type { FindProductsResult, Product } from "../types/product.types.js";
 
 export class ProductService {
   constructor(private readonly productRepository: ProductRepository) {}
 
-  async createProduct(input: CreateProductInput) {
+  async createProduct(input: CreateProductInput): Promise<Product> {
     const existingProduct = await this.productRepository.findBySku(input.sku);
 
     if (existingProduct) {
@@ -20,10 +22,11 @@ export class ProductService {
       description: input.description,
       sku: input.sku,
       price: input.price,
+      category: input.category,
     });
   }
 
-  async getProductById(id: string) {
+  async getProductById(id: string): Promise<Product> {
     const product = await this.productRepository.findById(id);
 
     if (!product) {
@@ -33,11 +36,11 @@ export class ProductService {
     return product;
   }
 
-  async getProducts() {
-    return this.productRepository.findAll();
+  async getProducts(query: GetProductsQuery): Promise<FindProductsResult> {
+    return this.productRepository.findAll(query);
   }
 
-  async updateProduct(id: string, input: UpdateProductInput) {
+  async updateProduct(id: string, input: UpdateProductInput): Promise<Product> {
     const product = await this.productRepository.findById(id);
 
     if (!product) {

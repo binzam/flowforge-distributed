@@ -1,13 +1,18 @@
 import { apiClient } from "@/lib/api-client";
 import type {
+  GetProductsParams,
   ProductPayload,
   ProductResponse,
   ProductsResponse,
   UpdateProductPayload,
 } from "../types/product-types";
 
-export const getProducts = async (): Promise<ProductsResponse> => {
-  const response = await apiClient.get<ProductsResponse>("/products");
+export const getProducts = async (
+  params: GetProductsParams = {},
+): Promise<ProductsResponse> => {
+  const response = await apiClient.get<ProductsResponse>("/products", {
+    params,
+  });
   return response.data;
 };
 

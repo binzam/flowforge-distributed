@@ -7,6 +7,7 @@ import { ProductRepository } from "./repositories/ProductRepository.js";
 import { ProductService } from "./services/ProductService.js";
 import {
   createProductSchema,
+  getProductsQuerySchema,
   productIdSchema,
   updateProductSchema,
 } from "./schemas/product.schemas.js";
@@ -19,7 +20,11 @@ const productService = new ProductService(productRepository);
 const productController = new ProductController(productService);
 
 // Public
-router.get("/", productController.getAll);
+router.get(
+  "/",
+  validate(getProductsQuerySchema, "query"),
+  productController.getAll,
+);
 
 router.get(
   "/:id",

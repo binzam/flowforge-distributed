@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query";
 import {
   createProduct,
   deleteProduct,
@@ -7,15 +7,17 @@ import {
   updateProduct,
 } from "../services/product-services";
 import type {
+  GetProductsParams,
   ProductPayload,
   UpdateProductPayload,
 } from "../types/product-types";
 import { queryClient } from "@/lib/query-client";
 
-export const useGetProducts = () =>
+export const useGetProducts = (params: GetProductsParams = {}) =>
   useQuery({
-    queryKey: ["admin-products"],
-    queryFn: getProducts,
+    queryKey: ["admin-products", "list", params],
+    queryFn: () => getProducts(params),
+    placeholderData: keepPreviousData,
   });
 
 export const useGetProduct = (id: string) =>

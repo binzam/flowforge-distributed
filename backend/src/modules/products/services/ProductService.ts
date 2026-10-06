@@ -29,7 +29,7 @@ export class ProductService {
   async getProductById(id: string): Promise<Product> {
     const product = await this.productRepository.findById(id);
 
-    if (!product) {
+    if (!product || !product.isActive) {
       throw new AppError("Product not found", 404);
     }
 
